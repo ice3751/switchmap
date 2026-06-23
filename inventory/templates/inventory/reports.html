@@ -1,0 +1,88 @@
+{% extends "inventory/base.html" %}
+{% block title %}گزارش‌ها | SwitchMap{% endblock %}
+{% block page_title %}گزارش‌ها{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">گزارش‌ها پیش‌فرض بسته هستند؛ هر بخش را فقط در صورت نیاز باز کن.</p>{% endblock %}
+{% block page_actions %}
+<div class="toolbar-group">
+    <a class="btn btn-secondary" href="{% url 'inventory:export_ports_csv' %}">Export CSV</a>
+    <a class="btn btn-secondary" href="{% url 'inventory:asset_documentation' %}">Asset Docs</a>
+</div>
+{% endblock %}
+
+{% block content %}
+<section class="summary-bar-grid report-count-grid">
+    <div class="summary-tile"><span>سوییچ‌ها</span><strong>{{ switches|length }}</strong></div>
+    <div class="summary-tile"><span>پورت آزاد</span><strong>{{ free_ports|length }}</strong></div>
+    <div class="summary-tile"><span>فعال بدون مستندات</span><strong>{{ active_undocumented_ports|length }}</strong></div>
+    <div class="summary-tile"><span>Trunk</span><strong>{{ trunk_ports|length }}</strong></div>
+    <div class="summary-tile"><span>Neighbor</span><strong>{{ neighbor_ports|length }}</strong></div>
+    <div class="summary-tile"><span>PoE</span><strong>{{ poe_ports|length }}</strong></div>
+    <div class="summary-tile"><span>Multi-MAC</span><strong>{{ multi_mac_ports|length }}</strong></div>
+    <div class="summary-tile"><span>خطا</span><strong>{{ error_ports|length }}</strong></div>
+</section>
+
+<section class="report-accordion-list" data-report-accordion>
+    <details class="surface-card report-accordion-item">
+        <summary><span>پورت‌های آزاد احتمالی</span><strong>{{ free_ports|length }}</strong></summary>
+        <div class="table-wrap"><table class="data-table compact-table"><thead><tr><th>Switch</th><th>Interface</th><th>Room</th><th>Patch</th><th>Outlet</th></tr></thead><tbody>
+        {% for port in free_ports|slice:":100" %}
+            <tr><td><a class="table-link" href="{% url 'inventory:switch_detail' port.switch.id %}?port={{ port.id }}">{{ port.switch.name }}</a></td><td class="ltr">{{ port.interface_name }}</td><td>{{ port.room|default:"-" }}</td><td>{{ port.patch_panel|default:"-" }}</td><td>{{ port.outlet|default:"-" }}</td></tr>
+        {% empty %}<tr><td colspan="5">موردی نیست.</td></tr>{% endfor %}
+        </tbody></table></div>
+    </details>
+
+    <details class="surface-card report-accordion-item">
+        <summary><span>فعال بدون مستندات</span><strong>{{ active_undocumented_ports|length }}</strong></summary>
+        <div class="table-wrap"><table class="data-table compact-table"><thead><tr><th>Switch</th><th>Interface</th><th>MAC</th><th>Alias</th>{% if swmap_can_edit_port %}<th>Edit</th>{% endif %}</tr></thead><tbody>
+        {% for port in active_undocumented_ports|slice:":100" %}
+            <tr><td><a class="table-link" href="{% url 'inventory:switch_detail' port.switch.id %}?port={{ port.id }}">{{ port.switch.name }}</a></td><td class="ltr">{{ port.interface_name }}</td><td>{{ port.mac_count }}</td><td>{{ port.snmp_alias|default:"-" }}</td>{% if swmap_can_edit_port %}<td><a class="table-link" href="{% url 'inventory:port_edit' port.id %}">ویرایش</a></td>{% endif %}</tr>
+        {% empty %}<tr><td colspan="5">موردی نیست.</td></tr>{% endfor %}
+        </tbody></table></div>
+    </details>
+
+    <details class="surface-card report-accordion-item">
+        <summary><span>پورت‌های Trunk</span><strong>{{ trunk_ports|length }}</strong></summary>
+        <div class="table-wrap"><table class="data-table compact-table"><thead><tr><th>Switch</th><th>Interface</th><th>Native</th><th>Allowed VLANs</th><th>Neighbor</th></tr></thead><tbody>
+        {% for port in trunk_ports|slice:":100" %}
+            <tr><td><a class="table-link" href="{% url 'inventory:switch_detail' port.switch.id %}?port={{ port.id }}">{{ port.switch.name }}</a></td><td class="ltr">{{ port.interface_name }}</td><td>{{ port.native_vlan|default:"-" }}</td><td class="ltr">{{ port.trunk_vlans|default:"-" }}</td><td class="ltr">{{ port.neighbor_device|default:"-" }}</td></tr>
+        {% empty %}<tr><td colspan="5">موردی نیست.</td></tr>{% endfor %}
+        </tbody></table></div>
+    </details>
+
+    <details class="surface-card report-accordion-item">
+        <summary><span>دارای Neighbor</span><strong>{{ neighbor_ports|length }}</strong></summary>
+        <div class="table-wrap"><table class="data-table compact-table"><thead><tr><th>Switch</th><th>Interface</th><th>Source</th><th>Neighbor</th><th>Port</th></tr></thead><tbody>
+        {% for port in neighbor_ports|slice:":100" %}
+            <tr><td><a class="table-link" href="{% url 'inventory:switch_detail' port.switch.id %}?port={{ port.id }}">{{ port.switch.name }}</a></td><td class="ltr">{{ port.interface_name }}</td><td>{{ port.neighbor_source|default:"-" }}</td><td class="ltr">{{ port.neighbor_device|default:"-" }}</td><td class="ltr">{{ port.neighbor_port|default:"-" }}</td></tr>
+        {% empty %}<tr><td colspan="5">موردی نیست.</td></tr>{% endfor %}
+        </tbody></table></div>
+    </details>
+
+    <details class="surface-card report-accordion-item">
+        <summary><span>پورت‌های PoE فعال</span><strong>{{ poe_ports|length }}</strong></summary>
+        <div class="table-wrap"><table class="data-table compact-table"><thead><tr><th>Switch</th><th>Interface</th><th>PoE</th><th>Device</th><th>Description</th></tr></thead><tbody>
+        {% for port in poe_ports|slice:":100" %}
+            <tr><td><a class="table-link" href="{% url 'inventory:switch_detail' port.switch.id %}?port={{ port.id }}">{{ port.switch.name }}</a></td><td class="ltr">{{ port.interface_name }}</td><td>{{ port.poe_summary }}</td><td>{{ port.connected_device|default:"-" }}</td><td>{{ port.description|default:"-" }}</td></tr>
+        {% empty %}<tr><td colspan="5">موردی نیست.</td></tr>{% endfor %}
+        </tbody></table></div>
+    </details>
+
+    <details class="surface-card report-accordion-item">
+        <summary><span>پورت‌های Multi-MAC</span><strong>{{ multi_mac_ports|length }}</strong></summary>
+        <div class="table-wrap"><table class="data-table compact-table"><thead><tr><th>Switch</th><th>Interface</th><th>MAC Count</th><th>MAC Addresses</th><th>Neighbor</th></tr></thead><tbody>
+        {% for port in multi_mac_ports|slice:":100" %}
+            <tr><td><a class="table-link" href="{% url 'inventory:switch_detail' port.switch.id %}?port={{ port.id }}">{{ port.switch.name }}</a></td><td class="ltr">{{ port.interface_name }}</td><td>{{ port.mac_count }}</td><td class="ltr">{{ port.mac_addresses|default:"-" }}</td><td class="ltr">{{ port.neighbor_device|default:"-" }}</td></tr>
+        {% empty %}<tr><td colspan="5">موردی نیست.</td></tr>{% endfor %}
+        </tbody></table></div>
+    </details>
+
+    <details class="surface-card report-accordion-item">
+        <summary><span>پورت‌های دارای خطا</span><strong>{{ error_ports|length }}</strong></summary>
+        <div class="table-wrap"><table class="data-table compact-table"><thead><tr><th>Switch</th><th>Interface</th><th>Status</th><th>Alias</th><th>Neighbor</th></tr></thead><tbody>
+        {% for port in error_ports|slice:":100" %}
+            <tr><td><a class="table-link" href="{% url 'inventory:switch_detail' port.switch.id %}?port={{ port.id }}">{{ port.switch.name }}</a></td><td class="ltr">{{ port.interface_name }}</td><td>{{ port.get_status_display }}</td><td>{{ port.snmp_alias|default:"-" }}</td><td class="ltr">{{ port.neighbor_device|default:"-" }}</td></tr>
+        {% empty %}<tr><td colspan="5">موردی نیست.</td></tr>{% endfor %}
+        </tbody></table></div>
+    </details>
+</section>
+{% endblock %}

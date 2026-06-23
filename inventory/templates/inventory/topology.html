@@ -1,0 +1,286 @@
+{% extends "inventory/base.html" %}
+{% block title %}Topology | SwitchMap{% endblock %}
+{% block page_title %}Topology واقعی شبکه{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">نقشه واقعی‌تر از CDP / LLDP، Match بهتر Neighbor ها و نمایش گرافیکی لینک‌ها.</p>{% endblock %}
+{% block page_actions %}
+    {% if swmap_can_refresh %}
+        <form method="post" action="{% url 'inventory:poll_all_discovery' %}" class="inline-form">
+            {% csrf_token %}
+            <button class="btn btn-primary" type="submit">Update CDP / LLDP</button>
+        </form>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<section class="summary-bar-grid topology-summary-grid phase33-summary">
+    <div class="summary-tile"><span>سوییچ‌ها</span><strong>{{ switch_count }}</strong></div>
+    <div class="summary-tile"><span>لینک داخلی</span><strong>{{ matched_link_count }}</strong></div>
+    <div class="summary-tile warning-tile"><span>Unknown / External</span><strong>{{ external_link_count }}</strong></div>
+    <div class="summary-tile"><span>Uplink بدون Neighbor</span><strong>{{ unknown_uplink_count }}</strong></div>
+    <div class="summary-tile"><span>Duplicate</span><strong>{{ duplicate_link_count }}</strong></div>
+    <div class="summary-tile danger-tile"><span>Down / Error</span><strong>{{ down_link_count }}</strong></div>
+</section>
+
+<section class="surface-card topology-control-card">
+    <div class="topology-control-main">
+        <div>
+            <h3>Network Topology Overview</h3>
+            <p>سوییچ‌ها بر اساس نقش احتمالی گروه‌بندی شده‌اند. لینک‌های Down و Unknown در اولویت نمایش هستند.</p>
+        </div>
+        <div class="topology-health-strip">
+            <span class="topology-health-pill up">Up: {{ up_link_count }}</span>
+            <span class="topology-health-pill warning">Warning: {{ warning_link_count }}</span>
+            <span class="topology-health-pill down">Down: {{ down_link_count }}</span>
+        </div>
+    </div>
+</section>
+
+<section class="surface-card topology-visual-map-card">
+    <div class="section-title-row compact-title-row">
+        <div>
+            <h3>Visual Link Map</h3>
+            <p>نمای فشرده ارتباط سوییچ‌ها بر اساس لینک‌های Match شده. برای جزئیات، جدول‌های پایین صفحه را ببین.</p>
+        </div>
+        <span class="pill success">{{ matched_link_count }} Internal</span>
+    </div>
+
+    <div class="topology-visual-map">
+        <div class="topology-map-column core-column">
+            <div class="topology-map-column-title">Core / Distribution</div>
+            {% for node in topology_map.core_nodes %}
+                <a class="topology-map-node node-{{ node.role_key }} {% if node.is_isolated %}is-isolated{% endif %}" href="{% url 'inventory:switch_detail' node.switch.id %}">
+                    <strong>{{ node.switch.name }}</strong>
+                    <span class="ltr">{{ node.switch.management_ip }}</span>
+                    <small>{{ node.link_count }} links</small>
+                </a>
+            {% empty %}
+                <div class="empty-mini-card">Core شناسایی نشده.</div>
+            {% endfor %}
+        </div>
+
+        <div class="topology-map-links">
+            {% for link in topology_map.links|slice:":28" %}
+                <a class="topology-map-link health-{{ link.health }}" href="{% url 'inventory:switch_detail' link.source_switch.id %}?port={{ link.source_port.id }}">
+                    <span class="ltr">{{ link.source_switch.name }} / {{ link.source_port.interface_name }}</span>
+                    <b></b>
+                    <span class="ltr">{{ link.matched_switch.name }} / {% if link.matched_port %}{{ link.matched_port.interface_name }}{% else %}{{ link.neighbor_port|default:"-" }}{% endif %}</span>
+                    <em>{{ link.health_label }} • {{ link.matched_by }}</em>
+                </a>
+            {% empty %}
+                <div class="topology-map-empty">فعلاً لینک داخلی Match شده وجود ندارد.</div>
+            {% endfor %}
+        </div>
+
+        <div class="topology-map-column mikrotik-column">
+            <div class="topology-map-column-title">MikroTik / Edge / Remote / AP</div>
+            {% for node in topology_map.edge_nodes %}
+                <a class="topology-map-node node-{{ node.role_key }} {% if node.is_isolated %}is-isolated{% endif %}" href="{% url 'inventory:switch_detail' node.switch.id %}">
+                    <strong>{{ node.switch.name }}</strong>
+                    <span class="ltr">{{ node.switch.management_ip }}{% if node.switch.winbox_port %}:{{ node.switch.winbox_port }}{% endif %}</span>
+                    <small>{{ node.role_label }} • {{ node.switch.site|default:"-" }}</small>
+                </a>
+            {% endfor %}
+            {% for node in topology_map.remote_nodes %}
+                <a class="topology-map-node node-{{ node.role_key }} {% if node.is_isolated %}is-isolated{% endif %}" href="{% url 'inventory:switch_detail' node.switch.id %}">
+                    <strong>{{ node.switch.name }}</strong>
+                    <span class="ltr">{{ node.switch.management_ip }}{% if node.switch.winbox_port %}:{{ node.switch.winbox_port }}{% endif %}</span>
+                    <small>{{ node.role_label }} • {{ node.switch.site|default:"-" }}</small>
+                </a>
+            {% endfor %}
+            {% for node in topology_map.wireless_nodes %}
+                <a class="topology-map-node node-{{ node.role_key }} {% if node.is_isolated %}is-isolated{% endif %}" href="{% url 'inventory:switch_detail' node.switch.id %}">
+                    <strong>{{ node.switch.name }}</strong>
+                    <span class="ltr">{{ node.switch.management_ip }}{% if node.switch.winbox_port %}:{{ node.switch.winbox_port }}{% endif %}</span>
+                    <small>{{ node.role_label }} • {{ node.switch.site|default:"-" }}</small>
+                </a>
+            {% endfor %}
+        </div>
+
+        <div class="topology-map-column access-column">
+            <div class="topology-map-column-title">Access</div>
+            {% for node in topology_map.access_nodes %}
+                <a class="topology-map-node node-{{ node.role_key }} {% if node.is_isolated %}is-isolated{% endif %}" href="{% url 'inventory:switch_detail' node.switch.id %}">
+                    <strong>{{ node.switch.name }}</strong>
+                    <span class="ltr">{{ node.switch.management_ip }}</span>
+                    <small>{{ node.link_count }} links • {{ node.visible_port_count }} ports</small>
+                </a>
+            {% empty %}
+                <div class="empty-mini-card">Access شناسایی نشده.</div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="topology-workspace">
+    <div class="topology-groups-panel surface-card">
+        <div class="section-title-row compact-title-row">
+            <div>
+                <h3>Switch Groups</h3>
+                <p>گروه‌بندی خودکار بر اساس نام، مدل، Uplink و Link های داخلی.</p>
+            </div>
+        </div>
+
+        <div class="topology-group-grid">
+            {% for group in topology_groups %}
+                <div class="topology-group-column topology-group-{{ group.key }}">
+                    <div class="topology-group-title">
+                        <strong>{{ group.title }}</strong>
+                        <span>{{ group.nodes|length }}</span>
+                    </div>
+                    <div class="topology-group-nodes">
+                        {% for node in group.nodes %}
+                            <a class="topology-mini-switch {% if node.has_internal_link %}has-link{% endif %} {% if node.is_isolated %}is-isolated{% endif %}" href="{% url 'inventory:switch_detail' node.switch.id %}">
+                                <span class="switch-role-dot {{ node.role_key }}"></span>
+                                <span class="topology-mini-switch-name">{{ node.switch.name }}</span>
+                                <span class="ltr topology-mini-ip">{{ node.switch.management_ip }}</span>
+                                <span class="topology-mini-meta">{{ node.role_label }} • {{ node.switch.site|default:"-" }} • Links {{ node.link_count }} • Uplink {{ node.uplink_count }} • Ports {{ node.visible_port_count }}</span>
+                            </a>
+                        {% empty %}
+                            <div class="empty-mini-card">موردی نیست.</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="topology-links-panel surface-card">
+        <div class="section-title-row compact-title-row">
+            <div>
+                <h3>Internal Links</h3>
+                <p>پورت مبدأ و مقصد، وضعیت لینک و روش Match مشخص است.</p>
+            </div>
+            <span class="pill success">{{ matched_link_count }} لینک</span>
+        </div>
+
+        <div class="topology-link-stack phase33-link-stack">
+            {% for link in internal_links|slice:":160" %}
+                <a class="topology-link-card health-{{ link.health }} {% if link.is_uplink %}uplink-link{% endif %}" href="{% url 'inventory:switch_detail' link.source_switch.id %}?port={{ link.source_port.id }}">
+                    <div class="topology-link-side">
+                        <strong>{{ link.source_switch.name }}</strong>
+                        <span class="ltr">{{ link.source_port.interface_name }}</span>
+                        <small>{{ link.source_port.get_port_mode_display }}{% if link.source_port.trunk_vlans %} • VLAN {{ link.source_port.trunk_vlans }}{% endif %}</small>
+                    </div>
+                    <div class="topology-link-mid">
+                        <span class="link-line"></span>
+                        <span class="topology-health-pill {{ link.health }}">{{ link.health_label }}</span>
+                        <small>{{ link.neighbor_source|default:"CDP/LLDP" }} • {{ link.direction }} • {{ link.matched_by }}</small>
+                    </div>
+                    <div class="topology-link-side target">
+                        <strong>{{ link.matched_switch.name }}</strong>
+                        <span class="ltr">{% if link.matched_port %}{{ link.matched_port.interface_name }}{% else %}{{ link.neighbor_port|default:"-" }}{% endif %}</span>
+                        <small class="ltr">{{ link.neighbor_ip|default:"-" }}</small>
+                    </div>
+                </a>
+            {% empty %}
+                <div class="empty-card">لینک داخلی Match شده وجود ندارد.</div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<section class="topology-details-grid">
+    <details class="surface-card topology-details-card" open>
+        <summary>
+            <span>Unknown / External Links</span>
+            <strong>{{ external_link_count }}</strong>
+        </summary>
+        <div class="table-wrap">
+            <table class="data-table compact-table">
+                <thead>
+                    <tr>
+                        <th>Switch</th>
+                        <th>Port</th>
+                        <th>Source</th>
+                        <th>Neighbor Device</th>
+                        <th>Neighbor Port</th>
+                        <th>Neighbor IP</th>
+                        <th>Health</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for link in external_links %}
+                        <tr>
+                            <td><a class="table-link" href="{% url 'inventory:switch_detail' link.source_switch.id %}?port={{ link.source_port.id }}">{{ link.source_switch.name }}</a></td>
+                            <td class="ltr">{{ link.source_port.interface_name }}</td>
+                            <td>{{ link.neighbor_source|default:"-" }}</td>
+                            <td class="ltr">{{ link.neighbor_device|default:"Unknown" }}</td>
+                            <td class="ltr">{{ link.neighbor_port|default:"-" }}</td>
+                            <td class="ltr">{{ link.neighbor_ip|default:"-" }}</td>
+                            <td><span class="topology-health-pill {{ link.health }}">{{ link.health_label }}</span></td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="7">مورد ناشناس وجود ندارد.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </details>
+
+    <details class="surface-card topology-details-card">
+        <summary>
+            <span>Uplink های بدون Neighbor</span>
+            <strong>{{ unknown_uplink_count }}</strong>
+        </summary>
+        <div class="table-wrap">
+            <table class="data-table compact-table">
+                <thead>
+                    <tr>
+                        <th>Switch</th>
+                        <th>Port</th>
+                        <th>Status</th>
+                        <th>Mode</th>
+                        <th>VLAN</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for port in uplinks_without_neighbor|slice:":180" %}
+                        <tr>
+                            <td><a class="table-link" href="{% url 'inventory:switch_detail' port.switch.id %}?port={{ port.id }}">{{ port.switch.name }}</a></td>
+                            <td class="ltr">{{ port.interface_name }}</td>
+                            <td>{{ port.get_status_display }}</td>
+                            <td>{{ port.get_port_mode_display }}</td>
+                            <td class="ltr">{{ port.trunk_vlans|default:port.vlan|default:"-" }}</td>
+                            <td>{{ port.description|default:port.snmp_alias|default:"-" }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="6">موردی نیست.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </details>
+
+    <details class="surface-card topology-details-card">
+        <summary>
+            <span>Duplicate CDP / LLDP Entries</span>
+            <strong>{{ duplicate_link_count }}</strong>
+        </summary>
+        <div class="table-wrap">
+            <table class="data-table compact-table">
+                <thead>
+                    <tr>
+                        <th>Switch</th>
+                        <th>Port</th>
+                        <th>Neighbor</th>
+                        <th>Neighbor Port</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for port in duplicate_links|slice:":120" %}
+                        <tr>
+                            <td><a class="table-link" href="{% url 'inventory:switch_detail' port.switch.id %}?port={{ port.id }}">{{ port.switch.name }}</a></td>
+                            <td class="ltr">{{ port.interface_name }}</td>
+                            <td class="ltr">{{ port.neighbor_device|default:"-" }}</td>
+                            <td class="ltr">{{ port.neighbor_port|default:"-" }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="4">Duplicate وجود ندارد.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </details>
+</section>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends "inventory/base.html" %}
+{% block title %}ویرایش پورت | {{ port.interface_name }}{% endblock %}
+{% block page_title %}ویرایش {{ port.interface_name }}{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">{{ switch.name }} • <span class="ltr">{{ switch.management_ip }}</span></p>{% endblock %}
+{% block page_actions %}
+<div class="toolbar-group">
+    <a class="btn btn-secondary" href="{% url 'inventory:switch_detail' switch.id %}">نقشه پورت‌ها</a>
+    <a class="btn btn-secondary" href="{% url 'inventory:switch_ports_table' switch.id %}">جدول پورت‌ها</a>
+    <a class="btn btn-secondary" href="{% url 'inventory:port_documentation_history' port.id %}">History</a>
+</div>
+{% endblock %}
+{% block content %}
+<section class="form-layout-grid">
+    <div class="surface-card form-card-main">
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ next }}">
+            <div class="form-grid-two">
+                {% for field in form %}
+                    <div class="field-row {% if field.name == 'notes' %}field-wide{% endif %}">
+                        <label>{{ field.label }}</label>
+                        {{ field.errors }}
+                        {{ field }}
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="toolbar-group top-margin">
+                <button class="btn btn-primary" type="submit">ذخیره</button>
+                {% if next == "table" %}
+                    <a class="btn btn-ghost" href="{% url 'inventory:switch_ports_table' switch.id %}">انصراف</a>
+                {% else %}
+                    <a class="btn btn-ghost" href="{% url 'inventory:switch_detail' switch.id %}">انصراف</a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+    <div class="surface-card form-side-info">
+        <h3>اطلاعات SNMP</h3>
+        <div class="key-grid compact-grid">
+            <div class="key-item"><span>IfIndex</span><strong>{{ port.snmp_if_index|default:"-" }}</strong></div>
+            <div class="key-item"><span>SNMP Name</span><strong class="ltr">{{ port.snmp_raw_name|default:"-" }}</strong></div>
+            <div class="key-item"><span>Alias</span><strong>{{ port.snmp_alias|default:"-" }}</strong></div>
+            <div class="key-item"><span>Admin / Oper</span><strong>{{ port.snmp_admin_status|default:"-" }} / {{ port.snmp_oper_status|default:"-" }}</strong></div>
+            <div class="key-item"><span>Speed</span><strong>{% if port.snmp_speed_mbps %}{{ port.snmp_speed_mbps }} Mbps{% else %}-{% endif %}</strong></div>
+            <div class="key-item"><span>Last Poll</span><strong>{{ port.snmp_last_poll|date:"Y-m-d H:i"|default:"-" }}</strong></div>
+        </div>
+        <hr class="soft-divider">
+        <h3>آخرین تغییرات</h3>
+        <div class="mini-history-list">
+            {% for item in recent_history %}
+                <a class="mini-history-item" href="{% url 'inventory:port_documentation_history' port.id %}">
+                    <strong>{{ item.changed_fields|default:"-" }}</strong>
+                    <span class="ltr">{{ item.created_at_text }}</span>
+                </a>
+            {% empty %}
+                <span class="inline-state">History ثبت نشده است.</span>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

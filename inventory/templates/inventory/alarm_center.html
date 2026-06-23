@@ -1,0 +1,187 @@
+{% extends "inventory/base.html" %}
+
+{% block title %}Alarm Center{% endblock %}
+{% block page_title %}Alarm / Notification Center{% endblock %}
+{% block page_subtitle %}
+<p class="page-subtitle">آلارم‌های فعال از SNMP، SFP، Interface Error، Uplink Down و Topology</p>
+{% endblock %}
+{% block page_actions %}
+{% if swmap_can_ssh %}
+<form method="post" action="{% url 'inventory:alarm_sync' %}" class="inline-form">
+    {% csrf_token %}
+    <button class="btn btn-primary" type="submit">Sync Alarms</button>
+</form>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<section class="summary-bar-grid alarm-summary-grid">
+    <div class="summary-tile is-error"><span>Active</span><strong>{{ active_count }}</strong></div>
+    <div class="summary-tile is-error"><span>Critical</span><strong>{{ critical_count }}</strong></div>
+    <div class="summary-tile is-disabled"><span>Warning</span><strong>{{ warning_count }}</strong></div>
+    <div class="summary-tile"><span>Acknowledged</span><strong>{{ ack_count }}</strong></div>
+    <div class="summary-tile"><span>Resolved</span><strong>{{ resolved_count }}</strong></div>
+</section>
+
+<details class="surface-card search-panel ui-collapsible alarm-filter-panel">
+    <summary class="ui-collapsible-summary">
+        <span>
+            <strong>Filter Alarms</strong>
+            <small>Status / Severity / Switch / Text</small>
+        </span>
+        <span class="status-pill muted">{{ page_obj.paginator.count }} مورد</span>
+    </summary>
+    <div class="ui-collapsible-body">
+        <form method="get" class="filter-grid alarm-filter-grid">
+            <div>
+                <label>Search</label>
+                <input class="input" type="search" name="q" value="{{ query }}" placeholder="Switch / Port / Message">
+            </div>
+            <div>
+                <label>Status</label>
+                <select class="input" name="status">
+                    <option value="">همه</option>
+                    {% for value,label in status_choices %}
+                        <option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label>Severity</label>
+                <select class="input" name="severity">
+                    <option value="">همه</option>
+                    {% for value,label in severity_choices %}
+                        <option value="{{ value }}" {% if selected_severity == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label>Category</label>
+                <select class="input" name="category">
+                    <option value="">همه</option>
+                    {% for value,label in category_choices %}
+                        <option value="{{ value }}" {% if selected_category == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label>Switch</label>
+                <select class="input" name="switch">
+                    <option value="">همه</option>
+                    {% for switch in switches %}
+                        <option value="{{ switch.id }}" {% if selected_switch == switch.id|stringformat:'s' %}selected{% endif %}>{{ switch.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="filter-actions">
+                <button class="btn btn-primary" type="submit">Filter</button>
+                <a class="btn btn-ghost" href="{% url 'inventory:alarm_center' %}">Reset</a>
+            </div>
+        </form>
+    </div>
+</details>
+
+<section class="surface-card table-panel ui-data-panel">
+    <div class="table-title-row alarm-table-title-row">
+        <div>
+            <h3>Alarms</h3>
+            <span class="inline-state">View Only فقط مشاهده می‌کند؛ Acknowledge / Resolve برای Operator و Admin است.</span>
+        </div>
+        {% if swmap_can_ssh %}
+            <form id="alarm-bulk-form" method="post" action="{% url 'inventory:alarm_bulk_action' %}" class="alarm-bulk-actions">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                <select class="input" name="bulk_action" required>
+                    <option value="">Bulk Action</option>
+                    <option value="acknowledge">Acknowledge selected</option>
+                    <option value="resolve">Resolve selected</option>
+                </select>
+                <button class="btn btn-secondary btn-small" type="submit">Apply</button>
+            </form>
+        {% endif %}
+    </div>
+    <div class="table-wrap">
+        <table class="data-table alarm-table">
+            <thead>
+                <tr>
+                    {% if swmap_can_ssh %}<th class="alarm-select-col"><input type="checkbox" data-alarm-select-all aria-label="Select all alarms"></th>{% endif %}
+                    <th>Severity</th>
+                    <th>Status</th>
+                    <th>Category</th>
+                    <th>Switch</th>
+                    <th>Port</th>
+                    <th>Title</th>
+                    <th>Message</th>
+                    <th>Occurrences</th>
+                    <th>First Seen</th>
+                    <th>Last Seen</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for alarm in page_obj.object_list %}
+                    <tr class="alarm-row alarm-severity-{{ alarm.severity }} alarm-status-{{ alarm.status }}">
+                        {% if swmap_can_ssh %}
+                            <td class="alarm-select-col">
+                                {% if alarm.status != 'resolved' %}
+                                    <input type="checkbox" name="alarm_ids" value="{{ alarm.id }}" form="alarm-bulk-form" data-alarm-checkbox aria-label="Select alarm {{ alarm.id }}">
+                                {% endif %}
+                            </td>
+                        {% endif %}
+                        <td><span class="alarm-pill alarm-pill-{{ alarm.severity }}">{{ alarm.get_severity_display }}</span></td>
+                        <td><span class="alarm-pill alarm-pill-status">{{ alarm.get_status_display }}</span></td>
+                        <td>{{ alarm.get_category_display }}</td>
+                        <td>{% if alarm.switch %}<a class="table-link" href="{% url 'inventory:switch_detail' alarm.switch.id %}">{{ alarm.switch.name }}</a>{% else %}-{% endif %}</td>
+                        <td class="ltr">{% if alarm.port %}{{ alarm.port.interface_name }}{% else %}-{% endif %}</td>
+                        <td><strong>{{ alarm.title }}</strong><br><small class="ltr">{{ alarm.source }}</small></td>
+                        <td>{{ alarm.message }}{% if alarm.details %}<br><small class="ltr">{{ alarm.details }}</small>{% endif %}</td>
+                        <td class="ltr">{{ alarm.occurrences }}</td>
+                        <td class="ltr">{{ alarm.first_seen_text }}</td>
+                        <td class="ltr">{{ alarm.last_seen_text }}</td>
+                        <td>
+                            {% if swmap_can_ssh and alarm.status != 'resolved' %}
+                                <div class="alarm-action-stack">
+                                    <form method="post" action="{% url 'inventory:alarm_acknowledge' alarm.id %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                                        <button class="btn btn-ghost btn-small" type="submit">Ack</button>
+                                    </form>
+                                    <form method="post" action="{% url 'inventory:alarm_resolve' alarm.id %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                                        <button class="btn btn-secondary btn-small" type="submit">Resolve</button>
+                                    </form>
+                                </div>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="{% if swmap_can_ssh %}12{% else %}11{% endif %}">آلارمی پیدا نشد.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if page_obj.paginator.num_pages > 1 %}
+        <div class="pagination-row">
+            {% if page_obj.has_previous %}<a class="btn btn-ghost" href="?page={{ page_obj.previous_page_number }}">قبلی</a>{% endif %}
+            <span>Page {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+            {% if page_obj.has_next %}<a class="btn btn-ghost" href="?page={{ page_obj.next_page_number }}">بعدی</a>{% endif %}
+        </div>
+    {% endif %}
+</section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const toggle = document.querySelector("[data-alarm-select-all]");
+    if (!toggle) return;
+    toggle.addEventListener("change", function () {
+        document.querySelectorAll("[data-alarm-checkbox]").forEach(function (item) {
+            item.checked = toggle.checked;
+        });
+    });
+});
+</script>
+{% endblock %}

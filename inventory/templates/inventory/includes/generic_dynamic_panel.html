@@ -1,0 +1,25 @@
+{% load switchmap_extras %}
+<div class="dynamic-device-panel generic-switch{% if map_mode == 'full' %} is-full{% else %} is-dashboard{% endif %}" data-dynamic-device-layout="generic-switch">
+    <div class="dynamic-device-face">
+        <div class="dynamic-device-brand">
+            <span class="brand-chip">Device</span>
+            <strong>{{ switch_name }}</strong>
+            <small class="ltr">{{ switch_ip }}</small>
+            <em>{{ visual.subtitle }}</em>
+        </div>
+        <div class="dynamic-device-body">
+            <div class="dynamic-device-left"><span>{{ switch_obj.model|default:"Unknown" }}</span></div>
+            <div class="dynamic-device-ports">
+                {% for row in visual.port_rows %}
+                    <div class="dynamic-port-row">
+                        {% for port in row %}
+                            {% include "inventory/includes/generic_port_button.html" with port=port switch_obj=switch_obj switch_name=switch_name switch_ip=switch_ip switch_user=switch_obj.ssh_username %}
+                        {% endfor %}
+                    </div>
+                {% empty %}
+                    <div class="dynamic-no-ports">پورت تصویری برای این مدل وجود ندارد.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>

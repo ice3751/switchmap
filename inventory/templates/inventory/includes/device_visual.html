@@ -1,0 +1,11 @@
+{% load switchmap_extras %}
+{% dynamic_device_visual_context switch_obj map_mode as visual %}
+{% if visual.layout_key == "cisco-nexus" %}
+    {% include "inventory/includes/nexus_svg.html" with map_mode=map_mode switch_obj=switch_obj switch_name=switch_name switch_ip=switch_ip switch_user=switch_user %}
+{% elif visual.layout_key == "cisco-3850" %}
+    {% include "inventory/includes/cisco_3850_svg.html" with map_mode=map_mode switch_obj=switch_obj switch_name=switch_name switch_ip=switch_ip switch_user=switch_user top_ports=top_ports bottom_ports=bottom_ports uplink_ports=uplink_ports %}
+{% elif switch_obj.vendor == "mikrotik" %}
+    {% include "inventory/includes/mikrotik_dynamic_panel.html" with visual=visual map_mode=map_mode switch_obj=switch_obj switch_name=switch_name switch_ip=switch_ip switch_user=switch_user %}
+{% else %}
+    {% include "inventory/includes/generic_dynamic_panel.html" with visual=visual map_mode=map_mode switch_obj=switch_obj switch_name=switch_name switch_ip=switch_ip switch_user=switch_user %}
+{% endif %}

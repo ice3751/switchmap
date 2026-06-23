@@ -1,0 +1,198 @@
+<div class="nexus-map-wrap {% if map_mode == 'dashboard' %}nexus-map-dashboard{% else %}nexus-map-full{% endif %}" data-nexus-map="1" data-switch-id="{{ switch_obj.id }}">
+    <style>
+        .nexus-map-wrap{direction:ltr;width:100%;max-width:100%;box-sizing:border-box;margin:6px 0 10px 0;font-family:Arial,Helvetica,sans-serif;overflow:hidden;--nexus-main-w:28px;--nexus-main-h:28px;--nexus-gap:6px;--nexus-uplink-w:34px;--nexus-uplink-h:48px;--nexus-uplink-gap:7px;--nexus-left-w:150px;--nexus-right-w:104px;--nexus-face-gap:14px;}
+        .nexus-map-dashboard{--nexus-main-w:34px;--nexus-main-h:26px;--nexus-gap:0px;--nexus-uplink-w:37px;--nexus-uplink-h:48px;--nexus-uplink-gap:5px;--nexus-left-w:86px;--nexus-right-w:58px;--nexus-face-gap:8px;}
+        .nexus-chassis{width:100%;max-width:100%;box-sizing:border-box;background:linear-gradient(180deg,#263241 0%,#111827 100%);border:1px solid #0f172a;border-radius:16px;box-shadow:0 18px 35px rgba(15,23,42,.22),inset 0 1px 0 rgba(255,255,255,.1);padding:14px 16px 16px 16px;overflow:hidden;}
+        .nexus-map-dashboard .nexus-chassis{padding:10px 12px 12px 12px;border-radius:14px;}
+        .nexus-head{display:flex;align-items:center;justify-content:space-between;color:#e5eefb;margin-bottom:10px;gap:12px;min-width:0;}
+        .nexus-head strong{font-size:15px;letter-spacing:.5px;white-space:nowrap;}
+        .nexus-head span{font-size:11px;color:#9fb3c8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+        .nexus-map-dashboard .nexus-head{margin-bottom:7px;}
+        .nexus-map-dashboard .nexus-head span{display:none;}
+        .nexus-face{display:grid;grid-template-columns:var(--nexus-left-w) minmax(0,1fr) var(--nexus-right-w);gap:var(--nexus-face-gap);align-items:stretch;min-width:0;}
+        .nexus-left,.nexus-right{border:1px solid rgba(148,163,184,.28);border-radius:10px;background:rgba(15,23,42,.52);min-height:122px;position:relative;overflow:hidden;}
+        .nexus-map-dashboard .nexus-left,.nexus-map-dashboard .nexus-right{min-height:80px;border-radius:8px;}
+        .nexus-left:before{content:"Nexus";position:absolute;left:14px;top:14px;color:#e2e8f0;font-weight:800;font-size:22px;letter-spacing:-.5px;}
+        .nexus-left:after{content:"MGMT  CONSOLE  USB";position:absolute;left:14px;bottom:14px;color:#64748b;font-size:10px;letter-spacing:1.2px;}
+        .nexus-map-dashboard .nexus-left:before{left:8px;top:10px;font-size:13px;}
+        .nexus-map-dashboard .nexus-left:after{display:none;}
+        .nexus-right:before{content:"";position:absolute;inset:18px 19px;border-radius:7px;background:repeating-linear-gradient(90deg,#334155 0,#334155 5px,#0f172a 5px,#0f172a 11px);opacity:.75;}
+        .nexus-map-dashboard .nexus-right:before{inset:14px 10px;}
+        .nexus-ports-zone{min-width:0;background:rgba(2,6,23,.42);border:1px solid rgba(148,163,184,.24);border-radius:12px;padding:10px;box-sizing:border-box;display:grid;grid-template-columns:max-content max-content;gap:10px;align-items:center;justify-content:center;}
+        .nexus-map-dashboard .nexus-ports-zone{padding:8px 10px;border-radius:8px;grid-template-columns:minmax(0,1fr) 58px;gap:10px;justify-content:stretch;}
+        .nexus-main-stack{min-width:0;display:grid;grid-template-rows:auto auto;gap:8px;align-content:center;justify-content:center;}
+        .nexus-map-dashboard .nexus-main-stack{width:100%;gap:7px;justify-content:stretch;}
+        .nexus-row{min-width:0;display:grid;grid-template-columns:repeat(24,var(--nexus-main-w));gap:var(--nexus-gap);align-items:center;justify-content:center;}
+        .nexus-map-dashboard .nexus-row{display:flex;align-items:center;justify-content:space-between;width:100%;gap:0;}
+        .nexus-uplink-zone{min-width:0;display:grid;grid-template-columns:var(--nexus-uplink-w) var(--nexus-uplink-w);gap:var(--nexus-uplink-gap);border-left:1px solid rgba(148,163,184,.22);padding-left:10px;align-self:stretch;align-content:center;justify-content:center;}
+        .nexus-map-dashboard .nexus-uplink-zone{padding-left:7px;align-content:center;justify-content:center;}
+        .nexus-port{appearance:none;border:1px solid #475569;background:linear-gradient(180deg,#e5e7eb 0%,#94a3b8 100%);border-radius:5px;width:var(--nexus-main-w);height:var(--nexus-main-h);min-width:0;min-height:0;max-width:none;max-height:none;aspect-ratio:auto;padding:2px 1px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;color:#0f172a;line-height:1;box-shadow:inset 0 0 0 1px rgba(255,255,255,.35);font-family:Arial,Helvetica,sans-serif;overflow:hidden;}
+        .nexus-map-dashboard .nexus-port{width:var(--nexus-main-w);height:var(--nexus-main-h);flex:0 0 var(--nexus-main-w);border-radius:4px;padding:0 1px;}
+        .nexus-uplink-port{width:var(--nexus-uplink-w);height:var(--nexus-uplink-h);border-radius:7px;background:linear-gradient(180deg,#dbeafe 0%,#93c5fd 100%);border-color:#2563eb;}
+        .nexus-map-dashboard .nexus-uplink-port{width:var(--nexus-uplink-w);height:var(--nexus-uplink-h);flex:0 0 var(--nexus-uplink-w);border-radius:5px;padding:0 1px;}
+        .nexus-port:hover{outline:2px solid #38bdf8;outline-offset:1px;}
+        .nexus-port-no{font-size:8px;font-weight:800;white-space:nowrap;}
+        .nexus-port-vlan{font-size:8px;opacity:.82;white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;}
+        .nexus-uplink-port .nexus-port-no{font-size:9px;}
+        .nexus-map-dashboard .nexus-port-no{display:block;font-size:8px;line-height:1.05;font-weight:900;letter-spacing:-.35px;max-width:100%;overflow:hidden;text-overflow:clip;color:#0f172a;}
+        .nexus-map-dashboard .nexus-port-vlan{display:none;}
+        .nexus-map-dashboard .nexus-uplink-port .nexus-port-no{font-size:7px;letter-spacing:-.5px;}
+        .nexus-port.is-up,.nexus-port[data-oper-status="up"],.nexus-port[data-status="connected"],.nexus-port[data-status="up"]{background:linear-gradient(180deg,#86efac 0%,#22c55e 100%);border-color:#15803d;}
+        .nexus-port.is-trunk{box-shadow:inset 0 -4px 0 rgba(37,99,235,.78),inset 0 0 0 1px rgba(255,255,255,.35);}
+        .nexus-port.is-down,.nexus-port[data-oper-status="down"],.nexus-port[data-status="down"]{background:linear-gradient(180deg,#fca5a5 0%,#ef4444 100%);border-color:#991b1b;}
+        .nexus-port.is-disabled,.nexus-port[data-admin-status="down"],.nexus-port[data-status="disabled"]{background:linear-gradient(180deg,#cbd5e1 0%,#64748b 100%);border-color:#475569;color:#e2e8f0;}
+        .nexus-empty{direction:rtl;text-align:center;color:#cbd5e1;padding:28px 10px;font-size:13px;grid-column:1/-1;}
+        .nexus-caption{direction:rtl;text-align:right;color:#64748b;font-size:11px;margin-top:7px;}
+        @media(max-width:980px){.nexus-map-dashboard{--nexus-main-w:22px;--nexus-main-h:18px;--nexus-uplink-w:24px;--nexus-uplink-h:32px;--nexus-left-w:64px;--nexus-right-w:42px;--nexus-face-gap:6px}.nexus-map-dashboard .nexus-left,.nexus-map-dashboard .nexus-right{min-height:64px}.nexus-map-dashboard .nexus-ports-zone{padding:6px;grid-template-columns:minmax(0,1fr) 48px;gap:6px}.nexus-map-dashboard .nexus-main-stack{gap:5px}.nexus-map-dashboard .nexus-uplink-zone{padding-left:5px}.nexus-map-dashboard .nexus-port-no{font-size:5.5px}.nexus-map-dashboard .nexus-uplink-port .nexus-port-no{font-size:5px}}
+    </style>
+    <div class="nexus-chassis">
+        <div class="nexus-head">
+            <strong>{{ switch_name|default:"Nexus" }}</strong>
+            <span>{{ switch_ip|default:"" }} / {{ switch_obj.model|default:"Cisco Nexus" }}</span>
+        </div>
+        <div class="nexus-face">
+            <div class="nexus-left"></div>
+            <div class="nexus-ports-zone">
+                <div class="nexus-main-stack">
+                    <div class="nexus-row nexus-row-top">
+                        {% for port in switch_obj.ports.all|dictsort:"display_order" %}
+                            {% if forloop.counter <= 48 and not forloop.counter|divisibleby:"2" %}
+                                <button type="button"
+                                        class="nexus-port nexus-main-port {% if port.port_mode == 'trunk' %}is-trunk{% endif %} {% if port.snmp_oper_status == 'up' or port.status == 'connected' or port.status == 'up' %}is-up{% elif port.snmp_admin_status == 'down' or port.status == 'disabled' %}is-disabled{% elif port.snmp_oper_status == 'down' or port.status == 'down' %}is-down{% endif %}"
+                                        title="{{ port.interface_name }}{% if port.description %} - {{ port.description }}{% endif %}"
+                                        data-sm-port-button
+                                        data-port-id="{{ port.id }}"
+                                        data-switch-id="{{ switch_obj.id }}"
+                                        data-switch-name="{{ switch_name|default:'' }}"
+                                        data-switch-ip="{{ switch_ip|default:'' }}"
+                                        data-switch-user="{{ switch_user|default:'' }}"
+                                        data-interface-name="{{ port.interface_name }}"
+                                        data-port-name="{{ port.interface_name }}"
+                                        data-status="{{ port.status|default_if_none:'' }}"
+                                        data-port-status="{{ port.status|default_if_none:'' }}"
+                                        data-oper-status="{{ port.snmp_oper_status|default_if_none:'' }}"
+                                        data-admin-status="{{ port.snmp_admin_status|default_if_none:'' }}"
+                                        data-mode="{{ port.port_mode|default_if_none:'' }}"
+                                        data-port-mode="{{ port.port_mode|default_if_none:'' }}"
+                                        data-vlan="{{ port.vlan|default_if_none:'' }}"
+                                        data-access-vlan="{{ port.access_vlan|default_if_none:'' }}"
+                                        data-native-vlan="{{ port.native_vlan|default_if_none:'' }}"
+                                        data-voice-vlan="{{ port.voice_vlan|default_if_none:'' }}"
+                                        data-trunk-vlans="{{ port.trunk_vlans|default_if_none:'' }}"
+                                        data-description="{{ port.description|default_if_none:'' }}"
+                                        data-connected-device="{{ port.connected_device|default_if_none:'' }}"
+                                        data-neighbor-device="{{ port.neighbor_device|default_if_none:'' }}"
+                                        data-neighbor-ip="{{ port.neighbor_ip|default_if_none:'' }}"
+                                        data-neighbor-port="{{ port.neighbor_port|default_if_none:'' }}"
+                                        data-neighbor-source="{{ port.neighbor_source|default_if_none:'' }}"
+                                        data-ip-address="{{ port.ip_address|default_if_none:'' }}"
+                                        data-mac-address="{{ port.mac_address|default_if_none:'' }}"
+                                        data-mac-count="{{ port.mac_count|default_if_none:'' }}"
+                                        data-poe-enabled="{{ port.poe_enabled|default_if_none:'' }}"
+                                        data-poe-admin-status="{{ port.poe_admin_status|default_if_none:'' }}"
+                                        data-poe-detection-status="{{ port.poe_detection_status|default_if_none:'' }}"
+                                        data-snmp-alias="{{ port.snmp_alias|default_if_none:'' }}"
+                                        data-snmp-if-index="{{ port.snmp_if_index|default_if_none:'' }}">
+                                    <span class="nexus-port-no">{{ port.interface_name|cut:"Ethernet"|cut:"Eth" }}</span>
+                                    <span class="nexus-port-vlan">{% if port.port_mode == 'trunk' %}T{% elif port.access_vlan %}{{ port.access_vlan }}{% elif port.vlan %}{{ port.vlan }}{% else %}-{% endif %}</span>
+                                </button>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div class="nexus-row nexus-row-bottom">
+                        {% for port in switch_obj.ports.all|dictsort:"display_order" %}
+                            {% if forloop.counter <= 48 and forloop.counter|divisibleby:"2" %}
+                                <button type="button"
+                                        class="nexus-port nexus-main-port {% if port.port_mode == 'trunk' %}is-trunk{% endif %} {% if port.snmp_oper_status == 'up' or port.status == 'connected' or port.status == 'up' %}is-up{% elif port.snmp_admin_status == 'down' or port.status == 'disabled' %}is-disabled{% elif port.snmp_oper_status == 'down' or port.status == 'down' %}is-down{% endif %}"
+                                        title="{{ port.interface_name }}{% if port.description %} - {{ port.description }}{% endif %}"
+                                        data-sm-port-button
+                                        data-port-id="{{ port.id }}"
+                                        data-switch-id="{{ switch_obj.id }}"
+                                        data-switch-name="{{ switch_name|default:'' }}"
+                                        data-switch-ip="{{ switch_ip|default:'' }}"
+                                        data-switch-user="{{ switch_user|default:'' }}"
+                                        data-interface-name="{{ port.interface_name }}"
+                                        data-port-name="{{ port.interface_name }}"
+                                        data-status="{{ port.status|default_if_none:'' }}"
+                                        data-port-status="{{ port.status|default_if_none:'' }}"
+                                        data-oper-status="{{ port.snmp_oper_status|default_if_none:'' }}"
+                                        data-admin-status="{{ port.snmp_admin_status|default_if_none:'' }}"
+                                        data-mode="{{ port.port_mode|default_if_none:'' }}"
+                                        data-port-mode="{{ port.port_mode|default_if_none:'' }}"
+                                        data-vlan="{{ port.vlan|default_if_none:'' }}"
+                                        data-access-vlan="{{ port.access_vlan|default_if_none:'' }}"
+                                        data-native-vlan="{{ port.native_vlan|default_if_none:'' }}"
+                                        data-voice-vlan="{{ port.voice_vlan|default_if_none:'' }}"
+                                        data-trunk-vlans="{{ port.trunk_vlans|default_if_none:'' }}"
+                                        data-description="{{ port.description|default_if_none:'' }}"
+                                        data-connected-device="{{ port.connected_device|default_if_none:'' }}"
+                                        data-neighbor-device="{{ port.neighbor_device|default_if_none:'' }}"
+                                        data-neighbor-ip="{{ port.neighbor_ip|default_if_none:'' }}"
+                                        data-neighbor-port="{{ port.neighbor_port|default_if_none:'' }}"
+                                        data-neighbor-source="{{ port.neighbor_source|default_if_none:'' }}"
+                                        data-ip-address="{{ port.ip_address|default_if_none:'' }}"
+                                        data-mac-address="{{ port.mac_address|default_if_none:'' }}"
+                                        data-mac-count="{{ port.mac_count|default_if_none:'' }}"
+                                        data-poe-enabled="{{ port.poe_enabled|default_if_none:'' }}"
+                                        data-poe-admin-status="{{ port.poe_admin_status|default_if_none:'' }}"
+                                        data-poe-detection-status="{{ port.poe_detection_status|default_if_none:'' }}"
+                                        data-snmp-alias="{{ port.snmp_alias|default_if_none:'' }}"
+                                        data-snmp-if-index="{{ port.snmp_if_index|default_if_none:'' }}">
+                                    <span class="nexus-port-no">{{ port.interface_name|cut:"Ethernet"|cut:"Eth" }}</span>
+                                    <span class="nexus-port-vlan">{% if port.port_mode == 'trunk' %}T{% elif port.access_vlan %}{{ port.access_vlan }}{% elif port.vlan %}{{ port.vlan }}{% else %}-{% endif %}</span>
+                                </button>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="nexus-uplink-zone">
+                    {% for port in switch_obj.ports.all|dictsort:"display_order" %}
+                        {% if forloop.counter > 48 %}
+                            <button type="button"
+                                    class="nexus-port nexus-uplink-port {% if port.port_mode == 'trunk' %}is-trunk{% endif %} {% if port.snmp_oper_status == 'up' or port.status == 'connected' or port.status == 'up' %}is-up{% elif port.snmp_admin_status == 'down' or port.status == 'disabled' %}is-disabled{% elif port.snmp_oper_status == 'down' or port.status == 'down' %}is-down{% endif %}"
+                                    title="{{ port.interface_name }}{% if port.description %} - {{ port.description }}{% endif %}"
+                                    data-sm-port-button
+                                    data-port-id="{{ port.id }}"
+                                    data-switch-id="{{ switch_obj.id }}"
+                                    data-switch-name="{{ switch_name|default:'' }}"
+                                    data-switch-ip="{{ switch_ip|default:'' }}"
+                                    data-switch-user="{{ switch_user|default:'' }}"
+                                    data-interface-name="{{ port.interface_name }}"
+                                    data-port-name="{{ port.interface_name }}"
+                                    data-status="{{ port.status|default_if_none:'' }}"
+                                    data-port-status="{{ port.status|default_if_none:'' }}"
+                                    data-oper-status="{{ port.snmp_oper_status|default_if_none:'' }}"
+                                    data-admin-status="{{ port.snmp_admin_status|default_if_none:'' }}"
+                                    data-mode="{{ port.port_mode|default_if_none:'' }}"
+                                    data-port-mode="{{ port.port_mode|default_if_none:'' }}"
+                                    data-vlan="{{ port.vlan|default_if_none:'' }}"
+                                    data-access-vlan="{{ port.access_vlan|default_if_none:'' }}"
+                                    data-native-vlan="{{ port.native_vlan|default_if_none:'' }}"
+                                    data-voice-vlan="{{ port.voice_vlan|default_if_none:'' }}"
+                                    data-trunk-vlans="{{ port.trunk_vlans|default_if_none:'' }}"
+                                    data-description="{{ port.description|default_if_none:'' }}"
+                                    data-connected-device="{{ port.connected_device|default_if_none:'' }}"
+                                    data-neighbor-device="{{ port.neighbor_device|default_if_none:'' }}"
+                                    data-neighbor-ip="{{ port.neighbor_ip|default_if_none:'' }}"
+                                    data-neighbor-port="{{ port.neighbor_port|default_if_none:'' }}"
+                                    data-neighbor-source="{{ port.neighbor_source|default_if_none:'' }}"
+                                    data-ip-address="{{ port.ip_address|default_if_none:'' }}"
+                                    data-mac-address="{{ port.mac_address|default_if_none:'' }}"
+                                    data-mac-count="{{ port.mac_count|default_if_none:'' }}"
+                                    data-poe-enabled="{{ port.poe_enabled|default_if_none:'' }}"
+                                    data-poe-admin-status="{{ port.poe_admin_status|default_if_none:'' }}"
+                                    data-poe-detection-status="{{ port.poe_detection_status|default_if_none:'' }}"
+                                    data-snmp-alias="{{ port.snmp_alias|default_if_none:'' }}"
+                                    data-snmp-if-index="{{ port.snmp_if_index|default_if_none:'' }}">
+                                <span class="nexus-port-no">{{ port.interface_name|cut:"Ethernet"|cut:"Eth" }}</span>
+                                <span class="nexus-port-vlan">{% if port.port_mode == 'trunk' %}T{% elif port.access_vlan %}{{ port.access_vlan }}{% elif port.vlan %}{{ port.vlan }}{% else %}-{% endif %}</span>
+                            </button>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="nexus-right"></div>
+        </div>
+    </div>
+    {% if map_mode != 'dashboard' %}<div class="nexus-caption">Nexus layout: 48 main Ethernet ports are shown in odd/even physical rows; ports 49-52 are shown as the right uplink block.</div>{% endif %}
+</div>

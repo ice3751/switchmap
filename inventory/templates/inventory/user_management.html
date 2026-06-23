@@ -1,0 +1,133 @@
+{% extends "inventory/base.html" %}
+
+{% block title %}User Management{% endblock %}
+{% block page_title %}User Management{% endblock %}
+{% block page_subtitle %}
+<p class="page-subtitle">مدیریت کاربران، نقش‌ها و دسترسی‌ها بدون ورود به Admin Panel</p>
+{% endblock %}
+{% block page_actions %}
+<a class="btn btn-primary" href="{% url 'inventory:user_create' %}">New User</a>
+{% endblock %}
+
+{% block content %}
+<section class="surface-card search-panel user-filter-panel">
+    <form method="get" class="filter-grid user-filter-grid">
+        <div>
+            <label>Search</label>
+            <input class="input" type="search" name="q" value="{{ query }}" placeholder="Username / Name / Email">
+        </div>
+        <div>
+            <label>Role</label>
+            <select class="input" name="role">
+                <option value="">همه</option>
+                {% for role in role_choices %}
+                    <option value="{{ role }}" {% if selected_role == role %}selected{% endif %}>{{ role }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label>Status</label>
+            <select class="input" name="status">
+                <option value="">همه</option>
+                <option value="active" {% if selected_status == 'active' %}selected{% endif %}>Active</option>
+                <option value="disabled" {% if selected_status == 'disabled' %}selected{% endif %}>Disabled</option>
+            </select>
+        </div>
+        <div class="filter-actions">
+            <button class="btn btn-primary" type="submit">Filter</button>
+            <a class="btn btn-ghost" href="{% url 'inventory:user_management' %}">Reset</a>
+        </div>
+    </form>
+</section>
+
+<section class="surface-card table-panel ui-data-panel user-table-panel">
+    <div class="table-title-row">
+        <div>
+            <h3>Users</h3>
+            <span class="inline-state">فقط Admin اجازه مدیریت کاربران را دارد.</span>
+        </div>
+        <span class="status-pill muted">{{ page_obj.paginator.count }} کاربر</span>
+    </div>
+    <div class="table-wrap">
+        <table class="data-table user-management-table">
+            <thead>
+                <tr>
+                    <th>Username</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Staff</th>
+                    <th>Last login</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in page_obj.object_list %}
+                    <tr>
+                        <td class="ltr"><strong>{{ item.username }}</strong>{% if item.is_superuser %}<br><small>Superuser</small>{% endif %}</td>
+                        <td>{{ item.display_name }}</td>
+                        <td class="ltr">{{ item.email|default:"-" }}</td>
+                        <td><span class="role-pill role-{{ item.switchmap_role|slugify }}">{{ item.switchmap_role }}</span></td>
+                        <td>{% if item.is_active %}<span class="status-pill ok">Active</span>{% else %}<span class="status-pill error">Disabled</span>{% endif %}</td>
+                        <td>{% if item.is_staff %}Yes{% else %}No{% endif %}</td>
+                        <td class="ltr">{{ item.last_login|date:"Y-m-d H:i"|default:"-" }}</td>
+                        <td>
+                            <div class="action-inline-row">
+                                <a class="btn btn-secondary btn-small" href="{% url 'inventory:user_edit' item.id %}">Edit</a>
+                                <a class="btn btn-ghost btn-small" href="{% url 'inventory:user_password' item.id %}">Password</a>
+                            </div>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="8">کاربری پیدا نشد.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% if page_obj.paginator.num_pages > 1 %}
+        <div class="pagination-row">
+            {% if page_obj.has_previous %}<a class="btn btn-ghost" href="?page={{ page_obj.previous_page_number }}">قبلی</a>{% endif %}
+            <span>Page {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+            {% if page_obj.has_next %}<a class="btn btn-ghost" href="?page={{ page_obj.next_page_number }}">بعدی</a>{% endif %}
+        </div>
+    {% endif %}
+</section>
+
+<section class="surface-card table-panel ui-data-panel user-audit-panel">
+    <div class="table-title-row">
+        <div>
+            <h3>User Audit</h3>
+            <span class="inline-state">آخرین تغییرات کاربران</span>
+        </div>
+    </div>
+    <div class="table-wrap">
+        <table class="data-table user-audit-table">
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>Action</th>
+                    <th>Actor</th>
+                    <th>Role</th>
+                    <th>Target</th>
+                    <th>Message</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in audit_logs %}
+                    <tr>
+                        <td class="ltr">{{ log.created_at_text }}</td>
+                        <td class="ltr">{{ log.action }}</td>
+                        <td class="ltr">{{ log.actor_username }}</td>
+                        <td>{{ log.actor_role }}</td>
+                        <td class="ltr">{{ log.target_username }}</td>
+                        <td>{{ log.message|default:"-" }}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="6">Audit فعلاً خالی است.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

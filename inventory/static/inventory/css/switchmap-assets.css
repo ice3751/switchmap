@@ -1,0 +1,296 @@
+/* Extracted from switchmap.css for feature-based loading. */
+
+/* Phase 36 - Asset / Documentation */
+.asset-summary-grid{
+    grid-template-columns:repeat(6,minmax(0,1fr));
+}
+.asset-filter-panel{
+    margin-bottom:16px;
+}
+.asset-filter-grid{
+    display:grid;
+    grid-template-columns:minmax(220px,2fr) repeat(4,minmax(130px,1fr));
+    gap:12px;
+    align-items:end;
+}
+.asset-filter-grid .field-row{
+    min-width:0;
+}
+.asset-filter-actions{
+    display:flex;
+    gap:8px;
+    align-items:center;
+    justify-content:flex-start;
+    grid-column:span 2;
+}
+.asset-table-wrap{
+    max-height:calc(100vh - 340px);
+}
+.asset-doc-table th,
+.asset-doc-table td{
+    white-space:nowrap;
+}
+.asset-doc-table .wrap-cell,
+.wrap-cell{
+    white-space:normal;
+    word-break:break-word;
+    max-width:360px;
+}
+.status-pill.doc-documented{
+    background:#dcfce7;
+    color:#166534;
+}
+.status-pill.doc-partial{
+    background:#fef9c3;
+    color:#854d0e;
+}
+.status-pill.doc-needs_review{
+    background:#ffedd5;
+    color:#9a3412;
+}
+.status-pill.doc-undocumented{
+    background:#fee2e2;
+    color:#991b1b;
+}
+.pagination-row{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:12px;
+    padding:14px 0 0;
+}
+.history-item-card{
+    border:1px solid rgba(203,213,225,.8);
+    border-radius:14px;
+    padding:12px 14px;
+    margin-bottom:12px;
+    background:#fff;
+}
+.history-item-card summary{
+    cursor:pointer;
+    display:grid;
+    grid-template-columns:auto minmax(0,1fr) auto;
+    gap:14px;
+    align-items:center;
+}
+.mini-history-list{
+    display:grid;
+    gap:8px;
+}
+.mini-history-item{
+    display:grid;
+    gap:2px;
+    padding:8px 10px;
+    border:1px solid rgba(203,213,225,.8);
+    border-radius:10px;
+    text-decoration:none;
+    color:inherit;
+    background:#f8fafc;
+}
+.soft-divider{
+    border:0;
+    border-top:1px solid rgba(203,213,225,.8);
+    margin:16px 0;
+}
+.empty-state-box{
+    padding:18px;
+    border:1px dashed rgba(148,163,184,.9);
+    border-radius:14px;
+    color:#64748b;
+    background:#f8fafc;
+}
+@media(max-width:1400px){
+    .asset-summary-grid{
+        grid-template-columns:repeat(3,minmax(0,1fr));
+    }
+    .asset-filter-grid{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+    .asset-filter-actions{
+        grid-column:span 2;
+    }
+}
+@media(max-width:720px){
+    .asset-summary-grid,
+    .asset-filter-grid{
+        grid-template-columns:1fr;
+    }
+    .asset-filter-actions{
+        grid-column:auto;
+        flex-wrap:wrap;
+    }
+    .history-item-card summary{
+        grid-template-columns:1fr;
+    }
+}
+
+/* Phase 36.1 - Asset / Documentation UI cleanup */
+.asset-summary-grid-clean{
+    gap:12px;
+    margin-bottom:14px;
+}
+.asset-summary-grid-clean .summary-tile{
+    min-height:70px;
+    padding:12px 14px;
+    align-content:center;
+}
+.asset-summary-grid-clean .summary-tile span{
+    font-size:11px;
+    letter-spacing:.02em;
+}
+.asset-summary-grid-clean .summary-tile strong{
+    font-size:24px;
+    line-height:1.05;
+}
+.asset-filter-panel-clean{
+    padding:14px 16px;
+    margin-bottom:16px;
+}
+.asset-filter-grid-clean{
+    display:grid;
+    grid-template-columns:minmax(300px,2.2fr) repeat(4,minmax(138px,1fr));
+    gap:10px 12px;
+    align-items:end;
+    direction:rtl;
+}
+.asset-filter-grid-clean .field-row{
+    min-width:0;
+    gap:5px;
+}
+.asset-filter-grid-clean .field-row label{
+    font-size:12px;
+    color:#0f172a;
+    padding-inline:4px;
+}
+.asset-filter-grid-clean .input,
+.asset-filter-grid-clean select{
+    min-height:36px;
+    border-radius:10px;
+    font-size:12px;
+    padding:7px 10px;
+}
+.asset-filter-search{
+    grid-column:span 2;
+}
+.asset-filter-search input{
+    direction:ltr;
+    text-align:left;
+}
+.asset-filter-actions-clean{
+    grid-column:auto;
+    justify-content:flex-start;
+    gap:8px;
+}
+.asset-filter-actions-clean .btn{
+    min-height:36px;
+    padding:0 14px;
+    border-radius:10px;
+    font-size:12px;
+}
+.asset-table-panel-clean{
+    overflow:hidden;
+}
+.asset-title-row-clean{
+    padding:14px 16px 12px;
+    border-bottom:1px solid var(--line);
+}
+.asset-title-row-clean h3{
+    margin:0 0 4px;
+    font-size:18px;
+}
+.asset-table-wrap-clean{
+    max-height:calc(100vh - 360px);
+    min-height:410px;
+    scrollbar-gutter:stable;
+}
+.asset-doc-table-clean{
+    min-width:1450px;
+    table-layout:auto;
+    direction:rtl;
+}
+.asset-doc-table-clean th,
+.asset-doc-table-clean td{
+    padding:10px 9px;
+    font-size:12px;
+    line-height:1.55;
+    vertical-align:middle;
+    text-align:right;
+}
+.asset-doc-table-clean thead th{
+    background:#eef6ff;
+    color:#0f3f8f;
+    font-size:12px;
+    font-weight:950;
+    white-space:nowrap;
+}
+.asset-doc-table-clean tbody tr:nth-child(even){
+    background:#fbfdff;
+}
+.asset-doc-table-clean .asset-col-switch,
+.asset-doc-table-clean .asset-col-port{
+    position:sticky;
+    right:0;
+    z-index:2;
+    background:inherit;
+}
+.asset-doc-table-clean .asset-col-port{
+    right:84px;
+}
+.asset-doc-table-clean thead .asset-col-switch,
+.asset-doc-table-clean thead .asset-col-port{
+    z-index:4;
+    background:#e6f1ff;
+}
+.asset-doc-table-clean .asset-col-switch{
+    min-width:84px;
+    width:84px;
+}
+.asset-doc-table-clean .asset-col-port{
+    min-width:94px;
+    width:94px;
+}
+.asset-device-cell{
+    max-width:150px;
+}
+.asset-neighbor-cell{
+    max-width:220px;
+}
+.asset-updated-cell{
+    min-width:128px;
+}
+.asset-doc-table-clean .status-pill{
+    min-width:92px;
+    justify-content:center;
+    padding:7px 10px;
+    font-size:11px;
+}
+.asset-doc-table-clean .table-link{
+    white-space:nowrap;
+}
+@media(max-width:1500px){
+    .asset-filter-grid-clean{
+        grid-template-columns:repeat(4,minmax(140px,1fr));
+    }
+    .asset-filter-search{
+        grid-column:span 2;
+    }
+}
+@media(max-width:980px){
+    .asset-filter-grid-clean{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+    .asset-filter-search{
+        grid-column:span 2;
+    }
+    .asset-filter-actions-clean{
+        grid-column:span 2;
+    }
+}
+@media(max-width:640px){
+    .asset-filter-grid-clean,
+    .asset-filter-search,
+    .asset-filter-actions-clean{
+        grid-template-columns:1fr;
+        grid-column:auto;
+    }
+}

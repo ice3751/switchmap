@@ -1,0 +1,307 @@
+/* Extracted from switchmap.css for feature-based loading. */
+
+/* Phase 34 - Backup Center */
+.backup-summary-grid{
+    grid-template-columns:repeat(4,minmax(150px,1fr));
+}
+.backup-warning-card{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    border-color:rgba(245,158,11,.30);
+    background:linear-gradient(135deg,rgba(255,251,235,.92),rgba(255,255,255,.92));
+}
+.backup-warning-card h3{
+    margin:0 0 6px;
+}
+.backup-warning-card p{
+    margin:0;
+    color:var(--muted);
+    font-size:13px;
+}
+.backup-layout-grid{
+    display:grid;
+    grid-template-columns:minmax(0,1.4fr) minmax(320px,.6fr);
+    gap:16px;
+    align-items:start;
+}
+.backup-restore-panel h3,
+.backup-restore-panel h4{
+    margin:0 0 8px;
+}
+.backup-restore-panel p{
+    margin:0 0 14px;
+    color:var(--muted);
+    font-size:13px;
+}
+.backup-upload-form{
+    display:grid;
+    gap:10px;
+    margin-bottom:16px;
+}
+.restore-candidate-list{
+    border-top:1px solid var(--line);
+    padding-top:14px;
+}
+.restore-candidate-item{
+    display:grid;
+    gap:4px;
+    padding:10px 0;
+    border-bottom:1px solid var(--line-soft);
+    font-size:12px;
+}
+.restore-candidate-item a{
+    width:max-content;
+    color:var(--primary);
+    font-weight:800;
+    text-decoration:none;
+}
+.muted-text{
+    color:var(--muted);
+}
+.backup-table td,
+.backup-audit-table td{
+    vertical-align:middle;
+}
+@media (max-width:1100px){
+    .backup-layout-grid,
+    .backup-summary-grid{
+        grid-template-columns:1fr;
+    }
+    .backup-warning-card{
+        align-items:flex-start;
+        flex-direction:column;
+    }
+}
+
+/* Phase 34.1 - Backup Center UI cleanup */
+.backup-page-stack{
+    display:grid;
+    gap:16px;
+}
+.backup-compact-summary{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:12px;
+}
+.backup-compact-tile{
+    min-height:84px;
+    padding:16px;
+    border:1px solid var(--line);
+    border-radius:16px;
+    background:rgba(255,255,255,.96);
+    box-shadow:0 12px 28px rgba(15,23,42,.05);
+    display:grid;
+    align-content:center;
+    gap:8px;
+}
+.backup-compact-tile span{
+    color:var(--muted);
+    font-size:12px;
+    font-weight:900;
+}
+.backup-compact-tile strong{
+    font-size:22px;
+    font-weight:950;
+    direction:ltr;
+    text-align:right;
+}
+.backup-safety-details{
+    padding:0;
+    overflow:hidden;
+    border-color:rgba(245,158,11,.30);
+    background:linear-gradient(135deg,rgba(255,251,235,.84),rgba(255,255,255,.96));
+}
+.backup-safety-details summary,
+.backup-mini-details summary,
+.backup-audit-details summary{
+    cursor:pointer;
+    list-style:none;
+    padding:14px 16px;
+    font-weight:950;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+}
+.backup-safety-details summary::-webkit-details-marker,
+.backup-mini-details summary::-webkit-details-marker,
+.backup-audit-details summary::-webkit-details-marker{
+    display:none;
+}
+.backup-safety-details summary em{
+    font-style:normal;
+    font-size:12px;
+    color:#b45309;
+    background:#fff7ed;
+    border:1px solid #fed7aa;
+    border-radius:999px;
+    padding:5px 10px;
+}
+.backup-safety-details p{
+    margin:0;
+    padding:0 16px 14px;
+    color:var(--muted);
+    font-size:13px;
+    line-height:1.9;
+}
+.backup-clean-card{
+    padding:16px;
+    overflow:hidden;
+}
+.backup-card-head{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:14px;
+    padding-bottom:12px;
+    border-bottom:1px solid var(--line);
+}
+.backup-card-head.compact{
+    border-bottom:0;
+    padding-bottom:8px;
+}
+.backup-card-head h3{
+    margin:0 0 6px;
+    font-size:19px;
+    font-weight:950;
+}
+.backup-path{
+    display:block;
+    max-width:100%;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    color:var(--muted);
+    font-size:12px;
+    font-weight:800;
+}
+.backup-list{
+    display:grid;
+    gap:10px;
+    padding-top:12px;
+}
+.backup-row{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto auto;
+    align-items:center;
+    gap:12px;
+    padding:12px;
+    border:1px solid #e2e8f0;
+    border-radius:14px;
+    background:#f8fafc;
+}
+.backup-row-main{
+    min-width:0;
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+.backup-file-name{
+    min-width:0;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    font-size:13px;
+}
+.backup-row-meta{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    color:var(--muted);
+    font-size:12px;
+    font-weight:800;
+    white-space:nowrap;
+}
+.backup-empty{
+    padding:18px;
+    border:1px dashed #cbd5e1;
+    border-radius:14px;
+    background:#f8fafc;
+    color:var(--muted);
+    text-align:center;
+    font-weight:800;
+}
+.backup-secondary-grid{
+    display:grid;
+    grid-template-columns:minmax(280px,.7fr) minmax(0,1.3fr);
+    gap:16px;
+    align-items:start;
+}
+.backup-upload-form.compact{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:10px;
+    margin:0;
+}
+.backup-mini-details,
+.backup-audit-details{
+    padding:0;
+}
+.backup-mini-list,
+.backup-audit-list{
+    display:grid;
+    gap:10px;
+    padding:0 16px 16px;
+}
+.backup-mini-row,
+.backup-audit-row{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto auto;
+    gap:12px;
+    align-items:center;
+    padding:10px 12px;
+    border:1px solid #e2e8f0;
+    border-radius:12px;
+    background:#f8fafc;
+    font-size:12px;
+}
+.backup-mini-row strong,
+.backup-audit-row strong,
+.backup-mini-row span,
+.backup-audit-row span,
+.backup-audit-row p{
+    min-width:0;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    margin:0;
+}
+.backup-mini-row a{
+    color:var(--primary);
+    font-weight:900;
+}
+.backup-audit-list{
+    max-height:320px;
+    overflow:auto;
+}
+.backup-audit-row{
+    grid-template-columns:180px 140px minmax(0,1fr);
+}
+.backup-audit-row small{
+    display:block;
+    color:var(--muted);
+    margin-top:3px;
+}
+@media(max-width:1100px){
+    .backup-compact-summary,
+    .backup-secondary-grid{
+        grid-template-columns:1fr 1fr;
+    }
+    .backup-row,
+    .backup-mini-row,
+    .backup-audit-row{
+        grid-template-columns:1fr;
+        align-items:stretch;
+    }
+    .backup-upload-form.compact{
+        grid-template-columns:1fr;
+    }
+}
+@media(max-width:720px){
+    .backup-compact-summary,
+    .backup-secondary-grid{
+        grid-template-columns:1fr;
+    }
+}

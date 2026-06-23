@@ -1,0 +1,178 @@
+{% extends "inventory/base.html" %}
+
+{% block title %}Asset Documentation | SwitchMap{% endblock %}
+{% block page_title %}Asset / Documentation{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">مستندات پورت‌ها، مالک، محل، رک، کابل و خروجی Excel / CSV.</p>{% endblock %}
+{% block page_actions %}
+<div class="toolbar-group">
+    <a class="btn btn-secondary" href="{% url 'inventory:asset_documentation_export_xlsx' %}{% if filter_querystring %}?{{ filter_querystring }}{% endif %}">Export Excel</a>
+    <a class="btn btn-secondary" href="{% url 'inventory:asset_documentation_export_csv' %}{% if filter_querystring %}?{{ filter_querystring }}{% endif %}">Export CSV</a>
+</div>
+{% endblock %}
+
+{% block content %}
+<section class="summary-bar-grid asset-summary-grid asset-summary-grid-clean">
+    <div class="summary-tile"><span>Total</span><strong>{{ stats.total }}</strong></div>
+    <div class="summary-tile"><span>Documented</span><strong>{{ stats.documented }}</strong></div>
+    <div class="summary-tile"><span>Partial</span><strong>{{ stats.partial }}</strong></div>
+    <div class="summary-tile"><span>Needs Review</span><strong>{{ stats.needs_review }}</strong></div>
+    <div class="summary-tile"><span>Undocumented</span><strong>{{ stats.undocumented }}</strong></div>
+    <div class="summary-tile"><span>Active Not Done</span><strong>{{ stats.active_undocumented }}</strong></div>
+</section>
+
+<section class="surface-card search-panel ui-compact-panel asset-filter-panel asset-filter-panel-clean">
+    <form class="asset-filter-grid asset-filter-grid-clean" method="get">
+        <div class="field-row asset-filter-search">
+            <label>Search</label>
+            <input class="input wide" type="text" name="q" value="{{ filters.query }}" placeholder="Switch / Port / Owner / MAC / Cable / Rack / Notes">
+        </div>
+
+        <div class="field-row">
+            <label>Switch</label>
+            <select class="input select" name="switch">
+                <option value="">همه</option>
+                {% for switch in switches %}
+                    <option value="{{ switch.id }}" {% if filters.switch_id == switch.id|stringformat:'s' %}selected{% endif %}>{{ switch.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="field-row">
+            <label>Status</label>
+            <select class="input select" name="status">
+                <option value="">همه</option>
+                {% for value, label in status_choices %}
+                    <option value="{{ value }}" {% if filters.status == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="field-row">
+            <label>Doc Status</label>
+            <select class="input select" name="documentation_status">
+                <option value="">همه</option>
+                {% for value, label in documentation_status_choices %}
+                    <option value="{{ value }}" {% if filters.documentation_status == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="field-row">
+            <label>Device Type</label>
+            <select class="input select" name="device_type">
+                <option value="">همه</option>
+                {% for value, label in device_type_choices %}
+                    <option value="{{ value }}" {% if filters.device_type == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="field-row">
+            <label>Mode</label>
+            <select class="input select" name="mode">
+                <option value="">همه</option>
+                {% for value, label in mode_choices %}
+                    <option value="{{ value }}" {% if filters.mode == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="field-row">
+            <label>Neighbor</label>
+            <select class="input select" name="has_neighbor">
+                <option value="" {% if not filters.has_neighbor %}selected{% endif %}>همه</option>
+                <option value="yes" {% if filters.has_neighbor == 'yes' %}selected{% endif %}>دارد</option>
+                <option value="no" {% if filters.has_neighbor == 'no' %}selected{% endif %}>ندارد</option>
+            </select>
+        </div>
+
+        <div class="field-row">
+            <label>MAC</label>
+            <select class="input select" name="has_mac">
+                <option value="" {% if not filters.has_mac %}selected{% endif %}>همه</option>
+                <option value="yes" {% if filters.has_mac == 'yes' %}selected{% endif %}>دارد</option>
+                <option value="no" {% if filters.has_mac == 'no' %}selected{% endif %}>ندارد</option>
+            </select>
+        </div>
+
+        <div class="asset-filter-actions asset-filter-actions-clean">
+            <button class="btn btn-primary" type="submit">اعمال</button>
+            <a class="btn btn-ghost" href="{% url 'inventory:asset_documentation' %}">پاک کردن</a>
+        </div>
+    </form>
+</section>
+
+<section class="surface-card table-panel ui-data-panel asset-table-panel-clean">
+    <div class="table-title-row compact-title-row asset-title-row-clean">
+        <div>
+            <h3>لیست مستندات پورت‌ها</h3>
+            <span class="inline-state">{{ page_obj.paginator.count }} مورد مطابق فیلتر</span>
+        </div>
+    </div>
+
+    <div class="table-wrap asset-table-wrap asset-table-wrap-clean">
+        <table class="data-table compact-table asset-doc-table asset-doc-table-clean">
+            <thead>
+                <tr>
+                    <th class="asset-col-switch">Switch</th>
+                    <th class="asset-col-port">Port</th>
+                    <th>Status</th>
+                    <th>Doc</th>
+                    <th>Device</th>
+                    <th>Owner</th>
+                    <th>Asset</th>
+                    <th>Room</th>
+                    <th>Rack</th>
+                    <th>Patch</th>
+                    <th>Outlet</th>
+                    <th>Cable</th>
+                    <th>IP</th>
+                    <th>MAC</th>
+                    <th>Neighbor</th>
+                    <th>Updated</th>
+                    {% if swmap_can_edit_port %}<th>Edit</th>{% endif %}
+                    <th>History</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for port in page_obj.object_list %}
+                    <tr>
+                        <td class="asset-col-switch"><a class="table-link" href="{% url 'inventory:switch_detail' port.switch.id %}?port={{ port.id }}">{{ port.switch.name }}</a></td>
+                        <td class="ltr strong asset-col-port">{{ port.interface_name }}</td>
+                        <td>{{ port.get_status_display }}</td>
+                        <td><span class="status-pill doc-{{ port.documentation_status }}">{{ port.get_documentation_status_display }}</span></td>
+                        <td class="wrap-cell asset-device-cell">{{ port.connected_device|default:port.get_device_type_display }}</td>
+                        <td class="wrap-cell">{{ port.owner|default:"-" }}</td>
+                        <td class="ltr">{{ port.asset_tag|default:"-" }}</td>
+                        <td>{{ port.room|default:"-" }}</td>
+                        <td class="ltr">{% if port.rack or port.rack_unit %}{{ port.rack|default:"-" }} {{ port.rack_unit|default:"" }}{% else %}-{% endif %}</td>
+                        <td class="ltr">{% if port.patch_panel or port.patch_panel_port %}{{ port.patch_panel|default:"-" }} {{ port.patch_panel_port|default:"" }}{% else %}-{% endif %}</td>
+                        <td class="ltr">{{ port.outlet|default:"-" }}</td>
+                        <td class="ltr">{{ port.cable_label|default:"-" }}</td>
+                        <td class="ltr">{{ port.ip_address|default:"-" }}</td>
+                        <td class="ltr">{{ port.mac_address|default:"-" }}</td>
+                        <td class="ltr wrap-cell asset-neighbor-cell">{% if port.neighbor_device %}{{ port.neighbor_device }} / {{ port.neighbor_port|default:"-" }}{% else %}-{% endif %}</td>
+                        <td class="ltr asset-updated-cell">{{ port.updated_at_text }}</td>
+                        {% if swmap_can_edit_port %}<td><a class="table-link" href="{% url 'inventory:port_edit' port.id %}?next=assets">ویرایش</a></td>{% endif %}
+                        <td><a class="table-link" href="{% url 'inventory:port_documentation_history' port.id %}">History</a></td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="18">موردی پیدا نشد.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if page_obj.paginator.num_pages > 1 %}
+        <div class="pagination-row">
+            {% if page_obj.has_previous %}
+                <a class="btn btn-ghost" href="?{% if filter_querystring %}{{ filter_querystring }}&{% endif %}page={{ page_obj.previous_page_number }}">قبلی</a>
+            {% endif %}
+            <span class="inline-state">Page {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+            {% if page_obj.has_next %}
+                <a class="btn btn-ghost" href="?{% if filter_querystring %}{{ filter_querystring }}&{% endif %}page={{ page_obj.next_page_number }}">بعدی</a>
+            {% endif %}
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

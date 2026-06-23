@@ -1,0 +1,51 @@
+{% extends "inventory/base.html" %}
+
+{% block title %}History | {{ port.interface_name }}{% endblock %}
+{% block page_title %}Port Documentation History{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">{{ switch.name }} • <span class="ltr">{{ port.interface_name }}</span></p>{% endblock %}
+{% block page_actions %}
+<div class="toolbar-group">
+    <a class="btn btn-secondary" href="{% url 'inventory:asset_documentation' %}">Assets</a>
+    <a class="btn btn-secondary" href="{% url 'inventory:port_edit' port.id %}">ویرایش پورت</a>
+    <a class="btn btn-secondary" href="{% url 'inventory:switch_detail' switch.id %}?port={{ port.id }}">نقشه پورت</a>
+</div>
+{% endblock %}
+
+{% block content %}
+<section class="surface-card table-panel ui-data-panel">
+    <div class="table-title-row compact-title-row">
+        <div>
+            <h3>تاریخچه تغییرات مستندات</h3>
+            <span class="inline-state">آخرین 100 تغییر</span>
+        </div>
+    </div>
+
+    {% for item in history_items %}
+        <details class="history-item-card" {% if forloop.first %}open{% endif %}>
+            <summary>
+                <span class="ltr">{{ item.created_at_text }}</span>
+                <strong>{{ item.changed_fields|default:"-" }}</strong>
+                <span>{{ item.actor_username|default:"-" }} / {{ item.actor_role|default:"-" }}</span>
+            </summary>
+            <div class="table-wrap compact">
+                <table class="data-table compact-table">
+                    <thead><tr><th>Field</th><th>Before</th><th>After</th></tr></thead>
+                    <tbody>
+                        {% for row in item.change_rows %}
+                            <tr>
+                                <td>{{ row.field }}</td>
+                                <td class="ltr wrap-cell">{{ row.before|default:"-" }}</td>
+                                <td class="ltr wrap-cell">{{ row.after|default:"-" }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="3">جزئیاتی ثبت نشده است.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </details>
+    {% empty %}
+        <div class="empty-state-box">هنوز History برای این پورت ثبت نشده است.</div>
+    {% endfor %}
+</section>
+{% endblock %}

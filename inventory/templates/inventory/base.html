@@ -1,0 +1,117 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SwitchMap{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'inventory/switchmap.css' %}">
+    <link rel="stylesheet" href="{% static 'inventory/css/switchmap-sfp.css' %}">
+    <link rel="stylesheet" href="{% static 'inventory/css/switchmap-topology-base.css' %}">
+    <link rel="stylesheet" href="{% static 'inventory/css/switchmap-ssh.css' %}">
+    <link rel="stylesheet" href="{% static 'inventory/css/switchmap-alarms.css' %}">
+    <link rel="stylesheet" href="{% static 'inventory/css/switchmap-users.css' %}">
+    <link rel="stylesheet" href="{% static 'inventory/css/switchmap-topology.css' %}">
+    <link rel="stylesheet" href="{% static 'inventory/css/switchmap-backups.css' %}">
+    <link rel="stylesheet" href="{% static 'inventory/css/switchmap-notifications.css' %}">
+    <link rel="stylesheet" href="{% static 'inventory/css/switchmap-assets.css' %}">
+    <link rel="stylesheet" href="{% static 'inventory/css/switchmap-phase42.css' %}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="phase42-shell">
+    {% with current=request.resolver_match.url_name %}
+    <div class="modern-app-frame">
+        <header class="app-topbar">
+            <div class="topbar-brand">
+                <a class="brand-link" href="{% url 'inventory:switch_list' %}" aria-label="SwitchMap Dashboard">
+                    <span class="brand-mark">SM</span>
+                    <span class="brand-copy">
+                        <strong>SwitchMap</strong>
+                        <small>Production Monitoring</small>
+                    </span>
+                </a>
+            </div>
+
+            <nav class="topbar-nav" aria-label="Main navigation">
+                <a class="topbar-link {% if current == 'switch_list' %}active{% endif %}" href="{% url 'inventory:switch_list' %}">داشبورد</a>
+
+                <details class="topbar-dropdown switches-dropdown">
+                    <summary class="topbar-link {% if current == 'switch_detail' or current == 'switch_ports_table' or current == 'switch_edit' %}active{% endif %}">سوییچ‌ها</summary>
+                    <div class="dropdown-panel switch-menu-panel">
+                        {% for group in swmap_switch_menu_groups %}
+                            <section class="switch-menu-group">
+                                <div class="switch-menu-group-title">
+                                    <span>{{ group.title }}</span>
+                                    <b>{{ group.count }}</b>
+                                </div>
+                                {% for item in group.items %}
+                                    <a class="switch-menu-item" href="{{ item.url }}">
+                                        <strong>{{ item.name }}</strong>
+                                        <small><span class="ltr">{{ item.ip }}</span>{% if item.role %} · {{ item.role }}{% endif %}</small>
+                                    </a>
+                                {% empty %}
+                                    <span class="switch-menu-empty">موردی ثبت نشده</span>
+                                {% endfor %}
+                            </section>
+                        {% empty %}
+                            <section class="switch-menu-group"><span class="switch-menu-empty">دستگاهی ثبت نشده است.</span></section>
+                        {% endfor %}
+                    </div>
+                </details>
+
+                <a class="topbar-link {% if current == 'topology' %}active{% endif %}" href="{% url 'inventory:topology' %}">Topology</a>
+                <a class="topbar-link {% if current == 'sfp_monitor' %}active{% endif %}" href="{% url 'inventory:sfp_monitor' %}">SFP Live</a>
+                <a class="topbar-link {% if current == 'alarm_center' %}active{% endif %}" href="{% url 'inventory:alarm_center' %}">Alarms{% if swmap_alarm_active_count %}<b class="topbar-badge {% if swmap_alarm_critical_count %}is-critical{% endif %}">{{ swmap_alarm_active_count }}</b>{% endif %}</a>
+                <a class="topbar-link {% if current == 'asset_documentation' or current == 'port_documentation_history' %}active{% endif %}" href="{% url 'inventory:asset_documentation' %}">Assets</a>
+                <a class="topbar-link {% if current == 'reports' %}active{% endif %}" href="{% url 'inventory:reports' %}">گزارش‌ها</a>
+                <a class="topbar-link {% if current == 'action_logs' %}active{% endif %}" href="{% url 'inventory:action_logs' %}">Log</a>
+                {% if swmap_can_manage_users %}<a class="topbar-link {% if current == 'user_management' or current == 'user_create' or current == 'user_edit' or current == 'user_password' %}active{% endif %}" href="{% url 'inventory:user_management' %}">Users</a>{% endif %}
+                {% if swmap_can_manage_backups %}<a class="topbar-link {% if current == 'backup_center' %}active{% endif %}" href="{% url 'inventory:backup_center' %}">Backup</a>{% endif %}
+                {% if swmap_can_admin %}<a class="topbar-link" href="/admin/" target="_blank">Admin</a>{% endif %}
+            </nav>
+
+            <div class="topbar-user">
+                <a class="notification-chip {% if swmap_alarm_critical_count %}is-critical{% endif %}" href="{% url 'inventory:alarm_center' %}?status=active" title="Notifications">{{ swmap_alarm_active_count|default:"0" }}</a>
+                {% if request.user.is_authenticated %}
+                    <details class="user-dropdown">
+                        <summary>{{ request.user.username }}</summary>
+                        <div class="user-panel">
+                            <span>Role: {{ swmap_role }}</span>
+                            <form method="post" action="{% url 'logout' %}">
+                                {% csrf_token %}
+                                <button class="btn btn-ghost btn-block" type="submit">Logout</button>
+                            </form>
+                        </div>
+                    </details>
+                {% endif %}
+            </div>
+        </header>
+
+        <main class="page-shell modern-page-shell">
+            <section class="page-heading-card modern-heading-card">
+                <div class="page-heading-text">
+                    <h1 class="page-title">{% block page_title %}SwitchMap{% endblock %}</h1>
+                    {% block page_subtitle %}{% endblock %}
+                </div>
+                <div class="page-heading-actions">
+                    {% block page_actions %}{% endblock %}
+                </div>
+            </section>
+
+            {% if messages %}
+                <section class="message-stack">
+                    {% for message in messages %}
+                        <div class="flash-message {{ message.tags|default:'info' }}">{{ message }}</div>
+                    {% endfor %}
+                </section>
+            {% endif %}
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+    {% endwith %}
+
+    <script src="{% static 'inventory/switchmap.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

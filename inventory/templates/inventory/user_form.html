@@ -1,0 +1,72 @@
+{% extends "inventory/base.html" %}
+
+{% block title %}{% if mode == 'create' %}New User{% else %}Edit User{% endif %}{% endblock %}
+{% block page_title %}{% if mode == 'create' %}New User{% else %}Edit User{% endif %}{% endblock %}
+{% block page_subtitle %}
+<p class="page-subtitle">نقش‌ها: View Only فقط مشاهده، Operator عملیات مجاز، Admin دسترسی کامل</p>
+{% endblock %}
+{% block page_actions %}
+<a class="btn btn-ghost" href="{% url 'inventory:user_management' %}">Back</a>
+{% if mode == 'edit' %}<a class="btn btn-secondary" href="{% url 'inventory:user_password' target_user.id %}">Change Password</a>{% endif %}
+{% endblock %}
+
+{% block content %}
+<section class="surface-card user-form-card">
+    <form method="post" class="user-form-grid">
+        {% csrf_token %}
+        {% if form.non_field_errors %}<div class="form-errors">{{ form.non_field_errors }}</div>{% endif %}
+
+        <div class="field-row">
+            <label for="id_username">Username</label>
+            {{ form.username }}
+            {{ form.username.errors }}
+        </div>
+        <div class="field-row">
+            <label for="id_email">Email</label>
+            {{ form.email }}
+            {{ form.email.errors }}
+        </div>
+        <div class="field-row">
+            <label for="id_first_name">First name</label>
+            {{ form.first_name }}
+            {{ form.first_name.errors }}
+        </div>
+        <div class="field-row">
+            <label for="id_last_name">Last name</label>
+            {{ form.last_name }}
+            {{ form.last_name.errors }}
+        </div>
+        <div class="field-row">
+            <label for="id_role">Role</label>
+            {{ form.role }}
+            {{ form.role.errors }}
+            {% if target_user and target_user.is_superuser %}<small class="field-help">Superuser همیشه Admin محسوب می‌شود.</small>{% endif %}
+        </div>
+        <div class="field-row checkbox-row">
+            <label>{{ form.is_active }} Active</label>
+            {{ form.is_active.errors }}
+        </div>
+        {% if mode == 'edit' %}
+            <div class="field-row checkbox-row">
+                <label>{{ form.is_staff }} Django staff</label>
+                {{ form.is_staff.errors }}
+            </div>
+        {% else %}
+            <div class="field-row">
+                <label for="id_password1">Password</label>
+                {{ form.password1 }}
+                {{ form.password1.errors }}
+            </div>
+            <div class="field-row">
+                <label for="id_password2">Confirm password</label>
+                {{ form.password2 }}
+                {{ form.password2.errors }}
+            </div>
+        {% endif %}
+        <div class="user-form-actions">
+            <button class="btn btn-primary" type="submit">Save</button>
+            <a class="btn btn-ghost" href="{% url 'inventory:user_management' %}">Cancel</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

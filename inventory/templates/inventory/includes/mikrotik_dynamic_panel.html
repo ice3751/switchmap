@@ -1,0 +1,65 @@
+{% load switchmap_extras %}
+<div class="dynamic-device-panel mikrotik-device-card device-visual {{ visual.layout_key }}{% if map_mode == 'full' %} is-full{% else %} is-dashboard{% endif %}"
+     data-dynamic-device-layout="{{ visual.layout_key }}"
+     style="--mk-face-min:{{ visual.face_min_width }}px;--mk-port-w:{{ visual.port_width }}px;--mk-port-h:{{ visual.port_height }}px;--mk-fiber-w:{{ visual.fiber_width }}px;--mk-bay-min:{{ visual.bay_min_width }}px;--mk-side-w:{{ visual.side_width }}px;">
+    <div class="dynamic-device-face mikrotik-face">
+        <div class="dynamic-device-brand mikrotik-brand-bar">
+            <span class="brand-chip mikrotik-brand-chip">{{ visual.brand }}</span>
+            <div class="mikrotik-brand-title">
+                <strong>{{ switch_name }}</strong>
+                <small class="ltr">{{ switch_ip }}{% if switch_obj.winbox_port %}:{{ switch_obj.winbox_port }}{% endif %}</small>
+            </div>
+            <div class="mikrotik-model-stack">
+                <span>{{ visual.badge }}</span>
+                <em>{{ visual.subtitle }}</em>
+            </div>
+        </div>
+        <div class="dynamic-device-body mikrotik-device-body">
+            <div class="dynamic-device-left mikrotik-identity-panel">
+                <div class="device-leds"><i></i><i></i><i></i></div>
+                <span>{{ switch_obj.get_device_role_display }}</span>
+                <small>{{ switch_obj.site|default:switch_obj.location|default:"-" }}</small>
+                {% if visual.wireless_ports %}<b class="mikrotik-wifi-mark">WiFi</b>{% endif %}
+            </div>
+            <div class="dynamic-device-ports mikrotik-port-bay">
+                {% for row in visual.port_rows %}
+                    {% if row %}
+                        <div class="dynamic-port-row">
+                            {% for port in row %}
+                                {% include "inventory/includes/generic_port_button.html" with port=port switch_obj=switch_obj switch_name=switch_name switch_ip=switch_ip switch_user=switch_obj.ssh_username %}
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+                {% if visual.uplink_ports %}
+                    <div class="dynamic-uplink-row">
+                        {% for port in visual.uplink_ports %}
+                            {% include "inventory/includes/generic_port_button.html" with port=port switch_obj=switch_obj switch_name=switch_name switch_ip=switch_ip switch_user=switch_obj.ssh_username %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                {% if visual.wireless_ports %}
+                    <div class="dynamic-wireless-row">
+                        {% for port in visual.wireless_ports %}
+                            {% include "inventory/includes/generic_port_button.html" with port=port switch_obj=switch_obj switch_name=switch_name switch_ip=switch_ip switch_user=switch_obj.ssh_username %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                {% if not visual.ports %}
+                    <div class="dynamic-no-ports">پورت تصویری هنوز ساخته نشده است.</div>
+                {% endif %}
+            </div>
+            <div class="dynamic-device-right mikrotik-role-panel">
+                <span>{{ switch_obj.get_device_family_display }}</span>
+                <span>{{ switch_obj.get_device_role_display }}</span>
+                {% for chip in visual.status_chips %}<span>{{ chip }}</span>{% endfor %}
+                {% if switch_obj.needs_review %}<b>Review</b>{% endif %}
+            </div>
+        </div>
+        <div class="dynamic-device-meta mikrotik-device-meta">
+            <span>{{ switch_obj.get_device_family_display }}</span>
+            <span>{{ switch_obj.get_device_role_display }}</span>
+            <span>{{ switch_obj.location|default:"-" }}</span>
+        </div>
+    </div>
+</div>

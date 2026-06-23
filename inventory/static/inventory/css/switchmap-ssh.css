@@ -1,0 +1,105 @@
+/* Extracted from switchmap.css for feature-based loading. */
+
+/* Phase 31A - Bulk SSH */
+.bulk-ssh-panel {
+    margin-bottom: 18px;
+}
+
+.bulk-ssh-panel .panel-title-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 14px;
+}
+
+.bulk-ssh-panel .panel-title-row h3 {
+    margin: 0 0 6px;
+}
+
+.bulk-ssh-panel .panel-title-row p {
+    margin: 0;
+    color: var(--muted-text, #64748b);
+    font-size: 13px;
+}
+
+.bulk-ssh-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(140px, 1fr));
+    gap: 12px;
+}
+
+.bulk-ssh-options,
+.bulk-ssh-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-top: 14px;
+}
+
+.bulk-ssh-actions {
+    justify-content: flex-start;
+}
+
+.bulk-ssh-result {
+    margin-top: 14px;
+}
+
+.bulk-result-summary {
+    border-radius: 12px;
+    padding: 10px 12px;
+    background: rgba(59, 130, 246, 0.10);
+    border: 1px solid rgba(59, 130, 246, 0.22);
+    font-weight: 700;
+}
+
+.bulk-result-summary.ok {
+    background: rgba(34, 197, 94, 0.10);
+    border-color: rgba(34, 197, 94, 0.25);
+}
+
+.bulk-result-summary.fail {
+    background: rgba(239, 68, 68, 0.10);
+    border-color: rgba(239, 68, 68, 0.25);
+}
+
+.bulk-port-table input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+}
+
+.data-table tr.ok td {
+    background: rgba(34, 197, 94, 0.06);
+}
+
+.data-table tr.fail td {
+    background: rgba(239, 68, 68, 0.06);
+}
+
+@media (max-width: 1200px) {
+    .bulk-ssh-grid {
+        grid-template-columns: repeat(2, minmax(160px, 1fr));
+    }
+}
+
+@media (max-width: 760px) {
+    .bulk-ssh-panel .panel-title-row {
+        display: block;
+    }
+    .bulk-ssh-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.btn-danger {
+    background: #b91c1c;
+    border-color: #b91c1c;
+    color: #fff;
+}
+
+.btn-danger:hover {
+    background: #991b1b;
+    border-color: #991b1b;
+    color: #fff;
+}
