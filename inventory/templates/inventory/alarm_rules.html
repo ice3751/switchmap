@@ -1,0 +1,70 @@
+{% extends "inventory/base.html" %}
+
+{% block title %}Alarm Rule Report{% endblock %}
+{% block page_title %}Alarm Rule Report{% endblock %}
+{% block page_subtitle %}
+<p class="page-subtitle">Phase80 Alarm Normalization / Dedup / Correlation</p>
+{% endblock %}
+{% block page_actions %}
+<a class="btn btn-ghost" href="{% url 'inventory:alarm_center' %}">Back to Alarms</a>
+{% endblock %}
+
+{% block content %}
+<!-- PHASE80_ALARM_RULE_REPORT -->
+<section class="summary-bar-grid alarm-summary-grid">
+    <div class="summary-tile"><span>Rules</span><strong>{{ rules|length }}</strong></div>
+    <div class="summary-tile"><span>Tracked Keys</span><strong>{{ state_summary.tracked_keys }}</strong></div>
+    <div class="summary-tile"><span>Confirmed</span><strong>{{ state_summary.confirmed }}</strong></div>
+    <div class="summary-tile"><span>Suppressed</span><strong>{{ state_summary.suppressed }}</strong></div>
+</section>
+
+<section class="surface-card table-panel ui-data-panel">
+    <div class="table-title-row">
+        <div>
+            <h3>Rules</h3>
+            <span class="inline-state">هر آلارم باید dedup_key، threshold، consecutive failure و recovery condition داشته باشد.</span>
+        </div>
+    </div>
+    <div class="table-wrap">
+        <table class="data-table alarm-table">
+            <thead>
+                <tr>
+                    <th>Rule</th>
+                    <th>Source</th>
+                    <th>Device Type</th>
+                    <th>Severity</th>
+                    <th>Threshold</th>
+                    <th>Consecutive</th>
+                    <th>Recovery</th>
+                    <th>Dedup Key</th>
+                    <th>Suppress Parent</th>
+                    <th>Cooldown</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rule in rules %}
+                <tr>
+                    <td><strong class="ltr">{{ rule.key }}</strong><br><small>{{ rule.description }}</small></td>
+                    <td>{{ rule.source }}</td>
+                    <td>{{ rule.device_type }}</td>
+                    <td><span class="alarm-pill alarm-pill-{{ rule.severity }}">{{ rule.severity }}</span></td>
+                    <td>{{ rule.threshold }}</td>
+                    <td class="ltr">{{ rule.consecutive_failures }}</td>
+                    <td>{{ rule.recovery_condition }}</td>
+                    <td class="ltr">{{ rule.dedup_key }}</td>
+                    <td>{% if rule.suppress_if_parent_down %}Yes{% else %}No{% endif %}</td>
+                    <td class="ltr">{{ rule.cooldown_text }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="10">Rule not found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="surface-card table-panel ui-data-panel">
+    <h3>State</h3>
+    <p class="ltr">{{ state_summary.state_path }}</p>
+</section>
+{% endblock %}

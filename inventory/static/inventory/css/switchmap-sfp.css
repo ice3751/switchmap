@@ -1,0 +1,783 @@
+/* Extracted from switchmap.css for feature-based loading. */
+
+/* Phase 26.4 - SFP Live Monitor */
+.summary-bar-grid.six-cols,
+.sfp-summary{
+    grid-template-columns:repeat(6,minmax(0,1fr));
+}
+
+.sfp-control-card h3,
+.sfp-note-card h3,
+.table-title-row h3{
+    margin:0 0 12px;
+}
+
+.sfp-poll-form{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+}
+
+.sfp-form-grid{
+    display:grid;
+    grid-template-columns:1.3fr 1fr 1fr 1fr .8fr;
+    gap:12px;
+    align-items:end;
+}
+
+.sfp-form-grid label{
+    display:block;
+    margin-bottom:6px;
+    font-size:12px;
+    color:var(--muted);
+    font-weight:950;
+}
+
+.sfp-control-actions,
+.table-title-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.sfp-control-actions{
+    justify-content:flex-start;
+}
+
+.sfp-monitor-table th,
+.sfp-monitor-table td{
+    white-space:nowrap;
+}
+
+.sfp-row.sfp-health-critical{
+    background:#fff1f2;
+}
+
+.sfp-row.sfp-health-warning{
+    background:#fffbeb;
+}
+
+.sfp-row.sfp-health-healthy{
+    background:#f0fdf4;
+}
+
+.sfp-note-card{
+    padding:16px 18px;
+    margin-top:18px;
+}
+
+.sfp-note-card p{
+    margin:0;
+    color:var(--muted);
+    line-height:1.9;
+}
+
+@media (max-width:1200px){
+    .summary-bar-grid.six-cols,
+    .sfp-summary{
+        grid-template-columns:repeat(3,minmax(0,1fr));
+    }
+
+    .sfp-form-grid{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+}
+
+@media (max-width:760px){
+    .summary-bar-grid.six-cols,
+    .sfp-summary,
+    .sfp-form-grid{
+        grid-template-columns:1fr;
+    }
+}
+
+/* Phase 26.5 - Dashboard SFP Live Compact */
+.sfp-dashboard-card{
+    grid-column:span 3;
+    min-height:112px;
+    align-content:stretch;
+    gap:10px;
+}
+
+.sfp-dashboard-card:after{
+    display:none;
+}
+
+.sfp-dash-head,
+.sfp-dash-status-row,
+.sfp-dash-form{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+}
+
+.sfp-dash-head strong{
+    display:block;
+    margin-top:5px;
+}
+
+.btn-mini{
+    min-height:34px;
+    padding:7px 12px;
+    font-size:12px;
+}
+
+.sfp-dash-status-row{
+    justify-content:flex-start;
+    flex-wrap:wrap;
+}
+
+.sfp-status-chip{
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    min-height:26px;
+    padding:4px 10px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:950;
+    border:1px solid #d7e3f4;
+}
+
+.sfp-status-chip.ok{
+    color:#166534;
+    background:#dcfce7;
+    border-color:#86efac;
+}
+
+.sfp-status-chip.error{
+    color:#991b1b;
+    background:#fee2e2;
+    border-color:#fecaca;
+}
+
+.sfp-dash-list{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:7px;
+    max-height:88px;
+    overflow:auto;
+    padding-inline-end:2px;
+}
+
+.sfp-dash-item,
+.sfp-dash-empty{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    padding:7px 9px;
+    border-radius:12px;
+    border:1px solid #d7e3f4;
+    background:#f8fbff;
+    min-width:0;
+}
+
+.sfp-dash-item strong,
+.sfp-dash-item span{
+    min-width:0;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    font-size:12px;
+    font-weight:950;
+}
+
+.sfp-dash-item span{
+    direction:ltr;
+    text-align:left;
+}
+
+.sfp-dash-item.is-ok{
+    border-color:#bbf7d0;
+    background:#f0fdf4;
+}
+
+.sfp-dash-item.is-error{
+    border-color:#fecaca;
+    background:#fff1f2;
+}
+
+.sfp-dash-empty{
+    grid-column:1 / -1;
+    color:var(--muted);
+    font-size:12px;
+    font-weight:900;
+}
+
+.sfp-dash-form{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr auto;
+    align-items:center;
+}
+
+.sfp-dash-form .input{
+    min-height:38px;
+    font-size:12px;
+}
+
+.sfp-dash-form .btn{
+    min-height:38px;
+    white-space:nowrap;
+}
+
+@media(max-width:1200px){
+    .sfp-dashboard-card{
+        grid-column:1 / -1;
+    }
+
+    .sfp-dash-form{
+        grid-template-columns:1fr 1fr;
+    }
+}
+
+@media(max-width:760px){
+    .sfp-dash-head,
+    .sfp-dash-status-row{
+        align-items:flex-start;
+        flex-direction:column;
+    }
+
+    .sfp-dash-list,
+    .sfp-dash-form{
+        grid-template-columns:1fr;
+    }
+}
+
+/* Phase 26.6 - Dashboard SFP Widget Responsive Cleanup */
+.dashboard-overview-grid{
+    grid-template-columns:minmax(260px,1.05fr) minmax(0,3fr);
+    align-items:stretch;
+}
+
+.overview-primary{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    justify-content:center;
+    text-align:right;
+    gap:10px;
+    min-height:100%;
+    padding:24px 28px;
+}
+
+.overview-primary:after{
+    display:none;
+}
+
+.overview-primary span{
+    font-size:13px;
+    line-height:1.5;
+}
+
+.overview-primary strong{
+    font-size:clamp(34px,3.1vw,48px);
+    line-height:.9;
+}
+
+.overview-primary small{
+    max-width:210px;
+    line-height:1.7;
+}
+
+.sfp-dashboard-card{
+    grid-column:auto;
+    min-height:0;
+    max-height:250px;
+    padding:16px 18px;
+    display:grid;
+    grid-template-rows:auto minmax(64px,1fr) auto auto;
+    align-content:stretch;
+    gap:9px;
+}
+
+.sfp-dash-head{
+    display:grid;
+    grid-template-columns:minmax(170px,auto) minmax(0,1fr);
+    align-items:start;
+    gap:12px;
+}
+
+.sfp-dash-title{
+    display:grid;
+    gap:3px;
+    justify-items:end;
+    text-align:right;
+}
+
+.sfp-dash-title strong{
+    display:flex;
+    align-items:baseline;
+    gap:7px;
+    margin:0;
+    font-size:clamp(22px,2vw,30px);
+    line-height:1;
+}
+
+.sfp-dash-title small{
+    white-space:nowrap;
+}
+
+.sfp-dash-tools{
+    display:flex;
+    align-items:center;
+    justify-content:flex-start;
+    gap:7px;
+    flex-wrap:wrap;
+    min-width:0;
+}
+
+.sfp-mini-state{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-height:28px;
+    padding:4px 10px;
+    border-radius:999px;
+    background:#eef6ff;
+    color:#1d4ed8;
+    border:1px solid #bfdbfe;
+    font-size:12px;
+    font-weight:950;
+    white-space:nowrap;
+}
+
+.sfp-has-error .sfp-mini-state{
+    background:#fff7ed;
+    border-color:#fed7aa;
+    color:#c2410c;
+}
+
+.sfp-dash-status-row{
+    display:none;
+}
+
+.sfp-status-chip{
+    min-height:28px;
+    padding:4px 9px;
+    font-size:12px;
+    gap:5px;
+    direction:ltr;
+}
+
+.sfp-dash-list{
+    grid-template-columns:repeat(2,minmax(170px,1fr));
+    gap:6px;
+    max-height:none;
+    min-height:0;
+    overflow:auto;
+    padding:1px 2px 1px 6px;
+    scrollbar-width:thin;
+}
+
+.sfp-dash-list::-webkit-scrollbar{
+    width:6px;
+    height:6px;
+}
+
+.sfp-dash-list::-webkit-scrollbar-thumb{
+    background:#cbd5e1;
+    border-radius:999px;
+}
+
+.sfp-dash-item,
+.sfp-dash-empty{
+    min-height:32px;
+    padding:6px 9px;
+    border-radius:10px;
+    gap:8px;
+}
+
+.sfp-dash-item strong,
+.sfp-dash-item span{
+    font-size:12px;
+    line-height:1.3;
+}
+
+.sfp-dash-item span{
+    flex:0 0 auto;
+    min-width:46px;
+    text-align:center;
+    padding:2px 8px;
+    border-radius:999px;
+    background:rgba(255,255,255,.75);
+}
+
+.sfp-dash-message{
+    min-height:18px;
+    color:#64748b;
+    font-size:11px;
+    font-weight:900;
+    direction:ltr;
+    text-align:left;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.sfp-has-error .sfp-dash-message{
+    color:#b45309;
+}
+
+.sfp-dash-form{
+    display:grid;
+    grid-template-columns:minmax(110px,.9fr) minmax(130px,1fr) minmax(130px,1fr) auto;
+    gap:8px;
+    align-items:center;
+}
+
+.sfp-dash-form .input,
+.sfp-dash-form .btn{
+    min-height:36px;
+    height:36px;
+    font-size:12px;
+}
+
+.sfp-dash-form .btn{
+    min-width:132px;
+    padding:0 14px;
+}
+
+@media(max-width:1440px){
+    .dashboard-overview-grid{
+        grid-template-columns:minmax(250px,.95fr) minmax(0,2.7fr);
+    }
+}
+
+@media(max-width:1120px){
+    .dashboard-overview-grid{
+        grid-template-columns:1fr;
+    }
+
+    .overview-primary{
+        min-height:112px;
+        align-items:center;
+        text-align:center;
+    }
+
+    .overview-primary small{
+        max-width:none;
+    }
+
+    .sfp-dashboard-card{
+        max-height:none;
+    }
+}
+
+@media(max-width:860px){
+    .sfp-dash-head{
+        grid-template-columns:1fr;
+    }
+
+    .sfp-dash-title{
+        justify-items:start;
+        text-align:left;
+        direction:ltr;
+    }
+
+    .sfp-dash-tools{
+        justify-content:flex-start;
+    }
+
+    .sfp-dash-list{
+        grid-template-columns:1fr;
+        max-height:160px;
+    }
+
+    .sfp-dash-form{
+        grid-template-columns:1fr 1fr;
+    }
+
+    .sfp-dash-form .btn{
+        grid-column:1 / -1;
+        width:100%;
+    }
+}
+
+@media(max-width:560px){
+    .sfp-dash-form{
+        grid-template-columns:1fr;
+    }
+
+    .sfp-dash-tools{
+        gap:6px;
+    }
+
+    .sfp-status-chip,
+    .sfp-mini-state,
+    .btn-mini{
+        flex:1 1 auto;
+    }
+}
+
+
+/* Phase 26.13 SFP dashboard true live */
+.sfp-live-badge{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-height:24px;
+    padding:2px 9px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:800;
+    background:#eef2ff;
+    color:#1e3a8a;
+    border:1px solid #bfdbfe;
+    white-space:nowrap;
+}
+.sfp-live-badge.is-live{
+    background:#dcfce7;
+    color:#166534;
+    border-color:#86efac;
+}
+.sfp-dash-live-meta{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    margin-top:6px;
+    font-size:12px;
+    color:#64748b;
+    min-height:18px;
+}
+.sfp-dash-form .sfp-live-interval{
+    min-width:118px;
+}
+.sfp-dash-form [data-sfp-start-live],
+.sfp-dash-form [data-sfp-stop-live],
+.sfp-dash-form [data-sfp-scan-button]{
+    white-space:nowrap;
+}
+@media(max-width:1100px){
+    .sfp-dash-live-meta{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+    .sfp-dash-form .sfp-live-interval{
+        min-width:0;
+    }
+}
+
+/* Phase 28 - SFP alerts and short history */
+.sfp-summary-phase28{
+    grid-template-columns:repeat(5,minmax(0,1fr));
+}
+.sfp-row-has-issue{
+    box-shadow:inset 4px 0 0 #f97316;
+}
+.sfp-alert-tags{
+    display:flex;
+    flex-wrap:wrap;
+    gap:4px;
+    min-width:220px;
+}
+.sfp-alert-tag{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-height:24px;
+    padding:2px 8px;
+    border-radius:999px;
+    background:#fff7ed;
+    color:#9a3412;
+    border:1px solid #fed7aa;
+    font-size:11px;
+    font-weight:950;
+    white-space:nowrap;
+}
+.sfp-alert-ok{
+    display:inline-flex;
+    align-items:center;
+    min-height:24px;
+    padding:2px 8px;
+    border-radius:999px;
+    background:#dcfce7;
+    color:#166534;
+    border:1px solid #86efac;
+    font-size:11px;
+    font-weight:950;
+}
+.sfp-delta-bad{
+    color:#b91c1c;
+    font-weight:950;
+}
+.sfp-history-mini{
+    max-width:310px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+.sfp-monitor-table-phase28 th,
+.sfp-monitor-table-phase28 td{
+    font-size:12px;
+}
+.sfp-dash-item.is-warning{
+    border-color:#fed7aa;
+    background:#fff7ed;
+}
+.sfp-dash-item em{
+    grid-column:1 / -1;
+    display:block;
+    width:100%;
+    min-width:0;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    color:#9a3412;
+    font-size:11px;
+    font-style:normal;
+    font-weight:850;
+    direction:ltr;
+    text-align:left;
+}
+@media(max-width:1200px){
+    .sfp-summary-phase28{
+        grid-template-columns:repeat(3,minmax(0,1fr));
+    }
+}
+@media(max-width:760px){
+    .sfp-summary-phase28{
+        grid-template-columns:1fr;
+    }
+    .sfp-alert-tags{
+        min-width:0;
+    }
+}
+.sfp-dash-item{
+    flex-wrap:wrap;
+}
+
+/* Phase 28.1 - Dashboard SFP visual sizing fix */
+.dashboard-overview-grid{
+    grid-template-columns:minmax(280px,.9fr) minmax(0,2.85fr);
+    align-items:stretch;
+    gap:14px;
+}
+
+.overview-primary{
+    min-height:100%;
+}
+
+.sfp-dashboard-card{
+    min-height:286px;
+    max-height:none;
+    padding:18px 20px;
+    grid-template-rows:auto minmax(66px,auto) auto auto;
+    gap:10px;
+    overflow:hidden;
+}
+
+.sfp-dash-head{
+    grid-template-columns:minmax(230px,1fr) auto;
+    align-items:start;
+    gap:14px;
+    direction:rtl;
+}
+
+.sfp-dash-title{
+    justify-items:start;
+    text-align:right;
+    direction:rtl;
+}
+
+.sfp-dash-title span,
+.sfp-dash-title small{
+    width:100%;
+}
+
+.sfp-dash-title strong{
+    justify-content:flex-start;
+    font-size:clamp(24px,2.1vw,32px);
+}
+
+.sfp-dash-tools{
+    justify-content:flex-start;
+    align-content:flex-start;
+    direction:ltr;
+    max-width:100%;
+}
+
+.sfp-dash-list{
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    align-content:start;
+    max-height:116px;
+    min-height:58px;
+    overflow:auto;
+    padding:2px 4px 2px 2px;
+}
+
+.sfp-dash-item,
+.sfp-dash-empty{
+    min-height:48px;
+    padding:9px 11px;
+}
+
+.sfp-dash-item em{
+    max-width:100%;
+    white-space:normal;
+    line-height:1.45;
+}
+
+.sfp-dash-message:empty{
+    display:none;
+}
+
+.sfp-dash-live-meta{
+    margin-top:0;
+    min-height:18px;
+}
+
+.sfp-dash-form{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:8px;
+    align-items:center;
+}
+
+.sfp-dash-form .input,
+.sfp-dash-form .btn{
+    width:100%;
+    min-width:0;
+    min-height:38px;
+    height:38px;
+    font-size:12px;
+}
+
+.sfp-dash-form .btn{
+    padding:0 10px;
+}
+
+@media(max-width:1200px){
+    .dashboard-overview-grid{
+        grid-template-columns:1fr;
+    }
+
+    .sfp-dashboard-card{
+        min-height:0;
+    }
+}
+
+@media(max-width:760px){
+    .sfp-dash-head{
+        grid-template-columns:1fr;
+    }
+
+    .sfp-dash-tools{
+        justify-content:flex-end;
+        direction:rtl;
+    }
+
+    .sfp-dash-form{
+        grid-template-columns:1fr 1fr;
+    }
+}
+
+@media(max-width:560px){
+    .sfp-dash-form{
+        grid-template-columns:1fr;
+    }
+}

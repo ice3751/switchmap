@@ -1,0 +1,634 @@
+/* Extracted from switchmap.css for feature-based loading. */
+
+/* Phase 35 - compact notification layer */
+.sidebar-notification-box{
+    border:1px solid rgba(148,163,184,.24);
+    border-radius:16px;
+    background:rgba(255,255,255,.055);
+    overflow:hidden;
+}
+.sidebar-notification-box summary{
+    min-height:44px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:10px 12px;
+    cursor:pointer;
+    list-style:none;
+    color:#e5edf7;
+    font-weight:900;
+    font-size:13px;
+}
+.sidebar-notification-box summary::-webkit-details-marker{display:none;}
+.sidebar-alarm-total{
+    min-width:28px;
+    min-height:24px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:2px 8px;
+    border-radius:999px;
+    background:rgba(148,163,184,.16);
+    color:#dbeafe;
+    font-size:12px;
+}
+.sidebar-alarm-total.is-critical{background:#fee2e2;color:#991b1b;}
+.sidebar-alarm-total.is-warning{background:#ffedd5;color:#9a3412;}
+.sidebar-notification-meta{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:6px;
+    padding:0 12px 10px;
+    color:#9fb2ce;
+    font-size:11px;
+}
+.sidebar-notification-meta span{
+    padding:6px 8px;
+    border-radius:10px;
+    background:rgba(15,23,42,.26);
+    border:1px solid rgba(148,163,184,.16);
+}
+.sidebar-notification-list{
+    display:grid;
+    gap:6px;
+    padding:0 10px 10px;
+    max-height:180px;
+    overflow:auto;
+}
+.sidebar-notification-item{
+    display:grid;
+    gap:3px;
+    padding:8px 10px;
+    border-radius:12px;
+    border:1px solid rgba(148,163,184,.18);
+    background:rgba(255,255,255,.06);
+    color:#e5edf7;
+}
+.sidebar-notification-item strong{
+    font-size:12px;
+    font-weight:950;
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+}
+.sidebar-notification-item span,
+.sidebar-notification-empty{
+    font-size:11px;
+    color:#9fb2ce;
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+}
+.sidebar-notification-item.alarm-dash-critical{border-color:rgba(248,113,113,.55);background:rgba(127,29,29,.22);}
+.sidebar-notification-item.alarm-dash-warning{border-color:rgba(251,146,60,.45);background:rgba(124,45,18,.18);}
+.sidebar-notification-link{
+    display:block;
+    margin:0 10px 10px;
+    padding:8px 10px;
+    border-radius:10px;
+    text-align:center;
+    color:#dbeafe;
+    border:1px solid rgba(96,165,250,.28);
+    background:rgba(37,99,235,.14);
+    font-size:12px;
+    font-weight:900;
+}
+.alarm-category-strip{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:6px;
+    margin:8px 0 10px;
+}
+.alarm-category-strip a{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:6px;
+    padding:7px 8px;
+    border-radius:10px;
+    border:1px solid rgba(148,163,184,.24);
+    background:#f8fbff;
+    color:#334155;
+    font-size:11px;
+    font-weight:800;
+}
+.alarm-category-strip b{
+    color:#0f172a;
+}
+.switch-alert-chip{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:6px 10px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:950;
+    border:1px solid #fed7aa;
+    background:#fff7ed;
+    color:#9a3412;
+}
+.switch-alert-chip.is-critical{
+    border-color:#fecaca;
+    background:#fef2f2;
+    color:#991b1b;
+}
+.switch-alert-chip small{
+    font-size:10px;
+    opacity:.82;
+}
+.switch-alarm-inline-list{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:8px;
+    margin:10px 0;
+}
+.switch-alarm-inline-item{
+    display:grid;
+    gap:2px;
+    padding:8px 10px;
+    border-radius:12px;
+    border:1px solid rgba(148,163,184,.24);
+    background:#f8fbff;
+    color:#0f172a;
+    min-width:0;
+}
+.switch-alarm-inline-item b,
+.switch-alarm-inline-item span{
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+}
+.switch-alarm-inline-item b{font-size:12px;font-weight:950;}
+.switch-alarm-inline-item span{font-size:11px;color:#64748b;}
+.switch-alarm-inline-item.alarm-dash-critical{background:#fef2f2;border-color:#fecaca;}
+.switch-alarm-inline-item.alarm-dash-warning{background:#fff7ed;border-color:#fed7aa;}
+@media (max-width:980px){
+    .sidebar-notification-box{display:none;}
+    .alarm-category-strip,
+    .switch-alarm-inline-list{grid-template-columns:1fr;}
+}
+
+
+/* Phase 35.1 - notification UI cleanup */
+.sidebar-notification-box{
+    display:none !important;
+}
+.nav-link-notification{
+    margin-top:10px;
+}
+.nav-link-notification .nav-badge{
+    margin-inline-start:auto;
+}
+.dashboard-overview-grid{
+    grid-template-columns:minmax(220px,.7fr) minmax(170px,.42fr) minmax(420px,1.7fr);
+    gap:12px;
+    align-items:start;
+}
+.alarm-mini-dropdown{
+    min-height:102px;
+    padding:12px 14px !important;
+    align-content:center;
+    overflow:visible;
+}
+.alarm-mini-summary{
+    min-height:54px;
+    display:grid !important;
+    grid-template-columns:auto auto minmax(0,1fr) !important;
+    align-items:center;
+    gap:8px;
+    padding:0;
+}
+.alarm-mini-title{
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:#64748b;
+}
+.alarm-mini-summary strong{
+    width:36px;
+    height:36px;
+    border-radius:999px;
+    display:inline-grid;
+    place-items:center;
+    background:#fee2e2;
+    color:#991b1b;
+    font-size:20px !important;
+    line-height:1;
+}
+.alarm-mini-counts{
+    justify-self:end;
+    font-size:11px;
+    color:#64748b;
+    white-space:nowrap;
+}
+.alarm-mini-panel{
+    margin-top:10px;
+    padding-top:10px;
+    border-top:1px solid rgba(203,213,225,.8);
+}
+.alarm-mini-dropdown:not([open]) .alarm-mini-panel{
+    display:none;
+}
+.alarm-category-strip{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+}
+.alarm-mini-list{
+    max-height:120px;
+}
+.sfp-dashboard-card{
+    min-height:0;
+    padding:14px 16px !important;
+}
+.sfp-dash-list{
+    max-height:126px;
+}
+@media(max-width:1280px){
+    .dashboard-overview-grid{
+        grid-template-columns:1fr;
+    }
+    .alarm-mini-dropdown,
+    .sfp-dashboard-card,
+    .overview-primary{
+        width:100%;
+    }
+}
+
+/* Phase 75.1 alarm topbar final compact link */
+body .topbar-user.command-topbar-user{
+    display:flex!important;
+    flex-direction:row!important;
+    align-items:center!important;
+    justify-content:flex-end!important;
+    gap:12px!important;
+    overflow:visible!important;
+    min-width:max-content!important;
+    height:auto!important;
+    position:relative!important;
+    z-index:5100!important;
+}
+body .topbar-user.command-topbar-user .command-user-dropdown{
+    order:1!important;
+    flex:0 0 auto!important;
+}
+body .topbar-user.command-topbar-user details[data-phase75-alarm-topbar],
+body .topbar-user.command-topbar-user details.phase75-alarm-topbar,
+body .topbar-user.command-topbar-user details.alarm-mini-dropdown.nav-link-notification.command-alarm-menu{
+    display:none!important;
+    visibility:hidden!important;
+    opacity:0!important;
+    width:0!important;
+    height:0!important;
+    min-width:0!important;
+    min-height:0!important;
+    max-width:0!important;
+    max-height:0!important;
+    margin:0!important;
+    padding:0!important;
+    overflow:hidden!important;
+}
+body .topbar-user.command-topbar-user .phase75-1-alarm-link,
+body .phase75-1-alarm-link{
+    order:2!important;
+    flex:0 0 auto!important;
+    width:auto!important;
+    min-width:74px!important;
+    max-width:160px!important;
+    height:42px!important;
+    min-height:42px!important;
+    max-height:42px!important;
+    margin:0!important;
+    padding:0 11px!important;
+    border-radius:14px!important;
+    border:1px solid rgba(255,255,255,.18)!important;
+    background:rgba(59,130,246,.16)!important;
+    color:#fff!important;
+    box-shadow:none!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:7px!important;
+    position:static!important;
+    inset:auto!important;
+    transform:none!important;
+    text-decoration:none!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    line-height:1!important;
+    vertical-align:middle!important;
+    cursor:pointer!important;
+    direction:rtl!important;
+}
+body .topbar-user.command-topbar-user .phase75-1-alarm-link.is-warning,
+body .phase75-1-alarm-link.is-warning{
+    background:rgba(245,158,11,.18)!important;
+    border-color:rgba(245,158,11,.34)!important;
+}
+body .topbar-user.command-topbar-user .phase75-1-alarm-link.is-critical,
+body .phase75-1-alarm-link.is-critical{
+    background:rgba(239,68,68,.20)!important;
+    border-color:rgba(239,68,68,.38)!important;
+}
+body .topbar-user.command-topbar-user .phase75-1-alarm-link:hover,
+body .phase75-1-alarm-link:hover{
+    background:rgba(59,130,246,.26)!important;
+    text-decoration:none!important;
+}
+body .topbar-user.command-topbar-user .phase75-1-alarm-link .topbar-alarm-icon,
+body .phase75-1-alarm-link .topbar-alarm-icon{
+    width:22px!important;
+    height:22px!important;
+    min-width:22px!important;
+    border-radius:999px!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    background:#f59e0b!important;
+    color:#111827!important;
+    font-size:13px!important;
+    font-weight:950!important;
+    line-height:1!important;
+}
+body .topbar-user.command-topbar-user .phase75-1-alarm-link.is-critical .topbar-alarm-icon,
+body .phase75-1-alarm-link.is-critical .topbar-alarm-icon{
+    background:#ef4444!important;
+    color:#fff!important;
+}
+body .topbar-user.command-topbar-user .phase75-1-alarm-link .topbar-alarm-text,
+body .phase75-1-alarm-link .topbar-alarm-text{
+    display:inline!important;
+    color:inherit!important;
+    font-size:12px!important;
+    font-weight:850!important;
+    line-height:1!important;
+}
+body .topbar-user.command-topbar-user .phase75-1-alarm-link .topbar-alarm-count,
+body .phase75-1-alarm-link .topbar-alarm-count{
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    min-width:20px!important;
+    height:20px!important;
+    padding:0 6px!important;
+    border-radius:999px!important;
+    background:rgba(255,255,255,.16)!important;
+    color:inherit!important;
+    font-size:12px!important;
+    font-weight:950!important;
+    line-height:1!important;
+}
+@media (max-width:860px){
+    body .topbar-user.command-topbar-user .phase75-1-alarm-link .topbar-alarm-text,
+    body .phase75-1-alarm-link .topbar-alarm-text{
+        display:none!important;
+    }
+    body .topbar-user.command-topbar-user .phase75-1-alarm-link,
+    body .phase75-1-alarm-link{
+        min-width:58px!important;
+        padding:0 9px!important;
+    }
+}
+
+/* Phase 75.2 alarm topbar dropdown */
+body .topbar-user.command-topbar-user{
+    display:flex!important;
+    flex-direction:row!important;
+    align-items:center!important;
+    justify-content:flex-end!important;
+    gap:12px!important;
+    overflow:visible!important;
+    min-width:max-content!important;
+    position:relative!important;
+    z-index:7000!important;
+}
+body .topbar-user.command-topbar-user .command-user-dropdown{
+    order:2!important;
+    flex:0 0 auto!important;
+}
+body .topbar-user.command-topbar-user .phase75-1-alarm-link{
+    display:none!important;
+    visibility:hidden!important;
+    opacity:0!important;
+}
+body .topbar-user.command-topbar-user details[data-phase75-alarm-topbar],
+body .topbar-user.command-topbar-user details.alarm-mini-dropdown.nav-link-notification.command-alarm-menu{
+    display:none!important;
+    visibility:hidden!important;
+    opacity:0!important;
+    width:0!important;
+    height:0!important;
+    overflow:hidden!important;
+}
+body .topbar-user.command-topbar-user .phase75-2-alarm-dropdown,
+body .phase75-2-alarm-dropdown{
+    order:1!important;
+    flex:0 0 auto!important;
+    position:relative!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    overflow:visible!important;
+    direction:rtl!important;
+    z-index:7600!important;
+}
+body .phase75-2-alarm-dropdown > summary,
+body .phase75-2-alarm-dropdown .topbar-alarm-summary{
+    list-style:none!important;
+    width:auto!important;
+    min-width:118px!important;
+    height:42px!important;
+    padding:0 12px!important;
+    border-radius:14px!important;
+    border:1px solid rgba(255,255,255,.18)!important;
+    background:rgba(59,130,246,.16)!important;
+    color:#fff!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:8px!important;
+    cursor:pointer!important;
+    white-space:nowrap!important;
+    user-select:none!important;
+    box-shadow:none!important;
+    line-height:1!important;
+}
+body .phase75-2-alarm-dropdown > summary::-webkit-details-marker{display:none!important;}
+body .phase75-2-alarm-dropdown.is-warning > summary{
+    background:rgba(245,158,11,.18)!important;
+    border-color:rgba(245,158,11,.38)!important;
+}
+body .phase75-2-alarm-dropdown.is-critical > summary{
+    background:rgba(239,68,68,.20)!important;
+    border-color:rgba(239,68,68,.42)!important;
+}
+body .phase75-2-alarm-dropdown .topbar-alarm-icon{
+    width:22px!important;
+    height:22px!important;
+    min-width:22px!important;
+    border-radius:999px!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    background:#f59e0b!important;
+    color:#111827!important;
+    font-size:13px!important;
+    font-weight:950!important;
+    line-height:1!important;
+}
+body .phase75-2-alarm-dropdown.is-critical .topbar-alarm-icon{
+    background:#ef4444!important;
+    color:#fff!important;
+}
+body .phase75-2-alarm-dropdown .topbar-alarm-text{
+    color:inherit!important;
+    font-size:12px!important;
+    font-weight:850!important;
+    line-height:1!important;
+}
+body .phase75-2-alarm-dropdown .topbar-alarm-count{
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    min-width:22px!important;
+    height:22px!important;
+    padding:0 7px!important;
+    border-radius:999px!important;
+    background:rgba(255,255,255,.16)!important;
+    color:inherit!important;
+    font-size:12px!important;
+    font-weight:950!important;
+    line-height:1!important;
+}
+body .phase75-2-alarm-dropdown .phase75-2-alarm-panel,
+body .phase75-2-alarm-dropdown .topbar-alarm-panel{
+    position:absolute!important;
+    top:calc(100% + 12px)!important;
+    right:0!important;
+    left:auto!important;
+    width:380px!important;
+    max-width:calc(100vw - 24px)!important;
+    min-width:340px!important;
+    max-height:520px!important;
+    overflow:auto!important;
+    padding:10px!important;
+    border-radius:18px!important;
+    border:1px solid rgba(148,163,184,.28)!important;
+    background:#ffffff!important;
+    color:#0f172a!important;
+    box-shadow:0 24px 60px rgba(15,23,42,.22)!important;
+    z-index:9000!important;
+    direction:rtl!important;
+    text-align:right!important;
+}
+body .phase75-2-alarm-dropdown:not([open]) .phase75-2-alarm-panel{display:none!important;}
+body .phase75-2-alarm-dropdown .topbar-alarm-panel-head{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:space-between!important;
+    gap:10px!important;
+    padding:7px 8px 10px!important;
+    border-bottom:1px solid rgba(226,232,240,.95)!important;
+    margin-bottom:8px!important;
+}
+body .phase75-2-alarm-dropdown .topbar-alarm-panel-head strong{
+    font-size:14px!important;
+    font-weight:950!important;
+    color:#0f172a!important;
+}
+body .phase75-2-alarm-dropdown .topbar-alarm-panel-head small{
+    color:#64748b!important;
+    font-size:11px!important;
+    font-weight:800!important;
+}
+body .phase75-2-alarm-dropdown .topbar-alarm-list{
+    display:flex!important;
+    flex-direction:column!important;
+    gap:7px!important;
+}
+body .phase75-2-alarm-dropdown .topbar-alarm-item{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:space-between!important;
+    gap:12px!important;
+    padding:10px 10px!important;
+    border-radius:14px!important;
+    border:1px solid rgba(226,232,240,.9)!important;
+    background:#f8fafc!important;
+    color:#0f172a!important;
+    text-decoration:none!important;
+    min-height:58px!important;
+}
+body .phase75-2-alarm-dropdown .topbar-alarm-item:hover{
+    background:#eef6ff!important;
+    border-color:rgba(59,130,246,.35)!important;
+    text-decoration:none!important;
+}
+body .phase75-2-alarm-dropdown .topbar-alarm-item-main{
+    display:flex!important;
+    flex-direction:column!important;
+    gap:5px!important;
+    min-width:0!important;
+}
+body .phase75-2-alarm-dropdown .topbar-alarm-item-main b{
+    font-size:12px!important;
+    font-weight:950!important;
+    color:#0f172a!important;
+    line-height:1.35!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    max-width:245px!important;
+}
+body .phase75-2-alarm-dropdown .topbar-alarm-item-main small{
+    font-size:11px!important;
+    font-weight:750!important;
+    color:#64748b!important;
+    direction:ltr!important;
+    text-align:left!important;
+}
+body .phase75-2-alarm-dropdown .topbar-alarm-item em{
+    font-style:normal!important;
+    font-size:10px!important;
+    font-weight:950!important;
+    border-radius:999px!important;
+    padding:5px 8px!important;
+    background:#f59e0b!important;
+    color:#111827!important;
+    flex:0 0 auto!important;
+}
+body .phase75-2-alarm-dropdown .topbar-alarm-item.severity-critical em{
+    background:#ef4444!important;
+    color:#fff!important;
+}
+body .phase75-2-alarm-dropdown .topbar-alarm-empty{
+    padding:18px 12px!important;
+    border-radius:14px!important;
+    background:#f8fafc!important;
+    color:#64748b!important;
+    text-align:center!important;
+    font-size:12px!important;
+    font-weight:800!important;
+}
+body .phase75-2-alarm-dropdown .topbar-alarm-all{
+    margin-top:9px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    height:38px!important;
+    border-radius:12px!important;
+    background:#2563eb!important;
+    color:#fff!important;
+    text-decoration:none!important;
+    font-size:12px!important;
+    font-weight:950!important;
+}
+body .phase75-2-alarm-dropdown .topbar-alarm-all:hover{
+    background:#1d4ed8!important;
+    color:#fff!important;
+}
+@media (max-width:860px){
+    body .phase75-2-alarm-dropdown > summary{min-width:58px!important;padding:0 9px!important;}
+    body .phase75-2-alarm-dropdown .topbar-alarm-text{display:none!important;}
+    body .phase75-2-alarm-dropdown .phase75-2-alarm-panel{right:auto!important;left:0!important;width:340px!important;min-width:300px!important;}
+}
+

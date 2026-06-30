@@ -1,0 +1,1484 @@
+/* SwitchMap Phase 50-54 MikroTik Center */
+.mikrotik-summary-grid{
+    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    margin-bottom:14px;
+}
+.mikrotik-hub-card,
+.mikrotik-panel,
+.mikrotik-tunnel-center,
+.mikrotik-routing-panel{
+    padding:16px;
+    margin-bottom:16px;
+}
+.mikrotik-section-title{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:16px;
+    margin-bottom:14px;
+}
+.mikrotik-section-title.compact{margin-bottom:10px;}
+.mikrotik-section-title h3{
+    margin:0 0 5px;
+    font-size:18px;
+    font-weight:950;
+    color:#0f172a;
+}
+.mikrotik-section-title p{
+    margin:0;
+    color:#64748b;
+    font-size:12px;
+}
+.mikrotik-mode-pill{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-height:28px;
+    padding:4px 11px;
+    border-radius:999px;
+    background:#eff6ff;
+    border:1px solid #bfdbfe;
+    color:#1d4ed8;
+    font-size:11px;
+    font-weight:950;
+    white-space:nowrap;
+}
+.mikrotik-mode-pill.warning{
+    background:#fff7ed;
+    border-color:#fed7aa;
+    color:#c2410c;
+}
+.mikrotik-hub-layout{
+    display:grid;
+    grid-template-columns:minmax(240px,.85fr) minmax(420px,1.65fr);
+    gap:16px;
+    align-items:stretch;
+}
+.mikrotik-hub-node{
+    display:grid;
+    align-items:center;
+}
+.mikrotik-device-card,
+.mikrotik-device-row,
+.mikrotik-health-card,
+.mikrotik-policy-card,
+.mikrotik-link-card{
+    color:#0f172a;
+    text-decoration:none;
+}
+.mikrotik-device-card{
+    display:grid;
+    gap:7px;
+    min-height:210px;
+    padding:18px;
+    border-radius:22px;
+    background:linear-gradient(135deg,#0f172a,#1d4ed8);
+    border:1px solid #bfdbfe;
+    color:#fff;
+    box-shadow:0 18px 42px rgba(15,23,42,.14);
+}
+.mikrotik-device-card strong{
+    font-size:26px;
+    font-weight:950;
+}
+.mikrotik-device-card small,
+.mikrotik-device-card em{
+    color:#dbeafe;
+    font-size:12px;
+    font-style:normal;
+}
+.device-kicker{
+    width:max-content;
+    padding:4px 9px;
+    border-radius:999px;
+    background:rgba(255,255,255,.14);
+    border:1px solid rgba(255,255,255,.18);
+    font-size:11px;
+    font-weight:950;
+}
+.mikrotik-spoke-links{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:10px;
+}
+.mikrotik-link-card{
+    display:grid;
+    gap:8px;
+    padding:12px;
+    border-radius:18px;
+    border:1px solid #e2e8f0;
+    background:#fff;
+}
+.mikrotik-link-card.status-up{border-color:#bbf7d0;background:#f8fffb;}
+.mikrotik-link-card.status-warning{border-color:#fed7aa;background:#fffaf3;}
+.mikrotik-link-card.status-unknown{border-color:#dbeafe;background:#f8fbff;}
+.mikrotik-link-line{
+    display:grid;
+    grid-template-columns:max-content 1fr max-content;
+    gap:9px;
+    align-items:center;
+    color:#334155;
+    font-size:11px;
+    font-weight:950;
+}
+.mikrotik-link-line b{
+    height:3px;
+    border-radius:999px;
+    background:linear-gradient(90deg,#2563eb,#16a34a);
+}
+.mikrotik-link-meta{
+    display:grid;
+    gap:3px;
+}
+.mikrotik-link-meta strong{font-size:14px;font-weight:950;}
+.mikrotik-link-meta small,
+.mikrotik-link-meta em{font-size:11px;color:#64748b;font-style:normal;}
+.mikrotik-workspace{
+    display:grid;
+    grid-template-columns:minmax(320px,.9fr) minmax(420px,1.1fr);
+    gap:16px;
+    align-items:start;
+}
+.mikrotik-role-groups{
+    display:grid;
+    gap:9px;
+}
+.mikrotik-role-group{
+    border:1px solid #e2e8f0;
+    border-radius:16px;
+    overflow:hidden;
+    background:#f8fafc;
+}
+.mikrotik-role-group summary{
+    cursor:pointer;
+    list-style:none;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:10px 12px;
+    background:#fff;
+    border-bottom:1px solid #e2e8f0;
+    font-weight:950;
+}
+.mikrotik-role-group summary::-webkit-details-marker{display:none;}
+.mikrotik-role-group summary strong{
+    display:grid;
+    place-items:center;
+    min-width:26px;
+    height:22px;
+    border-radius:999px;
+    background:#eff6ff;
+    color:#1d4ed8;
+    font-size:12px;
+}
+.mikrotik-device-list{
+    display:grid;
+    gap:8px;
+    padding:10px;
+}
+.mikrotik-device-row{
+    display:grid;
+    grid-template-columns:14px 1fr auto;
+    gap:4px 8px;
+    align-items:center;
+    padding:10px;
+    border:1px solid #e2e8f0;
+    border-radius:14px;
+    background:#fff;
+}
+.mikrotik-device-row strong{font-size:13px;font-weight:950;}
+.mikrotik-device-row small{font-size:11px;color:#64748b;}
+.mikrotik-device-row em{grid-column:2 / 4;font-size:11px;color:#64748b;font-style:normal;}
+.role-dot{
+    width:10px;
+    height:10px;
+    border-radius:999px;
+    background:#94a3b8;
+}
+.role-dot.core_router{background:#2563eb;}
+.role-dot.edge_router{background:#dc2626;}
+.role-dot.remote_router{background:#7c3aed;}
+.role-dot.access_point{background:#0891b2;}
+.role-dot.routeros_switch{background:#16a34a;}
+.role-dot.routeros_device{background:#f59e0b;}
+.mikrotik-health-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:10px;
+}
+.mikrotik-health-card{
+    display:grid;
+    gap:6px;
+    padding:12px;
+    border-radius:16px;
+    border:1px solid #e2e8f0;
+    background:#fff;
+}
+.mikrotik-health-card div{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+}
+.mikrotik-health-card strong{font-size:13px;font-weight:950;}
+.mikrotik-health-card span,
+.mikrotik-health-card small{font-size:11px;color:#64748b;}
+.mikrotik-health-card.health-up{border-color:#bbf7d0;background:#f8fffb;}
+.mikrotik-health-card.health-warning{border-color:#fed7aa;background:#fffaf3;}
+.mikrotik-health-card.health-down{border-color:#fecaca;background:#fff7f7;}
+.mikrotik-health-card.health-unknown{border-color:#dbeafe;background:#f8fbff;}
+.mikrotik-health-badge{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:max-content;
+    min-height:24px;
+    padding:3px 9px;
+    border-radius:999px;
+    background:#f8fafc;
+    border:1px solid #e2e8f0;
+    color:#475569;
+    font-size:11px;
+    font-weight:950;
+    white-space:nowrap;
+}
+.mikrotik-health-badge.up{background:#f0fdf4;border-color:#bbf7d0;color:#15803d;}
+.mikrotik-health-badge.warning{background:#fff7ed;border-color:#fed7aa;color:#c2410c;}
+.mikrotik-health-badge.down{background:#fef2f2;border-color:#fecaca;color:#b91c1c;}
+.mikrotik-health-badge.unknown{background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8;}
+.mikrotik-table td,
+.mikrotik-table th{
+    vertical-align:middle;
+}
+.mikrotik-policy-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+    gap:10px;
+}
+.mikrotik-policy-card{
+    display:grid;
+    gap:5px;
+    padding:12px;
+    border:1px solid #e2e8f0;
+    border-radius:16px;
+    background:#fff;
+}
+.mikrotik-policy-card.confidence-documented{border-color:#bbf7d0;background:#f8fffb;}
+.mikrotik-policy-card.confidence-inferred{border-color:#dbeafe;background:#f8fbff;}
+.mikrotik-policy-card.confidence-needs_review{border-color:#fed7aa;background:#fffaf3;}
+.mikrotik-policy-card strong{font-size:14px;font-weight:950;}
+.mikrotik-policy-card span,
+.mikrotik-policy-card small,
+.mikrotik-policy-card em{font-size:11px;color:#64748b;font-style:normal;}
+.mikrotik-empty-state{
+    display:grid;
+    place-items:center;
+    min-height:90px;
+    padding:14px;
+    border:1px dashed #cbd5e1;
+    border-radius:16px;
+    background:#f8fafc;
+    color:#64748b;
+    font-size:13px;
+    font-weight:800;
+    text-align:center;
+}
+.mikrotik-empty-state.small{min-height:40px;font-size:12px;}
+@media(max-width:1100px){
+    .mikrotik-hub-layout,
+    .mikrotik-workspace{
+        grid-template-columns:1fr;
+    }
+}
+@media(max-width:720px){
+    .mikrotik-section-title{
+        flex-direction:column;
+    }
+    .mikrotik-device-row{
+        grid-template-columns:14px 1fr;
+    }
+    .mikrotik-device-row small,
+    .mikrotik-device-row em{
+        grid-column:2;
+    }
+}
+
+/* Phase 55 - MikroTik data model foundation */
+.mikrotik-foundation-strip{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:14px 18px;
+    border-inline-start:5px solid #22c55e;
+    background:linear-gradient(135deg,#f0fdf4,#ffffff);
+}
+.mikrotik-foundation-strip div{
+    display:grid;
+    gap:3px;
+}
+.mikrotik-foundation-strip strong{
+    color:#0f172a;
+    font-size:14px;
+    font-weight:950;
+}
+.mikrotik-foundation-strip span,
+.mikrotik-foundation-strip small{
+    color:#64748b;
+    font-size:12px;
+    font-weight:800;
+}
+.mikrotik-wan-panel{
+    margin-top:16px;
+}
+
+/* Phase 56 - MikroTik data quality and JSON diagnostics */
+.mikrotik-data-quality{
+    padding:16px;
+    margin-bottom:16px;
+    border-inline-start:5px solid #3b82f6;
+}
+.mikrotik-review-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:10px;
+}
+.mikrotik-review-card{
+    display:grid;
+    gap:5px;
+    padding:12px;
+    border:1px solid #e2e8f0;
+    border-radius:16px;
+    background:#fff;
+    color:#0f172a;
+    text-decoration:none;
+}
+.mikrotik-review-card.severity-info{border-color:#dbeafe;background:#f8fbff;}
+.mikrotik-review-card.severity-warning{border-color:#fed7aa;background:#fffaf3;}
+.mikrotik-review-card.severity-critical{border-color:#fecaca;background:#fff7f7;}
+.mikrotik-review-card strong{font-size:13px;font-weight:950;}
+.mikrotik-review-card span,
+.mikrotik-review-card small{font-size:11px;color:#64748b;}
+.mikrotik-data-footnote{
+    margin-top:10px;
+    padding-top:10px;
+    border-top:1px solid #e2e8f0;
+    color:#64748b;
+    font-size:11px;
+    font-weight:800;
+}
+
+
+/* Phase 57 - MikroTik live read-only polling */
+.mikrotik-live-poll-card {
+    border-color: rgba(37, 99, 235, 0.18);
+}
+
+.mikrotik-live-poll-form {
+    display: grid;
+    grid-template-columns: minmax(240px, 2fr) repeat(3, minmax(140px, 1fr)) auto;
+    gap: 12px;
+    align-items: end;
+}
+
+.mikrotik-live-poll-form label {
+    display: grid;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 800;
+    color: #64748b;
+}
+
+.mikrotik-live-poll-form input,
+.mikrotik-live-poll-form select {
+    width: 100%;
+    min-height: 42px;
+    border: 1px solid rgba(148, 163, 184, 0.45);
+    border-radius: 12px;
+    padding: 9px 12px;
+    background: #ffffff;
+    color: #0f172a;
+    font-weight: 800;
+}
+
+.mikrotik-live-poll-note {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 12px;
+    font-size: 12px;
+    color: #64748b;
+}
+
+.mikrotik-live-poll-note span {
+    padding: 7px 10px;
+    border-radius: 999px;
+    background: rgba(37, 99, 235, 0.06);
+    border: 1px solid rgba(37, 99, 235, 0.12);
+}
+
+@media (max-width: 1100px) {
+    .mikrotik-live-poll-form {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 680px) {
+    .mikrotik-live-poll-form {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Phase 58 - MikroTik UX cleanup and explanation */
+.phase58-mikrotik-ux{
+    display:grid;
+    gap:14px;
+}
+.phase58-mikrotik-ux .surface-card{
+    overflow:hidden;
+}
+.mikrotik-purpose-card{
+    padding:16px 18px;
+    border-inline-start:5px solid #2563eb;
+    background:linear-gradient(135deg,#f8fbff,#ffffff);
+}
+.mikrotik-purpose-head{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:16px;
+    margin-bottom:12px;
+}
+.mikrotik-purpose-head h3{
+    margin:0 0 6px;
+    font-size:18px;
+    font-weight:950;
+    color:#0f172a;
+}
+.mikrotik-purpose-head p{
+    margin:0;
+    color:#64748b;
+    font-size:12px;
+    line-height:1.9;
+}
+.mikrotik-purpose-grid{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:10px;
+}
+.mikrotik-purpose-grid div{
+    display:grid;
+    gap:5px;
+    padding:12px;
+    border:1px solid #e2e8f0;
+    border-radius:16px;
+    background:#fff;
+}
+.mikrotik-purpose-grid strong{
+    color:#0f172a;
+    font-size:13px;
+    font-weight:950;
+}
+.mikrotik-purpose-grid span{
+    color:#64748b;
+    font-size:12px;
+    line-height:1.8;
+}
+.phase58-mikrotik-ux .mikrotik-live-poll-card{
+    padding:16px;
+    border-inline-start:5px solid #22c55e;
+    background:linear-gradient(135deg,#f0fdf4,#ffffff 55%);
+}
+.phase58-mikrotik-ux .mikrotik-live-poll-form.clean-form{
+    display:grid !important;
+    grid-template-columns:minmax(280px,2fr) minmax(150px,1fr) minmax(180px,1fr) 96px auto !important;
+    gap:10px !important;
+    align-items:end !important;
+    padding:12px;
+    border:1px solid #dbeafe;
+    border-radius:18px;
+    background:#fff;
+}
+.phase58-mikrotik-ux .mikrotik-live-poll-form label{
+    display:grid !important;
+    gap:6px !important;
+    margin:0 !important;
+    text-align:right;
+}
+.phase58-mikrotik-ux .mikrotik-live-poll-form label span{
+    color:#475569;
+    font-size:11px;
+    font-weight:950;
+}
+.phase58-mikrotik-ux .mikrotik-live-poll-form input,
+.phase58-mikrotik-ux .mikrotik-live-poll-form select{
+    min-height:40px !important;
+    width:100% !important;
+    border:1px solid #cbd5e1 !important;
+    border-radius:12px !important;
+    padding:8px 10px !important;
+    background:#fff !important;
+    color:#0f172a !important;
+    font-size:12px !important;
+    font-weight:800 !important;
+    box-sizing:border-box;
+}
+.phase58-mikrotik-ux .mikrotik-run-button{
+    min-height:40px;
+    white-space:nowrap;
+}
+.phase58-mikrotik-ux .mikrotik-live-poll-note{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-top:10px;
+    align-items:center;
+}
+.phase58-mikrotik-ux .mikrotik-live-poll-note span,
+.phase58-mikrotik-ux .mikrotik-live-poll-note details{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    min-height:30px;
+    padding:6px 10px;
+    border:1px solid #dbeafe;
+    border-radius:999px;
+    background:#f8fbff;
+    color:#475569;
+    font-size:11px;
+    font-weight:850;
+}
+.phase58-mikrotik-ux .mikrotik-live-poll-note details{
+    border-radius:14px;
+    flex-wrap:wrap;
+}
+.phase58-mikrotik-ux .mikrotik-live-poll-note summary{
+    cursor:pointer;
+    font-weight:950;
+}
+.phase58-mikrotik-ux .mikrotik-live-poll-note code{
+    direction:ltr;
+    unicode-bidi:embed;
+    background:#eef2ff;
+    border-radius:8px;
+    padding:3px 6px;
+}
+.mikrotik-top-grid{
+    display:grid;
+    grid-template-columns:minmax(520px,1.3fr) minmax(320px,.7fr);
+    gap:14px;
+    align-items:start;
+}
+.phase58-mikrotik-ux .mikrotik-hub-card,
+.phase58-mikrotik-ux .mikrotik-panel,
+.phase58-mikrotik-ux .mikrotik-data-quality{
+    padding:16px;
+    margin-bottom:0;
+}
+.phase58-mikrotik-ux .mikrotik-hub-layout.clean-map{
+    grid-template-columns:minmax(230px,.75fr) minmax(360px,1.25fr);
+}
+.phase58-mikrotik-ux .mikrotik-device-card{
+    min-height:170px;
+}
+.phase58-mikrotik-ux .compact-links{
+    grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+    gap:9px;
+    max-height:355px;
+    overflow:auto;
+    padding-inline-end:3px;
+}
+.phase58-mikrotik-ux .mikrotik-link-card{
+    padding:10px;
+    border-radius:15px;
+}
+.phase58-mikrotik-ux .mikrotik-link-line{
+    grid-template-columns:max-content 1fr max-content;
+}
+.phase58-mikrotik-ux .mikrotik-link-meta strong{
+    display:none;
+}
+.compact-review{
+    border-inline-start:5px solid #f59e0b;
+}
+.clean-review-grid{
+    grid-template-columns:1fr !important;
+    gap:8px;
+    max-height:420px;
+    overflow:auto;
+    padding-inline-end:3px;
+}
+.clean-review-grid .mikrotik-review-card{
+    padding:10px;
+    border-radius:14px;
+    gap:4px;
+}
+.clean-review-grid .mikrotik-review-card strong,
+.clean-review-grid .mikrotik-review-card span,
+.clean-review-grid .mikrotik-review-card small{
+    display:block;
+    white-space:normal;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    line-height:1.7;
+}
+.clean-review-grid .mikrotik-review-card small{
+    display:-webkit-box;
+    -webkit-line-clamp:2;
+    -webkit-box-orient:vertical;
+}
+.phase58-mikrotik-ux .mikrotik-workspace{
+    grid-template-columns:minmax(440px,1fr) minmax(360px,.8fr);
+    gap:14px;
+}
+.phase58-mikrotik-ux .mikrotik-health-grid{
+    grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+    max-height:460px;
+    overflow:auto;
+    padding-inline-end:3px;
+}
+.phase58-mikrotik-ux .mikrotik-role-groups{
+    max-height:460px;
+    overflow:auto;
+    padding-inline-end:3px;
+}
+.mikrotik-collapsible-section{
+    padding:14px 16px;
+}
+.mikrotik-collapsible-section > summary{
+    cursor:pointer;
+    list-style:none;
+    font-size:15px;
+    font-weight:950;
+    color:#0f172a;
+}
+.mikrotik-collapsible-section > summary::-webkit-details-marker{display:none;}
+.mikrotik-collapsible-section > summary:before{
+    content:"+";
+    display:inline-grid;
+    place-items:center;
+    width:24px;
+    height:24px;
+    margin-left:8px;
+    border-radius:999px;
+    background:#eff6ff;
+    color:#1d4ed8;
+    font-weight:950;
+}
+.mikrotik-collapsible-section[open] > summary:before{content:"−";}
+.mikrotik-collapsible-section p{
+    color:#64748b;
+    font-size:12px;
+    margin:10px 0 12px;
+}
+.mikrotik-dual-policy-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+}
+.mikrotik-dual-policy-grid h4{
+    margin:0 0 10px;
+    font-size:13px;
+    font-weight:950;
+    color:#0f172a;
+}
+.phase58-mikrotik-ux .table-wrap{
+    overflow:auto;
+    max-height:460px;
+}
+.phase58-mikrotik-ux .mikrotik-table{
+    min-width:860px;
+}
+@media(max-width:1200px){
+    .mikrotik-top-grid,
+    .phase58-mikrotik-ux .mikrotik-workspace,
+    .mikrotik-dual-policy-grid{
+        grid-template-columns:1fr;
+    }
+    .phase58-mikrotik-ux .mikrotik-hub-layout.clean-map{
+        grid-template-columns:1fr;
+    }
+    .phase58-mikrotik-ux .mikrotik-live-poll-form.clean-form{
+        grid-template-columns:1fr 1fr !important;
+    }
+}
+@media(max-width:720px){
+    .mikrotik-purpose-head{
+        flex-direction:column;
+    }
+    .mikrotik-purpose-grid,
+    .phase58-mikrotik-ux .mikrotik-live-poll-form.clean-form{
+        grid-template-columns:1fr !important;
+    }
+}
+
+/* Phase 59 - MikroTik live poll result UX */
+.phase59-poll-result-ux{
+    margin-top:12px;
+    padding:12px;
+    border:1px solid #dbeafe;
+    border-radius:18px;
+    background:linear-gradient(135deg,#ffffff,#f8fbff);
+}
+.mikrotik-poll-result-panel .mikrotik-section-title{
+    margin-bottom:10px;
+}
+.mikrotik-latest-result-card{
+    display:grid;
+    gap:10px;
+    padding:13px;
+    border:1px solid #e2e8f0;
+    border-radius:16px;
+    background:#fff;
+}
+.mikrotik-latest-result-card.status-up{border-color:#bbf7d0;background:#f8fffb;}
+.mikrotik-latest-result-card.status-warning{border-color:#fed7aa;background:#fffaf3;}
+.mikrotik-latest-result-card.status-down{border-color:#fecaca;background:#fff7f7;}
+.mikrotik-latest-result-card.status-unknown{border-color:#dbeafe;background:#f8fbff;}
+.mikrotik-result-device-line{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+}
+.mikrotik-result-device-line div{
+    display:grid;
+    gap:3px;
+}
+.mikrotik-result-device-line strong{
+    color:#0f172a;
+    font-size:15px;
+    font-weight:950;
+}
+.mikrotik-result-device-line span,
+.mikrotik-result-device-line small{
+    color:#64748b;
+    font-size:11px;
+    font-weight:850;
+}
+.mikrotik-result-metrics{
+    display:grid;
+    grid-template-columns:repeat(5,minmax(0,1fr));
+    gap:8px;
+}
+.mikrotik-result-metrics span{
+    display:grid;
+    gap:4px;
+    padding:9px;
+    border:1px solid #e2e8f0;
+    border-radius:13px;
+    background:#ffffff;
+}
+.mikrotik-result-metrics b{
+    color:#64748b;
+    font-size:10px;
+    font-weight:950;
+}
+.mikrotik-result-metrics em{
+    color:#0f172a;
+    font-size:12px;
+    font-style:normal;
+    font-weight:950;
+}
+.mikrotik-result-message{
+    display:flex;
+    gap:8px;
+    align-items:flex-start;
+    padding:9px 10px;
+    border-radius:13px;
+    background:#f8fafc;
+    border:1px solid #e2e8f0;
+    color:#475569;
+    font-size:12px;
+    line-height:1.8;
+}
+.mikrotik-result-message strong{
+    color:#0f172a;
+    white-space:nowrap;
+}
+.mikrotik-poll-history{
+    margin-top:10px;
+    border:1px solid #e2e8f0;
+    border-radius:16px;
+    background:#fff;
+    overflow:hidden;
+}
+.mikrotik-poll-history > summary{
+    cursor:pointer;
+    list-style:none;
+    padding:10px 12px;
+    color:#0f172a;
+    font-size:12px;
+    font-weight:950;
+    background:#f8fafc;
+    border-bottom:1px solid #e2e8f0;
+}
+.mikrotik-poll-history > summary::-webkit-details-marker{display:none;}
+.mikrotik-poll-history > summary:before{
+    content:"+";
+    display:inline-grid;
+    place-items:center;
+    width:21px;
+    height:21px;
+    margin-left:7px;
+    border-radius:999px;
+    background:#eff6ff;
+    color:#1d4ed8;
+    font-weight:950;
+}
+.mikrotik-poll-history[open] > summary:before{content:"−";}
+.mikrotik-poll-history-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+    gap:8px;
+    padding:10px;
+}
+.mikrotik-poll-history-row{
+    display:grid;
+    gap:4px;
+    padding:10px;
+    border:1px solid #e2e8f0;
+    border-radius:13px;
+    color:#0f172a;
+    text-decoration:none;
+    background:#fff;
+}
+.mikrotik-poll-history-row.status-up{border-color:#bbf7d0;background:#f8fffb;}
+.mikrotik-poll-history-row.status-warning{border-color:#fed7aa;background:#fffaf3;}
+.mikrotik-poll-history-row.status-down{border-color:#fecaca;background:#fff7f7;}
+.mikrotik-poll-history-row strong{
+    font-size:12px;
+    font-weight:950;
+}
+.mikrotik-poll-history-row span,
+.mikrotik-poll-history-row small,
+.mikrotik-poll-history-row em{
+    color:#64748b;
+    font-size:11px;
+    font-style:normal;
+}
+@media(max-width:980px){
+    .mikrotik-result-metrics{grid-template-columns:repeat(2,minmax(0,1fr));}
+}
+@media(max-width:620px){
+    .mikrotik-result-device-line,
+    .mikrotik-result-message{display:grid;}
+    .mikrotik-result-metrics{grid-template-columns:1fr;}
+}
+
+/* Phase 60 - MikroTik monitoring dashboard redesign */
+.phase60-monitoring-dashboard{
+    display:grid;
+    gap:16px;
+}
+.phase60-monitoring-dashboard .surface-card{
+    overflow:hidden;
+}
+.mikrotik-executive-summary{
+    display:grid;
+    grid-template-columns:minmax(320px,1.2fr) minmax(360px,1fr);
+    gap:16px;
+    align-items:center;
+    border-inline-start:6px solid #2563eb;
+    background:linear-gradient(135deg,#ffffff,#f8fbff);
+}
+.mikrotik-executive-summary.status-up{border-inline-start-color:#16a34a;background:linear-gradient(135deg,#f0fdf4,#ffffff);}
+.mikrotik-executive-summary.status-warning{border-inline-start-color:#f59e0b;background:linear-gradient(135deg,#fffbeb,#ffffff);}
+.mikrotik-executive-summary.status-critical{border-inline-start-color:#dc2626;background:linear-gradient(135deg,#fef2f2,#ffffff);}
+.mikrotik-summary-main{
+    display:flex;
+    gap:14px;
+    align-items:flex-start;
+}
+.mikrotik-summary-main h3{
+    margin:0 0 6px;
+    font-size:15px;
+    font-weight:950;
+    color:#0f172a;
+}
+.mikrotik-summary-main strong{
+    display:block;
+    margin-bottom:4px;
+    font-size:30px;
+    line-height:1.1;
+    font-weight:950;
+    color:#0f172a;
+}
+.mikrotik-summary-main p{
+    margin:0;
+    color:#64748b;
+    font-size:13px;
+    font-weight:800;
+}
+.mikrotik-kpi-strip{
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:10px;
+}
+.mikrotik-kpi-strip div{
+    display:grid;
+    gap:5px;
+    padding:12px;
+    border:1px solid #e2e8f0;
+    border-radius:16px;
+    background:#fff;
+    text-align:center;
+}
+.mikrotik-kpi-strip span{
+    color:#64748b;
+    font-size:11px;
+    font-weight:950;
+}
+.mikrotik-kpi-strip b{
+    color:#0f172a;
+    font-size:20px;
+    font-weight:950;
+}
+.mikrotik-dashboard-grid{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(240px,1fr));
+    gap:16px;
+}
+.mikrotik-chart-card{
+    display:grid;
+    gap:14px;
+    min-height:220px;
+}
+.mikrotik-bars{
+    display:grid;
+    gap:11px;
+}
+.mikrotik-bar-row{
+    display:grid;
+    grid-template-columns:72px 1fr 42px;
+    gap:10px;
+    align-items:center;
+    direction:ltr;
+}
+.mikrotik-bar-row span,
+.mikrotik-bar-row strong{
+    color:#334155;
+    font-size:12px;
+    font-weight:950;
+}
+.mikrotik-bar-track{
+    height:12px;
+    border-radius:999px;
+    background:#e2e8f0;
+    overflow:hidden;
+}
+.mikrotik-bar-track b{
+    display:block;
+    height:100%;
+    min-width:3px;
+    border-radius:999px;
+    background:#64748b;
+}
+.mikrotik-bar-row.up .mikrotik-bar-track b{background:#16a34a;}
+.mikrotik-bar-row.warning .mikrotik-bar-track b{background:#f59e0b;}
+.mikrotik-bar-row.down .mikrotik-bar-track b{background:#dc2626;}
+.mikrotik-bar-row.unknown .mikrotik-bar-track b{background:#2563eb;}
+.mikrotik-freshness-ring{
+    --fresh:0%;
+    width:148px;
+    height:148px;
+    margin:0 auto;
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    background:conic-gradient(#16a34a var(--fresh), #e2e8f0 0);
+    position:relative;
+}
+.mikrotik-freshness-ring::after{
+    content:"";
+    position:absolute;
+    inset:14px;
+    border-radius:50%;
+    background:#fff;
+}
+.mikrotik-freshness-ring strong,
+.mikrotik-freshness-ring span{
+    position:relative;
+    z-index:1;
+    display:block;
+    text-align:center;
+}
+.mikrotik-freshness-ring strong{
+    margin-top:22px;
+    color:#0f172a;
+    font-size:28px;
+    font-weight:950;
+}
+.mikrotik-freshness-ring span{
+    margin-top:-34px;
+    color:#64748b;
+    font-size:11px;
+    font-weight:950;
+}
+.mikrotik-mini-note{
+    text-align:center;
+    color:#64748b;
+    font-size:12px;
+    font-weight:850;
+}
+.mikrotik-action-panel{
+    border-inline-start:5px solid #f59e0b;
+}
+.mikrotik-action-list{
+    display:grid;
+    gap:8px;
+}
+.mikrotik-action-item{
+    display:grid;
+    grid-template-columns:88px 1fr;
+    gap:4px 12px;
+    align-items:start;
+    padding:12px;
+    border-radius:16px;
+    border:1px solid #e2e8f0;
+    background:#fff;
+    color:#0f172a;
+    text-decoration:none;
+}
+.mikrotik-action-item span{
+    grid-row:1 / 3;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-height:26px;
+    border-radius:999px;
+    font-size:10px;
+    font-weight:950;
+    text-transform:uppercase;
+}
+.mikrotik-action-item strong{
+    font-size:13px;
+    font-weight:950;
+}
+.mikrotik-action-item small{
+    color:#64748b;
+    font-size:12px;
+    font-weight:800;
+}
+.mikrotik-action-item.severity-critical{border-color:#fecaca;background:#fff7f7;}
+.mikrotik-action-item.severity-critical span{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;}
+.mikrotik-action-item.severity-warning{border-color:#fed7aa;background:#fffaf3;}
+.mikrotik-action-item.severity-warning span{background:#fff7ed;color:#c2410c;border:1px solid #fed7aa;}
+.mikrotik-action-item.severity-info{border-color:#dbeafe;background:#f8fbff;}
+.mikrotik-action-item.severity-info span{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;}
+.mikrotik-compact-grid{
+    display:grid;
+    grid-template-columns:1.1fr .9fr;
+    gap:16px;
+}
+.compact-health-panel{
+    display:grid;
+    gap:12px;
+}
+.mikrotik-compact-health-list{
+    display:grid;
+    gap:8px;
+}
+.mikrotik-compact-health-row{
+    display:grid;
+    grid-template-columns:1fr auto auto;
+    gap:10px;
+    align-items:center;
+    padding:10px 12px;
+    border-radius:14px;
+    border:1px solid #e2e8f0;
+    background:#fff;
+    color:#0f172a;
+    text-decoration:none;
+}
+.mikrotik-compact-health-row strong{font-size:13px;font-weight:950;}
+.mikrotik-compact-health-row span{font-size:12px;font-weight:950;}
+.mikrotik-compact-health-row small{color:#64748b;font-size:11px;font-weight:850;}
+.mikrotik-compact-health-row.health-up{border-color:#bbf7d0;background:#f8fffb;}
+.mikrotik-compact-health-row.health-warning{border-color:#fed7aa;background:#fffaf3;}
+.mikrotik-compact-health-row.health-down{border-color:#fecaca;background:#fff7f7;}
+.mikrotik-compact-health-row.health-unknown{border-color:#dbeafe;background:#f8fbff;}
+.mikrotik-auto-collector-card{
+    display:grid;
+    gap:10px;
+}
+.mikrotik-auto-collector-card div{
+    display:grid;
+    gap:4px;
+    padding:10px 12px;
+    border:1px solid #e2e8f0;
+    border-radius:14px;
+    background:#fff;
+}
+.mikrotik-auto-collector-card span{
+    color:#64748b;
+    font-size:11px;
+    font-weight:950;
+}
+.mikrotik-auto-collector-card b{
+    color:#0f172a;
+    font-size:12px;
+    font-weight:950;
+    overflow-wrap:anywhere;
+}
+.mikrotik-advanced-tools .mikrotik-live-poll-form{
+    margin-top:12px;
+}
+.phase60-monitoring-dashboard .compact-review:not([open]),
+.phase60-monitoring-dashboard .mikrotik-advanced-tools:not([open]){
+    padding-bottom:14px;
+}
+@media(max-width:1100px){
+    .mikrotik-executive-summary,
+    .mikrotik-dashboard-grid,
+    .mikrotik-compact-grid{
+        grid-template-columns:1fr;
+    }
+}
+@media(max-width:720px){
+    .mikrotik-kpi-strip{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+    .mikrotik-action-item,
+    .mikrotik-compact-health-row{
+        grid-template-columns:1fr;
+    }
+}
+
+
+/* Phase 61 - MikroTik insight dashboard */
+.phase61-insight-dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.mikrotik-insight-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(260px, 0.7fr);
+    gap: 18px;
+    align-items: stretch;
+    border-inline-start: 6px solid #64748b;
+}
+
+.mikrotik-insight-hero.state-critical {
+    border-inline-start-color: #dc2626;
+    background: linear-gradient(90deg, rgba(254, 226, 226, 0.72), rgba(255,255,255,0.95));
+}
+
+.mikrotik-insight-hero.state-warning,
+.mikrotik-insight-hero.state-coverage {
+    border-inline-start-color: #f59e0b;
+    background: linear-gradient(90deg, rgba(255, 247, 237, 0.85), rgba(255,255,255,0.95));
+}
+
+.mikrotik-insight-hero.state-healthy {
+    border-inline-start-color: #16a34a;
+    background: linear-gradient(90deg, rgba(220, 252, 231, 0.72), rgba(255,255,255,0.95));
+}
+
+.insight-hero-text h3,
+.insight-card h3,
+.insight-action-panel h3 {
+    margin: 0 0 8px;
+}
+
+.insight-hero-text strong {
+    display: block;
+    font-size: 28px;
+    line-height: 1.4;
+    color: #0f172a;
+    margin-top: 6px;
+}
+
+.insight-hero-text p,
+.insight-muted-text,
+.insight-mini-line {
+    color: #64748b;
+    line-height: 1.9;
+}
+
+.insight-hero-result {
+    border: 1px solid #dbeafe;
+    border-radius: 18px;
+    background: rgba(255,255,255,0.76);
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+}
+
+.insight-hero-result span,
+.insight-kpi-card span {
+    color: #64748b;
+    font-weight: 800;
+    font-size: 12px;
+}
+
+.insight-hero-result b {
+    font-size: 20px;
+    color: #0f172a;
+}
+
+.insight-hero-result small,
+.insight-kpi-card small {
+    color: #64748b;
+}
+
+.mikrotik-insight-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.insight-kpi-card {
+    min-height: 110px;
+    border-top: 4px solid #94a3b8;
+}
+
+.insight-kpi-card strong {
+    display: block;
+    font-size: 30px;
+    margin: 10px 0 4px;
+    color: #0f172a;
+}
+
+.insight-kpi-card.healthy { border-top-color: #16a34a; }
+.insight-kpi-card.failed { border-top-color: #dc2626; }
+.insight-kpi-card.stale { border-top-color: #f59e0b; }
+.insight-kpi-card.not-monitored { border-top-color: #64748b; }
+
+.mikrotik-insight-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.insight-card {
+    min-height: 260px;
+}
+
+.insight-ring {
+    margin: 18px auto 12px;
+}
+
+.insight-large-metric {
+    margin-top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.insight-large-metric b {
+    font-size: 48px;
+    color: #1d4ed8;
+}
+
+.insight-large-metric span {
+    color: #475569;
+    line-height: 1.8;
+}
+
+.insight-progress {
+    margin-top: 18px;
+    height: 14px;
+    border-radius: 999px;
+    background: #e2e8f0;
+    overflow: hidden;
+}
+
+.insight-progress b {
+    display: block;
+    height: 100%;
+    background: #2563eb;
+    border-radius: inherit;
+}
+
+.insight-status-ready,
+.insight-status-not-ready {
+    margin-top: 26px;
+    border-radius: 16px;
+    padding: 18px;
+    font-size: 22px;
+    font-weight: 900;
+    text-align: center;
+}
+
+.insight-status-ready {
+    color: #166534;
+    background: #dcfce7;
+    border: 1px solid #86efac;
+}
+
+.insight-status-not-ready {
+    color: #92400e;
+    background: #fffbeb;
+    border: 1px solid #fcd34d;
+}
+
+.insight-action-list {
+    display: grid;
+    gap: 10px;
+}
+
+.insight-action-item {
+    display: grid;
+    grid-template-columns: 260px minmax(0, 1fr) minmax(0, 1.2fr) 220px;
+    gap: 14px;
+    align-items: center;
+    text-decoration: none;
+    padding: 14px 16px;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    background: #fff;
+}
+
+.insight-action-item.severity-critical {
+    border-color: #fecaca;
+    background: #fff5f5;
+}
+
+.insight-action-item.severity-warning {
+    border-color: #fed7aa;
+    background: #fffaf0;
+}
+
+.insight-action-item.severity-info {
+    border-color: #bfdbfe;
+    background: #eff6ff;
+}
+
+.insight-action-item strong {
+    display: block;
+    color: #0f172a;
+}
+
+.insight-action-item span {
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.insight-action-item p,
+.insight-action-item small,
+.insight-action-item em {
+    margin: 0;
+    color: #475569;
+    line-height: 1.7;
+}
+
+.insight-device-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 10px;
+}
+
+.insight-device-card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 14px;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    background: #fff;
+    text-decoration: none;
+}
+
+.insight-device-card.state-healthy { border-color: #bbf7d0; }
+.insight-device-card.state-failed { border-color: #fecaca; background: #fff5f5; }
+.insight-device-card.state-stale { border-color: #fed7aa; background: #fffaf0; }
+.insight-device-card.state-not_monitored { border-color: #cbd5e1; background: #f8fafc; }
+
+.insight-device-card strong {
+    color: #0f172a;
+}
+
+.insight-device-card span {
+    font-weight: 900;
+    color: #334155;
+}
+
+.insight-device-card small,
+.insight-device-card em {
+    color: #64748b;
+    line-height: 1.6;
+}
+
+@media (max-width: 1100px) {
+    .mikrotik-insight-hero,
+    .mikrotik-insight-grid,
+    .mikrotik-insight-kpi-grid {
+        grid-template-columns: 1fr;
+    }
+    .insight-action-item {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Phase 62 - MikroTik automatic insight final UX polish */
+.phase62-auto-insight{display:grid;gap:14px;}
+.phase62-auto-insight .rtl-copy{text-align:right;}
+.final-hero{padding:20px 22px;display:flex;align-items:center;justify-content:space-between;gap:18px;}
+.auto-collector-status{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:14px 18px;border-color:#bbf7d0;background:linear-gradient(90deg,#ecfdf5,#f8fffb);}
+.auto-collector-status strong{display:block;font-size:16px;color:#166534;font-weight:950;margin-bottom:4px;}
+.auto-collector-status span{font-size:12px;color:#475569;}
+.auto-collector-meta{text-align:left;display:grid;gap:4px;color:#334155;}
+.auto-collector-meta b{font-size:12px;}
+.auto-collector-meta small{font-size:11px;color:#64748b;}
+.executive-answer{padding:20px;border-radius:22px;}
+.executive-answer.state-healthy{border-right:6px solid #16a34a;background:linear-gradient(90deg,#f0fdf4,#fff);}
+.executive-answer.state-warning,.executive-answer.state-critical{border-right:6px solid #f97316;background:linear-gradient(90deg,#fff7ed,#fff);}
+.executive-answer.state-info,.executive-answer.state-unknown{border-right:6px solid #2563eb;background:linear-gradient(90deg,#eff6ff,#fff);}
+.executive-answer-main{display:grid;grid-template-columns:1.4fr .8fr;gap:18px;align-items:center;direction:rtl;}
+.executive-answer h2{margin:8px 0 8px;color:#0f172a;font-size:28px;font-weight:950;letter-spacing:-.04em;}
+.executive-answer p{margin:0;color:#475569;font-size:13px;line-height:1.9;}
+.executive-next-step{padding:14px;border:1px solid #e2e8f0;border-radius:18px;background:#fff;display:grid;gap:7px;}
+.executive-next-step span{color:#64748b;font-size:12px;font-weight:800;}
+.executive-next-step strong{color:#0f172a;font-size:15px;line-height:1.8;}
+.insight-final-kpis{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:10px;}
+.final-kpi{min-height:116px;padding:15px;border-top:4px solid #94a3b8;display:grid;align-content:center;gap:5px;text-align:right;}
+.final-kpi span{font-size:12px;font-weight:900;color:#64748b;}
+.final-kpi strong{font-size:34px;font-weight:950;color:#0f172a;text-align:left;}
+.final-kpi small{font-size:12px;color:#64748b;}
+.final-kpi.healthy{border-top-color:#16a34a;}
+.final-kpi.failed{border-top-color:#ef4444;}
+.final-kpi.stale{border-top-color:#f59e0b;}
+.final-kpi.not-monitored{border-top-color:#64748b;}
+.insight-decision-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.final-ring-card{padding:18px;min-height:230px;display:grid;align-content:start;gap:12px;text-align:right;}
+.final-ring-card .mikrotik-freshness-ring{margin:6px auto;}
+.coverage-number{font-size:54px;font-weight:950;color:#2563eb;letter-spacing:-.05em;text-align:left;}
+.muted-decision{background:linear-gradient(180deg,#fff,#fffaf0);}
+.recommended-actions-final{padding:18px;border-right:5px solid #f97316;}
+.final-action-list{display:grid;gap:10px;}
+.final-action-item{display:grid;grid-template-columns:minmax(180px,.45fr) 1fr minmax(220px,.65fr) max-content;gap:14px;align-items:center;text-decoration:none;color:#0f172a;padding:14px;border:1px solid #e2e8f0;border-radius:18px;background:#fff;direction:rtl;}
+.final-action-item.severity-warning,.final-action-item.severity-critical{border-color:#fecaca;background:#fff7f7;}
+.final-action-item.severity-info{border-color:#bfdbfe;background:#f8fbff;}
+.final-action-item strong{font-size:15px;font-weight:950;}
+.final-action-item span{display:block;margin-top:3px;font-size:12px;color:#64748b;font-weight:800;}
+.final-action-item p{margin:0;color:#334155;font-size:13px;line-height:1.8;}
+.final-action-item small{color:#475569;font-size:12px;line-height:1.8;}
+.final-action-item em{font-style:normal;color:#64748b;font-size:12px;text-align:left;}
+.low-priority-insights{margin-top:12px;border:1px solid #e2e8f0;border-radius:16px;padding:10px;background:#f8fafc;}
+.low-priority-insights summary{cursor:pointer;font-weight:950;color:#334155;}
+.low-priority-insights .final-action-list{margin-top:10px;}
+.insight-device-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-top:12px;}
+.insight-device-card{display:grid;gap:5px;padding:12px;border:1px solid #e2e8f0;border-radius:16px;background:#fff;text-decoration:none;color:#0f172a;text-align:right;}
+.insight-device-card.state-healthy{border-color:#bbf7d0;background:#f8fffb;}
+.insight-device-card.state-failed{border-color:#fecaca;background:#fff7f7;}
+.insight-device-card.state-stale{border-color:#fed7aa;background:#fffaf3;}
+.insight-device-card.state-not_monitored{border-color:#dbeafe;background:#f8fbff;}
+.insight-device-card strong{font-size:14px;font-weight:950;}
+.insight-device-card span,.insight-device-card small,.insight-device-card em{font-size:12px;color:#64748b;font-style:normal;line-height:1.7;}
+@media (max-width:1100px){.executive-answer-main,.insight-decision-grid{grid-template-columns:1fr}.insight-final-kpis{grid-template-columns:repeat(2,minmax(140px,1fr))}.final-action-item{grid-template-columns:1fr}}
+@media (max-width:700px){.final-hero,.auto-collector-status{display:grid}.insight-final-kpis{grid-template-columns:1fr}.executive-answer h2{font-size:22px}}
+
+/* Legacy smoke compatibility markers. No UI impact. */
+/* Phase 58 - MikroTik UX cleanup and explanation */
+/* Phase 60 - MikroTik monitoring dashboard redesign */
+.phase60-monitoring-dashboard{}
+.clean-review-grid{}
+.mikrotik-collapsible-section{}
+.phase62-auto-insight{}

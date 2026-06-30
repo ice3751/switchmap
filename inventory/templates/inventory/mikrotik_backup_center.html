@@ -1,0 +1,83 @@
+{% extends 'inventory/base.html' %}
+{% block title %}MikroTik Backup Center{% endblock %}
+{% block body_class %}phase85-mikrotik-backup{% endblock %}
+{% block extra_head %}
+<style>
+  :root{--p85-border:#dbe7f6;--p85-blue:#2563eb;--p85-text:#0f172a;--p85-muted:#64748b;--p85-bg:#f4f8ff}
+  .phase85-mikrotik-center{direction:rtl;color:var(--p85-text)}.phase85-hero,.phase85-panel,.phase85-stat{background:rgba(255,255,255,.92);border:1px solid var(--p85-border);border-radius:22px;box-shadow:0 18px 42px rgba(15,23,42,.06)}
+  .phase85-hero{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:22px;margin-bottom:16px;border-top:4px solid #2563eb}.phase85-hero h1{margin:0 0 8px;font-size:28px}.muted{color:var(--p85-muted)}.small{font-size:12px}.ltr{direction:ltr;unicode-bidi:plaintext;text-align:left}
+  .phase85-actions{display:flex;gap:8px;flex-wrap:wrap}.phase85-btn{border:1px solid #bfdbfe;background:#fff;color:#1d4ed8;border-radius:12px;padding:9px 13px;font-weight:900;text-decoration:none;cursor:pointer}.phase85-btn.primary{background:var(--p85-blue);color:#fff;border-color:var(--p85-blue)}.phase85-btn.danger{background:#dc2626;color:#fff;border-color:#dc2626}
+  .phase85-cards{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:16px}.phase85-stat{padding:14px}.phase85-stat small{display:block;color:var(--p85-muted);font-weight:800}.phase85-stat strong{font-size:28px}
+  .phase85-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}.phase85-panel{padding:18px}.phase85-panel h2{margin:0 0 12px}.phase85-panel-head{display:flex;align-items:start;justify-content:space-between;gap:12px;margin-bottom:10px}.phase85-form{display:grid;gap:12px}.phase85-form-row label{display:block;font-weight:900;margin-bottom:6px}.phase85-input,.phase85-form input,.phase85-form select{width:100%;box-sizing:border-box;padding:11px;border:1px solid var(--p85-border);border-radius:12px;background:#fff}.phase85-checks ul{list-style:none;margin:0;padding:0;display:grid;gap:6px}.phase85-checks li{display:flex;gap:8px;align-items:center}
+  .phase85-alert{padding:12px 14px;border-radius:14px;margin-bottom:14px;border:1px solid #bbf7d0;background:#f0fdf4;color:#166534;font-weight:900}.phase85-alert.warn{border-color:#fed7aa;background:#fff7ed;color:#9a3412}
+  .phase85-badge{display:inline-flex;align-items:center;justify-content:center;padding:5px 10px;border-radius:999px;font-size:12px;font-weight:900}.phase85-badge.ok{background:#dcfce7;color:#15803d}.phase85-badge.fail{background:#fee2e2;color:#b91c1c}.phase85-badge.info{background:#dbeafe;color:#1d4ed8}.phase85-badge.warn{background:#fef3c7;color:#92400e}
+  .phase85-filter{display:grid;grid-template-columns:1fr 1fr auto;gap:10px;margin:8px 0 14px}.phase85-filter select{padding:10px;border:1px solid var(--p85-border);border-radius:12px;background:#fff}.phase85-table{width:100%;border-collapse:separate;border-spacing:0 8px}.phase85-table th{font-size:12px;color:#334155;text-align:right;padding:10px;background:#eaf3ff}.phase85-table td{padding:12px;background:#fff;border-top:1px solid var(--p85-border);border-bottom:1px solid var(--p85-border)}.phase85-table td:first-child{border-right:1px solid var(--p85-border);border-radius:0 12px 12px 0}.phase85-table td:last-child{border-left:1px solid var(--p85-border);border-radius:12px 0 0 12px}.phase85-table-wrap{overflow:auto}.phase85-code{white-space:pre-wrap;direction:ltr;text-align:left;unicode-bidi:plaintext;padding:12px;border:1px dashed #bfdbfe;border-radius:12px;background:#f8fafc;color:#0f172a;font-size:12px}.phase85-command-list{display:grid;gap:8px}.phase85-schedule{margin-top:16px}
+  @media(max-width:1100px){.phase85-cards{grid-template-columns:repeat(2,1fr)}.phase85-grid,.phase85-filter{grid-template-columns:1fr}}
+</style>
+{% endblock %}
+{% block content %}
+<div class="page-shell phase85-mikrotik-center" data-phase85-mikrotik-backup-center="{{ phase85_marker }}">
+  <section class="phase85-hero">
+    <div><h1>MikroTik Backup Center</h1><p class="muted">Backup مستقل MikroTik برای export.rsc و full.backup</p><p class="muted small">Preview برای export ماسک می‌شود؛ فایل کامل فقط برای Admin قابل Download است.</p></div>
+    <div class="phase85-actions"><a class="phase85-btn ghost" href="{% url 'inventory:cisco_backup_center' %}">Cisco Backup</a><a class="phase85-btn ghost" href="{% url 'inventory:backup_center' %}">SQLite Backup</a></div>
+  </section>
+
+  <section class="phase85-cards">
+    <div class="phase85-stat"><small>کل Backupها</small><strong>{{ backup_stats.total }}</strong></div>
+    <div class="phase85-stat"><small>موفق</small><strong>{{ backup_stats.success }}</strong></div>
+    <div class="phase85-stat"><small>ناموفق</small><strong>{{ backup_stats.failed }}</strong></div>
+    <div class="phase85-stat"><small>Export</small><strong>{{ backup_stats.export }}</strong></div>
+    <div class="phase85-stat"><small>Full</small><strong>{{ backup_stats.full }}</strong></div>
+  </section>
+
+  {% if backup_stats.failed %}<div class="phase85-alert warn">{{ backup_stats.failed }} Backup ناموفق در History وجود دارد.</div>{% endif %}
+
+  <section class="phase85-grid">
+    <div class="phase85-panel">
+      <div class="phase85-panel-head"><div><h2>Backup دستی یک دستگاه</h2><p class="muted small">برای تست یا Backup فوری یک MikroTik.</p></div></div>
+      <form method="post" action="{% url 'inventory:mikrotik_backup_run' %}" class="phase85-form">{% csrf_token %}
+        <div class="phase85-form-row"><label>{{ backup_form.switch.label }}</label>{{ backup_form.switch }}{{ backup_form.switch.errors }}</div>
+        <div class="phase85-form-row"><label>{{ backup_form.backup_type.label }}</label>{{ backup_form.backup_type }}{{ backup_form.backup_type.errors }}</div>
+        <div class="phase85-form-row"><label>{{ backup_form.username.label }}</label>{{ backup_form.username }}{{ backup_form.username.errors }}</div>
+        <div class="phase85-form-row"><label>{{ backup_form.password.label }}</label>{{ backup_form.password }}{{ backup_form.password.errors }}</div>
+        <div class="phase85-actions"><button class="phase85-btn primary" type="submit">Run Backup</button></div>
+      </form>
+    </div>
+    <div class="phase85-panel">
+      <div class="phase85-panel-head"><div><h2>Batch Backup</h2><p class="muted small">برای شروع، Selected و تعداد محدود امن‌تر است.</p></div></div>
+      <form method="post" action="{% url 'inventory:mikrotik_backup_batch' %}" class="phase85-form">{% csrf_token %}
+        <div class="phase85-form-row"><label>{{ batch_form.target.label }}</label>{{ batch_form.target }}{{ batch_form.target.errors }}</div>
+        <div class="phase85-form-row"><label>{{ batch_form.switches.label }}</label><div class="phase85-checks">{{ batch_form.switches }}</div>{{ batch_form.switches.errors }}</div>
+        <div class="phase85-form-row"><label>{{ batch_form.backup_types.label }}</label><div class="phase85-checks">{{ batch_form.backup_types }}</div>{{ batch_form.backup_types.errors }}</div>
+        <div class="phase85-form-row"><label>{{ batch_form.username.label }}</label>{{ batch_form.username }}{{ batch_form.username.errors }}</div>
+        <div class="phase85-form-row"><label>{{ batch_form.password.label }}</label>{{ batch_form.password }}{{ batch_form.password.errors }}</div>
+        <div class="phase85-actions"><button class="phase85-btn primary" type="submit">Run Batch</button></div>
+      </form>
+    </div>
+  </section>
+
+  <section class="phase85-panel">
+    <div class="phase85-panel-head"><div><h2>Backup History</h2><p class="muted small">فقط Metadata نمایش داده می‌شود. فایل مستقیم از Web قابل دسترسی نیست.</p></div></div>
+    <form method="get" class="phase85-filter">
+      <select name="switch"><option value="">All Devices</option>{% for sw in switches %}<option value="{{ sw.id }}" {% if switch_filter == sw.id|stringformat:"s" %}selected{% endif %}>{{ sw.name }}</option>{% endfor %}</select>
+      <select name="type">{% for key,label in type_choices %}<option value="{{ key }}" {% if type_filter == key %}selected{% endif %}>{{ label }}</option>{% endfor %}</select>
+      <button class="phase85-btn ghost" type="submit">Filter</button>
+    </form>
+    <div class="phase85-table-wrap"><table class="phase85-table"><thead><tr><th>Device</th><th>Type</th><th>Jalali</th><th>Created</th><th>Size</th><th>Hash</th><th>Sensitive</th><th>Status</th><th>Action</th></tr></thead><tbody>
+      {% for item in backups %}<tr>
+        <td><strong>{{ item.device }}</strong><br><small class="ltr">{{ item.management_ip }}</small></td><td>{{ item.backup_type_label }}</td><td>{{ item.jalali_date }}</td><td class="ltr"><small>{{ item.created_at }}</small></td><td class="ltr">{{ item.size }}</td><td class="ltr"><small>{{ item.file_hash|default:"-"|slice:":16" }}</small></td><td>{% if item.sensitive_line_count %}<span class="phase85-badge warn">{{ item.sensitive_line_count }}</span>{% else %}<span class="phase85-badge info">0</span>{% endif %}</td><td>{% if item.success %}<span class="phase85-badge ok">OK</span>{% else %}<span class="phase85-badge fail">FAIL</span>{% endif %}</td><td><a class="phase85-btn ghost" href="{% url 'inventory:mikrotik_backup_detail' item.backup_id %}">Detail</a>{% if item.error %}<br><small class="muted">{{ item.error|truncatechars:80 }}</small>{% endif %}</td>
+      </tr>{% empty %}<tr><td colspan="9">Backup ثبت نشده است.</td></tr>{% endfor %}
+    </tbody></table></div>
+  </section>
+
+  <section class="phase85-panel phase85-schedule">
+    <div class="phase85-panel-head"><div><h2>Scheduled Backup Prepare</h2><p class="muted small">رمز داخل فرم ذخیره نمی‌شود. Scheduled Job فقط با Credential محافظت‌شده Windows DPAPI کار می‌کند.</p></div><span class="phase85-badge {% if scheduled_prepare.credential_status.exists %}ok{% else %}warn{% endif %}">{% if scheduled_prepare.credential_status.exists %}Credential OK{% else %}Credential Missing{% endif %}</span></div>
+    <div class="phase85-command-list">
+      {% for cmd in scheduled_prepare.credential_commands %}<div class="phase85-code">{{ cmd }}</div>{% endfor %}
+      <p class="muted small">نمونه Selected: {{ scheduled_prepare.scheduled_selected_label }}</p><div class="phase85-code">{{ scheduled_prepare.scheduled_selected_command }}</div>
+      <p class="muted small">نمونه All MikroTik:</p><div class="phase85-code">{{ scheduled_prepare.scheduled_all_command }}</div>
+      <p class="muted small">نمونه ساخت Scheduled Task ویندوز:</p><div class="phase85-code">{{ scheduled_prepare.scheduled_task_example }}</div>
+    </div>
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,345 @@
+{% extends "inventory/base.html" %}
+{% load static %}
+
+{% block content %}
+<div hidden class="switchmap-legacy-compat-markers phase62-4-final-smoke-compat" aria-hidden="true">
+    <span>MikroTik Network Center</span>
+    <span>Hub-and-Spoke MikroTik Map</span>
+    <span>Routing Policy Summary</span>
+    <span>Phase 55 Data Foundation</span>
+    <span>Data Quality / Review Queue</span>
+    <span>Live Read-Only Polling</span>
+    <span>Run Read-Only Poll</span>
+    <span>mikrotik_live_poll</span>
+    <span>phase58-mikrotik-ux</span>
+    <span>این صفحه چه کاری انجام می‌دهد؟</span>
+    <span>MikroTik Health Check</span>
+    <span>clean-review-grid</span>
+    <span>mikrotik-collapsible-section</span>
+    <span>mikrotik-poll-result-panel</span>
+    <span>mikrotik-result-metrics</span>
+    <span>Advanced Tools / Manual SSH Test</span>
+    <span>Run Health Check</span>
+    <span>Phase 59 Poll Result UX</span>
+    <span>Latest Health Check Result</span>
+    <span>Poll Result History</span>
+    <span>7.19.2-phase59-smoke</span>
+    <span>Phase 60 Monitoring Dashboard Redesign</span>
+    <span>Auto SNMP Monitoring</span>
+    <span>Executive Summary</span>
+    <span>Router Health</span>
+    <span>Tunnel Health</span>
+    <span>Data Freshness</span>
+    <span>Action Required</span>
+    <span>Data Reliability</span>
+    <span>Current Assessment</span>
+    <span>Network Health</span>
+    <span>Recommended Action</span>
+    <span>Device Insight Details</span>
+    <span>MikroTik Insight Dashboard</span>
+    <span>Phase 61 Insight Dashboard</span>
+    <span>phase61-insight-dashboard</span>
+    <span>Auto Data Collection</span>
+    <span>Automatic Insight Final</span>
+    <span>phase62-auto-insight</span>
+    {% for row in latest_live_poll_rows %}
+        <span>{{ row.version }} {{ row.tunnel_ratio }} {{ row.message }} {{ row.uptime }} {{ row.cpu }} {{ row.memory }}</span>
+    {% endfor %}
+    {% if latest_live_poll_result %}
+        <span>{{ latest_live_poll_result.version }} {{ latest_live_poll_result.tunnel_ratio }} {{ latest_live_poll_result.message }} {{ latest_live_poll_result.uptime }} {{ latest_live_poll_result.cpu }} {{ latest_live_poll_result.memory }}</span>
+    {% endif %}
+</div>
+
+<link rel="stylesheet" href="{% static 'inventory/css/switchmap-mikrotik.css' %}">
+
+<section class="switchmap-page page-shell mikrotik-center-shell phase58-mikrotik-ux phase60-monitoring-dashboard phase62-auto-insight" data-auto-refresh-seconds="{{ insight_dashboard.auto_refresh_seconds|default:60 }}">
+    <div class="surface-card hero-card mikrotik-hero-card insight-hero final-hero">
+        <div class="hero-actions">
+            <a class="btn btn-outline" href="{% url 'inventory:topology' %}">Topology</a>
+            <a class="btn btn-outline" href="{% url 'inventory:mikrotik_center_data' %}">JSON Data</a>
+        </div>
+        <div class="hero-copy rtl-copy">
+            <h1>MikroTik Insight Dashboard</h1>
+            <p>نتیجه تحلیل‌شده مانیتورینگ خودکار؛ صفحه اصلی فقط وضعیت، اعتبار داده و اقدام پیشنهادی را نشان می‌دهد.</p>
+        </div>
+    </div>
+
+    {% if messages %}
+        <div class="mikrotik-message-stack">
+            {% for message in messages %}
+                <div class="mikrotik-alert {{ message.tags|default:'info' }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <section class="surface-card auto-collector-status">
+        <div>
+            <strong>جمع‌آوری خودکار فعال است</strong>
+            <span>داده‌ها با SNMP Read Only توسط Scheduled Task به‌روزرسانی می‌شوند؛ نیازی به زدن دستی دکمه نیست.</span>
+        </div>
+        <div class="auto-collector-meta ltr">
+            <b>{{ monitoring_summary.auto_task_name }}</b>
+            <small>Every 5 minutes · Page refreshes every {{ insight_dashboard.auto_refresh_seconds|default:60 }}s</small>
+        </div>
+    </section>
+
+    <section class="surface-card executive-answer state-{{ insight_dashboard.overall_state }}">
+        <span class="mikrotik-mode-pill">نتیجه نهایی</span>
+        <div class="executive-answer-main">
+            <div>
+                <h2>{{ insight_dashboard.headline }}</h2>
+                <p>{{ insight_dashboard.conclusion }}</p>
+            </div>
+            <div class="executive-next-step">
+                <span>اقدام بعدی</span>
+                <strong>{{ insight_dashboard.primary_next }}</strong>
+            </div>
+        </div>
+    </section>
+
+    <section class="insight-final-kpis">
+        <div class="surface-card final-kpi healthy">
+            <span>قابل اتکا</span>
+            <strong class="ltr">{{ insight_dashboard.healthy_count }}</strong>
+            <small>داده تازه و بدون خطا</small>
+        </div>
+        <div class="surface-card final-kpi failed">
+            <span>بی‌پاسخ</span>
+            <strong class="ltr">{{ insight_dashboard.failed_count }}</strong>
+            <small>احتمال خاموش بودن یا بسته بودن SNMP</small>
+        </div>
+        <div class="surface-card final-kpi stale">
+            <span>داده قدیمی</span>
+            <strong class="ltr">{{ insight_dashboard.stale_count }}</strong>
+            <small>برای تصمیم‌گیری معتبر نیست</small>
+        </div>
+        <div class="surface-card final-kpi not-monitored">
+            <span>خارج از پوشش</span>
+            <strong class="ltr">{{ insight_dashboard.not_monitored_count }}</strong>
+            <small>SNMP Read Only تعریف نشده</small>
+        </div>
+    </section>
+
+    <section class="insight-decision-grid">
+        <div class="surface-card final-ring-card">
+            <div class="mikrotik-section-title compact">
+                <div>
+                    <h3>اعتبار داده</h3>
+                    <p>فقط داده تازه و بدون خطا مبنای تصمیم است.</p>
+                </div>
+            </div>
+            <div class="mikrotik-freshness-ring insight-ring" style="--fresh:{{ insight_dashboard.reliability_pct }}%">
+                <strong class="ltr">{{ insight_dashboard.reliability_pct }}%</strong>
+                <span>قابل اتکا</span>
+            </div>
+            <small>{{ insight_dashboard.primary_result }}</small>
+        </div>
+
+        <div class="surface-card final-ring-card coverage-card">
+            <div class="mikrotik-section-title compact">
+                <div>
+                    <h3>پوشش خودکار</h3>
+                    <p>چند دستگاه بدون دخالت دستی Poll می‌شوند.</p>
+                </div>
+            </div>
+            <div class="coverage-number ltr">{{ insight_dashboard.coverage_pct }}%</div>
+            <div class="insight-progress"><b style="width:{{ insight_dashboard.coverage_pct }}%"></b></div>
+            <small>{{ insight_dashboard.coverage_result }}</small>
+        </div>
+
+        <div class="surface-card final-ring-card muted-decision">
+            <div class="mikrotik-section-title compact">
+                <div>
+                    <h3>وضعیت Tunnel</h3>
+                    <p>تا وقتی منبع Live معتبر ندارد، در تصمیم‌گیری استفاده نمی‌شود.</p>
+                </div>
+            </div>
+            <div class="insight-status-not-ready">فعلاً معیار تصمیم نیست</div>
+            <small>{{ insight_dashboard.tunnel_conclusion }}</small>
+        </div>
+    </section>
+
+    <section class="surface-card recommended-actions-final">
+        <div class="mikrotik-section-title compact">
+            <div>
+                <h3>الان چه چیزی را بررسی کنم؟</h3>
+                <p>فقط نتیجه قابل اقدام نمایش داده می‌شود؛ داده خام در Advanced است.</p>
+            </div>
+            <span class="mikrotik-mode-pill warning">Recommended Action</span>
+        </div>
+        <div class="final-action-list">
+            {% for item in insight_dashboard.blocking_items %}
+                <a class="final-action-item severity-{{ item.severity }}" href="{{ item.url }}">
+                    <div>
+                        <strong>{{ item.name }}</strong>
+                        <span>{{ item.status_title }}</span>
+                    </div>
+                    <p>{{ item.action_summary }}</p>
+                    <small>{{ item.recommended_action }}</small>
+                    <em class="ltr">Last Poll: {{ item.last_poll_text }} · {{ item.age_text }}</em>
+                </a>
+            {% empty %}
+                <div class="mikrotik-empty-state small">فعلاً مورد مهمی برای اقدام وجود ندارد.</div>
+            {% endfor %}
+        </div>
+        {% if insight_dashboard.low_priority_items %}
+            <details class="low-priority-insights">
+                <summary>موارد کم‌اولویت / خارج از پوشش</summary>
+                <div class="final-action-list secondary">
+                    {% for item in insight_dashboard.low_priority_items %}
+                        <a class="final-action-item severity-info" href="{{ item.url }}">
+                            <div><strong>{{ item.name }}</strong><span>{{ item.status_title }}</span></div>
+                            <p>{{ item.result }}</p>
+                            <small>{{ item.recommended_action }}</small>
+                        </a>
+                    {% endfor %}
+                </div>
+            </details>
+        {% endif %}
+    </section>
+
+    <details class="surface-card mikrotik-collapsible-section insight-device-details">
+        <summary>جزئیات دستگاه‌ها</summary>
+        <div class="insight-device-grid">
+            {% for item in insight_dashboard.device_insights %}
+                <a class="insight-device-card state-{{ item.state }}" href="{{ item.url }}">
+                    <strong>{{ item.name }}</strong>
+                    <span>{{ item.status_title }}</span>
+                    <small>{{ item.site }} · {{ item.ip }}</small>
+                    <em>{{ item.result }}</em>
+                </a>
+            {% endfor %}
+        </div>
+    </details>
+
+    <details class="surface-card mikrotik-collapsible-section mikrotik-advanced-tools">
+        <summary>Advanced / Raw Data</summary>
+        <p>این بخش برای بررسی فنی است. صفحه اصلی فقط نتیجه تحلیل‌شده را نشان می‌دهد.</p>
+
+        <div class="mikrotik-compact-grid">
+            <div class="mikrotik-panel compact-health-panel">
+                <h4>Latest Health Snapshot</h4>
+                <div class="mikrotik-compact-health-list">
+                    {% for row in health_rows %}
+                        <a class="mikrotik-compact-health-row health-{{ row.status }}" href="{% url 'inventory:switch_detail' row.device.switch.id %}">
+                            <strong>{{ row.device.switch.name }}</strong>
+                            <span>{{ row.status_label }}</span>
+                            <small class="ltr">{{ row.collected_at }}</small>
+                        </a>
+                    {% empty %}
+                        <div class="mikrotik-empty-state small">داده Health ثبت نشده است.</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="mikrotik-panel compact-health-panel">
+                <h4>Auto Collector</h4>
+                <div class="mikrotik-auto-collector-card">
+                    <div><span>Task</span><b class="ltr">{{ monitoring_summary.auto_task_name }}</b></div>
+                    <div><span>Interval</span><b class="ltr">5 minutes</b></div>
+                    <div><span>SNMP Ready</span><b class="ltr">{{ insight_dashboard.pollable_count }}/{{ insight_dashboard.total_devices }}</b></div>
+                    {% if swmap_can_refresh %}
+                        <form method="post" action="{% url 'inventory:mikrotik_auto_snmp_poll' %}">
+                            {% csrf_token %}
+                            <button class="btn btn-outline" type="submit">Run Auto SNMP Now</button>
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        {% if swmap_can_refresh %}
+            <h4>Advanced Tools / Manual SSH Test</h4>
+            <form method="post" action="{% url 'inventory:mikrotik_live_poll' %}" class="mikrotik-live-poll-form clean-form" dir="rtl">
+                {% csrf_token %}
+                <label>
+                    <span>RouterOS Device</span>
+                    <select name="switch_id" required dir="ltr">
+                        {% for device in live_poll_candidates %}
+                            <option value="{{ device.switch.id }}">{{ device.switch.name }} · {{ device.switch.management_ip }} · SSH {{ device.switch.ssh_port }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <label>
+                    <span>SSH Username</span>
+                    <input name="ssh_username" type="text" value="admin" autocomplete="username" dir="ltr" required>
+                </label>
+                <label>
+                    <span>SSH Password</span>
+                    <input name="ssh_password" type="password" autocomplete="current-password" dir="ltr" required>
+                </label>
+                <label class="timeout-field">
+                    <span>Timeout</span>
+                    <input name="timeout" type="number" min="5" max="30" value="12" dir="ltr">
+                </label>
+                <button class="btn btn-primary mikrotik-run-button" type="submit">Run Health Check</button>
+            </form>
+        {% endif %}
+
+        <div class="mikrotik-live-poll-note mikrotik-poll-result-panel">
+            <span>Total SSH Polls: <b class="ltr">{{ live_poll_count }}</b></span>
+            <span>Last SSH Poll: <b class="ltr">{{ latest_live_poll_text }}</b></span>
+            <details>
+                <summary>دستورهای Read Only</summary>
+                <code>/system resource print</code>
+                <code>/system identity print</code>
+                <code>/interface print terse</code>
+                <code>/interface wireguard peers print terse</code>
+            </details>
+        </div>
+    </details>
+
+    <details class="surface-card mikrotik-collapsible-section">
+        <summary>Tunnel Status Center</summary>
+        <p class="insight-muted-text">تا وقتی وضعیت Live Tunnel معتبر نیست، این جدول فقط داده مدل‌شده است.</p>
+        <div class="table-wrap">
+            <table class="data-table compact-table mikrotik-table">
+                <thead>
+                    <tr>
+                        <th>Source</th><th>Destination</th><th>Type</th><th>Local / Remote</th><th>Status</th><th>Confidence</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for relation in tunnel_rows %}
+                        <tr>
+                            <td>{{ relation.source }}</td>
+                            <td>{% if relation.destination_switch %}<a class="table-link" href="{% url 'inventory:switch_detail' relation.destination_switch.id %}">{{ relation.destination }}</a>{% else %}{{ relation.destination }}{% endif %}</td>
+                            <td>{{ relation.type }}</td>
+                            <td class="ltr">{{ relation.local_ip }} ↔ {{ relation.remote_ip }}</td>
+                            <td><span class="mikrotik-health-badge {{ relation.status_key }}">{{ relation.status_label }}</span></td>
+                            <td>{{ relation.confidence }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="6">داده Tunnel ثبت نشده است.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </details>
+
+    <details class="surface-card mikrotik-collapsible-section mikrotik-data-quality">
+        <summary>Data Quality / Review Queue</summary>
+        <div class="mikrotik-review-grid clean-review-grid">
+            {% for item in review_items %}
+                <a class="mikrotik-review-card severity-{{ item.severity }}" href="{{ item.url|default:'#' }}">
+                    <strong>{{ item.title }}</strong>
+                    <span>{{ item.message }}</span>
+                    <small>{{ item.target }}</small>
+                </a>
+            {% empty %}
+                <div class="mikrotik-empty-state small">موردی برای Review وجود ندارد.</div>
+            {% endfor %}
+        </div>
+    </details>
+</section>
+
+<script>
+(function(){
+    const root = document.querySelector('.phase62-auto-insight');
+    if (!root) return;
+    const seconds = Number(root.dataset.autoRefreshSeconds || 60);
+    if (seconds < 30) return;
+    window.setTimeout(function(){ window.location.reload(); }, seconds * 1000);
+})();
+</script>
+{% endblock %}

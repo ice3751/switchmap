@@ -1,0 +1,235 @@
+switch,display_order,label,source_page,source_note
+Edari-1,1,T1,1,page1: office switch 1
+Edari-1,2,T2,1,page1: office switch 1
+Edari-1,3,T3,1,page1: office switch 1
+Edari-1,4,T4,1,page1: office switch 1
+Edari-1,5,T5,1,page1: office switch 1
+Edari-1,6,T6,1,page1: office switch 1
+Edari-1,7,T7,1,page1: office switch 1
+Edari-1,8,T8,1,page1: office switch 1
+Edari-1,9,T9,1,page1: office switch 1
+Edari-1,10,T10,1,page1: office switch 1
+Edari-1,11,T11,1,page1: office switch 1
+Edari-1,12,T12,1,page1: office switch 1
+Edari-1,13,T13,1,page1: office switch 1
+Edari-1,14,T14,1,page1: office switch 1
+Edari-1,15,T15,1,page1: office switch 1
+Edari-1,16,T16,1,page1: office switch 1
+Edari-1,17,T17,1,page1: office switch 1
+Edari-1,18,T18,1,page1: office switch 1
+Edari-1,19,T19,1,page1: office switch 1
+Edari-1,20,T20,1,page1: office switch 1
+Edari-1,21,T21,1,page1: office switch 1
+Edari-1,22,T22,1,page1: office switch 1
+Edari-1,23,T23,1,page1: office switch 1
+Edari-1,24,T24,1,page1: office switch 1
+Edari-1,25,T25,1,page1: office switch 1
+Edari-1,26,T26,1,page1: office switch 1
+Edari-1,27,T27,1,page1: office switch 1
+Edari-1,28,T28,1,page1: office switch 1
+Edari-1,29,T29,1,page1: office switch 1
+Edari-1,30,T30,1,page1: office switch 1
+Edari-1,31,T31,1,page1: office switch 1
+Edari-1,32,T32,1,page1: office switch 1
+Edari-1,33,T33,1,page1: office switch 1
+Edari-1,34,T34,1,page1: office switch 1
+Edari-1,35,T35,1,page1: office switch 1
+Edari-1,36,T36,1,page1: office switch 1
+Edari-1,37,T37,1,page1: office switch 1
+Edari-1,38,T38,1,page1: office switch 1
+Edari-1,39,T39,1,page1: office switch 1
+Edari-1,40,T40,1,page1: office switch 1
+Edari-1,41,T41,1,page1: office switch 1
+Edari-1,42,T42,1,page1: office switch 1
+Edari-1,43,T43,1,page1: office switch 1
+Edari-1,44,T44,1,page1: office switch 1
+Edari-1,45,T45,1,page1: office switch 1
+Edari-1,46,T46,1,page1: office switch 1
+Edari-1,47,T47,1,page1: office switch 1
+Edari-1,48,T48,1,page1: office switch 1
+Edari-2,1,T49,2,page2: office switch 2
+Edari-2,2,T50,2,page2: office switch 2
+Edari-2,3,T51,2,page2: office switch 2
+Edari-2,4,T52,2,page2: office switch 2
+Edari-2,5,T53,2,page2: office switch 2
+Edari-2,6,T54,2,page2: office switch 2
+Edari-2,7,T55,2,page2: office switch 2
+Edari-2,8,T56,2,page2: office switch 2
+Edari-2,9,T57,2,page2: office switch 2
+Edari-2,10,T58,2,page2: office switch 2
+Edari-2,11,T59,2,page2: office switch 2
+Edari-2,12,T60,2,page2: office switch 2
+Edari-2,13,T61,2,page2: office switch 2
+Edari-2,14,T62,2,page2: office switch 2
+Edari-2,15,T63,2,page2: office switch 2
+Edari-2,16,T64,2,page2: office switch 2
+Edari-2,17,T65,2,page2: office switch 2
+Edari-2,20,T68,2,page2: office switch 2
+Edari-2,21,T69,2,page2: office switch 2
+Edari-2,22,T70,2,page2: office switch 2
+Edari-2,23,T71,2,page2: office switch 2
+Edari-2,24,T72,2,page2: office switch 2
+Edari-2,25,T73,2,page2: office switch 2
+Edari-2,26,T74,2,page2: office switch 2
+Edari-2,27,T75,2,page2: office switch 2
+Edari-2,28,T76,2,page2: office switch 2
+Edari-2,29,T77,2,page2: office switch 2
+Edari-2,30,T78,2,page2: office switch 2
+Edari-2,31,T79,2,page2: office switch 2
+Edari-2,32,T80,2,page2: office switch 2
+Edari-2,33,T81,2,page2: office switch 2
+Edari-2,34,T82,2,page2: office switch 2
+Edari-2,36,T84,2,page2: office switch 2
+Edari-2,37,T85,2,page2: office switch 2
+Edari-2,38,T86,2,page2: office switch 2
+Edari-2,39,T87,2,page2: office switch 2
+Edari-2,40,T88,2,page2: office switch 2
+Edari-2,41,T89,2,page2: office switch 2
+Edari-2,42,T90,2,page2: office switch 2
+Edari-2,43,T91,2,page2: office switch 2
+Edari-2,44,T92,2,page2: office switch 2
+Edari-2,45,T93,2,page2: office switch 2
+Edari-4,15,N1,3,page3: corrected by user as Edari-4
+Edari-4,16,N2,3,page3: corrected by user as Edari-4
+Edari-4,17,N3,3,page3: corrected by user as Edari-4
+Edari-4,18,N4,3,page3: corrected by user as Edari-4
+Edari-4,19,N5,3,page3: corrected by user as Edari-4
+Edari-4,20,N6,3,page3: corrected by user as Edari-4
+Edari-4,21,N7,3,page3: corrected by user as Edari-4
+Edari-4,22,N8,3,page3: corrected by user as Edari-4
+Edari-4,23,N9,3,page3: corrected by user as Edari-4
+Edari-4,24,N10,3,page3: corrected by user as Edari-4
+Edari-4,25,N11,3,page3: corrected by user as Edari-4
+Edari-4,26,N12,3,page3: corrected by user as Edari-4
+Edari-4,27,N13,3,page3: corrected by user as Edari-4
+Edari-4,28,N14,3,page3: corrected by user as Edari-4
+Edari-4,29,N15,3,page3: corrected by user as Edari-4
+Edari-4,30,N16,3,page3: corrected by user as Edari-4
+Edari-4,31,N17,3,page3: corrected by user as Edari-4
+Edari-4,32,N18,3,page3: corrected by user as Edari-4
+Edari-4,33,N19,3,page3: corrected by user as Edari-4
+Edari-4,34,N20,3,page3: corrected by user as Edari-4
+Edari-4,35,N21,3,page3: corrected by user as Edari-4
+Edari-4,36,N22,3,page3: corrected by user as Edari-4
+Edari-4,37,N23,3,page3: corrected by user as Edari-4
+Edari-4,38,N24,3,page3: corrected by user as Edari-4
+Edari-4,39,N25,3,page3: corrected by user as Edari-4
+Edari-4,40,N26,3,page3: corrected by user as Edari-4
+Edari-4,41,N27,3,page3: corrected by user as Edari-4
+Edari-4,42,N28,3,page3: corrected by user as Edari-4
+Edari-4,43,N29,3,page3: corrected by user as Edari-4
+Edari-4,44,N30,3,page3: corrected by user as Edari-4
+Edari-4,45,N31,3,page3: corrected by user as Edari-4
+Edari-4,46,N32,3,page3: corrected by user as Edari-4
+Edari-4,47,N33,3,page3: corrected by user as Edari-4
+Edari-4,48,N34,3,page3: corrected by user as Edari-4
+Edari-3,1,N35,4,page4: corrected by user as Edari-3
+Edari-3,2,N36,4,page4: corrected by user as Edari-3
+Edari-3,3,N37,4,page4: corrected by user as Edari-3
+Edari-3,4,N38,4,page4: corrected by user as Edari-3
+Edari-3,5,N39,4,page4: corrected by user as Edari-3
+Edari-3,6,N40,4,page4: corrected by user as Edari-3
+Edari-3,7,N41,4,page4: corrected by user as Edari-3
+Edari-3,8,N42,4,page4: corrected by user as Edari-3
+Edari-3,9,N43,4,page4: corrected by user as Edari-3
+Edari-3,10,N44,4,page4: corrected by user as Edari-3
+Edari-3,11,N45,4,page4: corrected by user as Edari-3
+Edari-3,12,N46,4,page4: corrected by user as Edari-3
+Edari-3,13,N47,4,page4: corrected by user as Edari-3
+Edari-3,14,N48,4,page4: corrected by user as Edari-3
+Edari-3,15,N49,4,page4: corrected by user as Edari-3
+Edari-3,16,N50,4,page4: corrected by user as Edari-3
+Edari-3,17,N51,4,page4: corrected by user as Edari-3
+Edari-3,18,N52,4,page4: corrected by user as Edari-3
+Edari-3,19,N53,4,page4: corrected by user as Edari-3
+Edari-3,20,N54,4,page4: corrected by user as Edari-3
+Edari-3,21,N55,4,page4: corrected by user as Edari-3
+Edari-3,22,N56,4,page4: corrected by user as Edari-3
+Edari-3,23,N57,4,page4: corrected by user as Edari-3
+Edari-3,24,N58,4,page4: corrected by user as Edari-3
+Edari-3,25,N59,4,page4: corrected by user as Edari-3
+Edari-3,26,N60,4,page4: corrected by user as Edari-3
+Edari-3,27,N61,4,page4: corrected by user as Edari-3
+Edari-3,28,N62,4,page4: corrected by user as Edari-3
+Edari-3,29,N63,4,page4: corrected by user as Edari-3
+Edari-3,30,N64,4,page4: corrected by user as Edari-3
+Edari-3,31,N65,4,page4: corrected by user as Edari-3
+Edari-3,32,N66,4,page4: corrected by user as Edari-3
+Edari-3,33,N67,4,page4: corrected by user as Edari-3
+Edari-3,34,N68,4,page4: corrected by user as Edari-3
+Edari-3,35,N69,4,page4: corrected by user as Edari-3
+Edari-3,36,N70,4,page4: corrected by user as Edari-3
+Edari-3,39,N73,4,page4: corrected by user as Edari-3
+Edari-3,40,N74,4,page4: corrected by user as Edari-3
+Edari-3,41,N75,4,page4: corrected by user as Edari-3
+Edari-3,42,N76,4,page4: corrected by user as Edari-3
+Edari-3,43,N77,4,page4: corrected by user as Edari-3
+Edari-3,44,N78,4,page4: corrected by user as Edari-3
+Edari-3,45,N79,4,page4: corrected by user as Edari-3
+Edari-3,46,N80,4,page4: corrected by user as Edari-3
+Edari-3,47,N81,4,page4: corrected by user as Edari-3
+Edari-3,48,N82,4,page4: corrected by user as Edari-3
+Edari-6,1,N83,5,page5: corrected by user as Edari-6
+Edari-6,2,N84,5,page5: corrected by user as Edari-6
+Edari-6,3,N85,5,page5: corrected by user as Edari-6
+Edari-6,5,N87,5,page5: corrected by user as Edari-6
+Edari-6,6,N88,5,page5: corrected by user as Edari-6
+Edari-6,8,N90,5,page5: corrected by user as Edari-6
+Edari-6,9,N91,5,page5: corrected by user as Edari-6
+Edari-6,10,N92,5,page5: corrected by user as Edari-6
+Edari-6,11,N93,5,page5: corrected by user as Edari-6
+Edari-6,12,N94,5,page5: corrected by user as Edari-6
+Edari-6,13,N95,5,page5: corrected by user as Edari-6
+Edari-6,14,N96,5,page5: corrected by user as Edari-6
+Edari-6,15,N97,5,page5: corrected by user as Edari-6
+Edari-6,16,N98,5,page5: corrected by user as Edari-6
+Edari-6,17,N99,5,page5: corrected by user as Edari-6
+Edari-6,18,N100,5,page5: corrected by user as Edari-6
+Edari-6,19,N101,5,page5: corrected by user as Edari-6
+Edari-6,20,N102,5,page5: corrected by user as Edari-6
+Edari-6,21,N103,5,page5: corrected by user as Edari-6
+Edari-5,1,D1,6,page6: Edari-5 / company cameras
+Edari-5,2,D2,6,page6: Edari-5 / company cameras
+Edari-5,3,D3,6,page6: Edari-5 / company cameras
+Edari-5,4,D4,6,page6: Edari-5 / company cameras
+Edari-5,5,D5,6,page6: Edari-5 / company cameras
+Edari-5,6,D6,6,page6: Edari-5 / company cameras
+Edari-5,7,D7,6,page6: Edari-5 / company cameras
+Edari-5,8,D8,6,page6: Edari-5 / company cameras
+Edari-5,9,D9,6,page6: Edari-5 / company cameras
+Edari-5,10,D10,6,page6: Edari-5 / company cameras
+Edari-5,11,D11,6,page6: Edari-5 / company cameras
+Edari-5,12,D12,6,page6: Edari-5 / company cameras
+Edari-5,13,D13,6,page6: Edari-5 / company cameras
+Edari-5,15,D15,6,page6: Edari-5 / company cameras
+Edari-5,16,D16,6,page6: Edari-5 / company cameras
+Edari-5,17,D17,6,page6: Edari-5 / company cameras
+Edari-5,18,D18,6,page6: Edari-5 / company cameras
+Edari-5,19,D19,6,page6: Edari-5 / company cameras
+Edari-5,20,D20,6,page6: Edari-5 / company cameras
+Edari-5,21,D21,6,page6: Edari-5 / company cameras
+Edari-5,22,D22,6,page6: Edari-5 / company cameras
+Edari-5,23,D23,6,page6: Edari-5 / company cameras
+Edari-5,24,D24,6,page6: Edari-5 / company cameras
+Edari-5,25,D25,6,page6: Edari-5 / company cameras
+Edari-5,26,D26,6,page6: Edari-5 / company cameras
+Edari-5,27,D27,6,page6: Edari-5 / company cameras
+Edari-5,29,D29,6,page6: Edari-5 / company cameras
+Edari-5,30,D30,6,page6: Edari-5 / company cameras
+Edari-5,31,D31,6,page6: Edari-5 / company cameras
+Edari-5,32,D32,6,page6: Edari-5 / company cameras
+Edari-5,33,D33,6,page6: Edari-5 / company cameras
+Edari-5,34,D34,6,page6: Edari-5 / company cameras
+Edari-5,35,D35,6,page6: Edari-5 / company cameras
+Edari-5,36,D36,6,page6: Edari-5 / company cameras
+Edari-5,37,D37,6,page6: Edari-5 / company cameras
+Edari-5,38,D38,6,page6: Edari-5 / company cameras
+Edari-5,40,D40,6,page6: Edari-5 / company cameras
+Edari-5,41,D41,6,page6: Edari-5 / company cameras
+Edari-5,42,D42,6,page6: Edari-5 / company cameras
+Edari-5,43,D43,6,page6: Edari-5 / company cameras
+Edari-5,44,D44,6,page6: Edari-5 / company cameras
+Edari-5,45,D45,6,page6: Edari-5 / company cameras
+Edari-5,46,D46,6,page6: Edari-5 / company cameras
+Edari-5,47,D47,6,page6: Edari-5 / company cameras
+Edari-5,48,D48,6,page6: Edari-5 / company cameras

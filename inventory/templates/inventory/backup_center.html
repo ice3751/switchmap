@@ -1,0 +1,130 @@
+{% extends "inventory/base.html" %}
+
+{% block title %}Backup Center{% endblock %}
+{% block page_title %}Backup / Restore Center{% endblock %}
+{% block page_subtitle %}
+<p class="page-subtitle">Backup دستی و بررسی فایل Restore برای SQLite. اجرای Restore واقعی در سایت فعال نیست.</p>
+{% endblock %}
+{% block page_actions %}
+<form method="post" action="{% url 'inventory:backup_create' %}" class="inline-form">
+    {% csrf_token %}
+    <button class="btn btn-primary" type="submit">Create Backup Now</button>
+</form>
+{% endblock %}
+
+{% block content %}
+<div class="backup-page-stack">
+    <section class="backup-compact-summary">
+        <div class="backup-compact-tile">
+            <span>Database</span>
+            <strong>{{ db_size_text }}</strong>
+        </div>
+        <div class="backup-compact-tile">
+            <span>Backups</span>
+            <strong>{{ backup_files|length }}</strong>
+        </div>
+        <div class="backup-compact-tile">
+            <span>Total Size</span>
+            <strong>{{ backup_total_size_text }}</strong>
+        </div>
+        <div class="backup-compact-tile">
+            <span>Retention</span>
+            <strong>{{ retention }}</strong>
+        </div>
+    </section>
+
+    <details class="surface-card backup-safety-details">
+        <summary>
+            <span>Restore Safety</span>
+            <em>Validate only</em>
+        </summary>
+        <p>Restore فقط Validate می‌شود و دیتابیس فعال Replace نمی‌شود. Restore واقعی باید بعد از توقف سرویس و گرفتن Backup جدید انجام شود.</p>
+    </details>
+
+    <section class="surface-card backup-clean-card backup-list-card">
+        <div class="backup-card-head">
+            <div>
+                <h3>SQLite Backups</h3>
+                <span class="backup-path ltr" title="{{ backup_dir }}">{{ backup_dir }}</span>
+            </div>
+            {% if latest_backup %}
+                <span class="status-pill ok">Latest: {{ latest_backup.created_at_text }}</span>
+            {% endif %}
+        </div>
+
+        <div class="backup-list" data-backup-list>
+            {% for item in backup_files %}
+                <article class="backup-row">
+                    <div class="backup-row-main">
+                        {% if item.is_zip %}
+                            <span class="status-pill ok">ZIP</span>
+                        {% else %}
+                            <span class="status-pill muted">SQLite</span>
+                        {% endif %}
+                        <strong class="backup-file-name ltr" title="{{ item.name }}">{{ item.name }}</strong>
+                    </div>
+                    <div class="backup-row-meta">
+                        <span class="ltr">{{ item.created_at_text }}</span>
+                        <span class="ltr">{{ item.size_text }}</span>
+                    </div>
+                    <a class="btn btn-secondary btn-small" href="{{ item.download_url }}">Download</a>
+                </article>
+            {% empty %}
+                <div class="backup-empty">هنوز Backup ساخته نشده است.</div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="backup-secondary-grid">
+        <div class="surface-card backup-clean-card backup-restore-card">
+            <div class="backup-card-head compact">
+                <div>
+                    <h3>Validate Restore Candidate</h3>
+                    <span class="inline-state">فقط تست سلامت فایل؛ بدون تغییر دیتابیس</span>
+                </div>
+            </div>
+            <form method="post" action="{% url 'inventory:backup_validate_restore' %}" enctype="multipart/form-data" class="backup-upload-form compact">
+                {% csrf_token %}
+                <input class="input" type="file" name="restore_file" accept=".zip,.sqlite3" required>
+                <button class="btn btn-secondary" type="submit">Upload & Validate</button>
+            </form>
+        </div>
+
+        <details class="surface-card backup-clean-card backup-mini-details">
+            <summary>Recent Restore Candidates</summary>
+            <div class="backup-mini-list">
+                {% for item in restore_candidates %}
+                    <div class="backup-mini-row">
+                        <strong class="ltr" title="{{ item.name }}">{{ item.name }}</strong>
+                        <span class="ltr">{{ item.size_text }} • {{ item.created_at_text }}</span>
+                        <a href="{{ item.download_url }}">Download</a>
+                    </div>
+                {% empty %}
+                    <p class="muted-text">Restore candidate فعلاً وجود ندارد.</p>
+                {% endfor %}
+            </div>
+        </details>
+    </section>
+
+    <details class="surface-card backup-clean-card backup-audit-details">
+        <summary>Backup Audit</summary>
+        <div class="backup-audit-list">
+            {% for log in audit_logs %}
+                <article class="backup-audit-row">
+                    <div>
+                        <strong class="ltr">{{ log.action }}</strong>
+                        <span class="ltr">{{ log.created_at_text }}</span>
+                    </div>
+                    <div>
+                        <span class="ltr">{{ log.actor_username }}</span>
+                        <small>{{ log.actor_role }}</small>
+                    </div>
+                    <p class="ltr">{{ log.message|default:"-" }}</p>
+                </article>
+            {% empty %}
+                <p class="muted-text">Audit فعلاً خالی است.</p>
+            {% endfor %}
+        </div>
+    </details>
+</div>
+{% endblock %}

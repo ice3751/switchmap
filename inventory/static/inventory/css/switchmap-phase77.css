@@ -1,0 +1,147 @@
+/* Phase 77 isolated UI: scoped only to new operational pages. */
+.phase77-body .page-content,
+.phase77-shell {
+    max-width: 1540px;
+}
+.phase77-shell {
+    display: grid;
+    gap: 18px;
+    margin: 0 auto;
+    padding: 18px;
+}
+.phase77-shell.narrow { max-width: 860px; }
+.phase77-page-head,
+.phase77-panel {
+    background: rgba(255,255,255,0.96);
+    border: 1px solid rgba(148,163,184,0.28);
+    border-radius: 18px;
+    box-shadow: 0 14px 36px rgba(15,23,42,0.08);
+}
+.phase77-page-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 20px;
+}
+.phase77-page-head h1 { margin: 0; font-size: 1.35rem; }
+.phase77-page-head p { margin: 6px 0 0; color: #64748b; }
+.phase77-eyebrow { margin: 0 !important; color: #2563eb !important; font-size: 0.75rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.phase77-head-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.phase77-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border: 0;
+    border-radius: 12px;
+    padding: 9px 13px;
+    font-weight: 800;
+    text-decoration: none;
+    cursor: pointer;
+    color: #fff;
+    background: #2563eb;
+}
+.phase77-btn.secondary { color: #0f172a; background: #e2e8f0; }
+.phase77-kpi-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px; }
+.phase77-kpi {
+    background: #fff;
+    border: 1px solid rgba(148,163,184,0.28);
+    border-radius: 16px;
+    padding: 15px;
+    box-shadow: 0 10px 24px rgba(15,23,42,0.06);
+}
+.phase77-kpi small { display: block; color: #64748b; font-weight: 800; }
+.phase77-kpi strong { display: block; margin-top: 4px; font-size: 1.65rem; color: #0f172a; }
+.phase77-kpi span { display: block; margin-top: 4px; color: #64748b; font-size: .86rem; }
+.phase77-kpi.is-danger { border-color: rgba(220,38,38,.35); background: #fff7f7; }
+.phase77-kpi.is-warning { border-color: rgba(217,119,6,.35); background: #fffbeb; }
+.phase77-two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-items: start; }
+.phase77-two-col.wide-left { grid-template-columns: minmax(0, 1.1fr) minmax(360px, .9fr); }
+.phase77-three-col { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; align-items: start; }
+.phase77-panel { padding: 16px; overflow: hidden; }
+.phase77-panel > header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.phase77-panel h2 { margin: 0; font-size: 1rem; }
+.phase77-panel a { color: #2563eb; text-decoration: none; font-weight: 800; }
+.phase77-list { display: grid; gap: 9px; }
+.phase77-list.compact { gap: 6px; }
+.phase77-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border: 1px solid rgba(148,163,184,.22);
+    border-radius: 13px;
+    background: #f8fafc;
+    color: #0f172a;
+    text-decoration: none;
+}
+.phase77-row span { display: grid; gap: 2px; min-width: 0; }
+.phase77-row b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.phase77-row small { color: #64748b; }
+.phase77-row em,
+.phase77-pill {
+    border-radius: 999px;
+    background: #e2e8f0;
+    color: #334155;
+    padding: 3px 8px;
+    font-style: normal;
+    font-weight: 800;
+    font-size: .75rem;
+    white-space: nowrap;
+}
+.phase77-row.severity-critical em,
+.phase77-row.severity-down em,
+.phase77-row.severity-error em { background: #fee2e2; color: #991b1b; }
+.phase77-row.severity-warning em { background: #fef3c7; color: #92400e; }
+.phase77-row.severity-info em,
+.phase77-row.severity-up em { background: #dcfce7; color: #166534; }
+.phase77-stat-list { display: grid; gap: 8px; }
+.phase77-stat-list span { display: flex; justify-content: space-between; border-bottom: 1px solid #e2e8f0; padding: 6px 0; }
+.phase77-filterbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; background: #fff; border: 1px solid rgba(148,163,184,.28); border-radius: 16px; padding: 12px; }
+.phase77-filterbar.compact { padding: 0; border: 0; background: transparent; }
+.phase77-filterbar select,
+.phase77-filterbar input,
+.phase77-form input,
+.phase77-form select,
+.phase77-form textarea {
+    width: 100%;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 9px 11px;
+    background: #fff;
+    color: #0f172a;
+}
+.phase77-filterbar select { max-width: 300px; }
+.phase77-form { display: grid; gap: 12px; }
+.phase77-form label { display: grid; gap: 6px; font-weight: 800; color: #334155; }
+.phase77-form label span { font-size: .86rem; }
+.phase77-table { width: 100%; border-collapse: separate; border-spacing: 0 8px; }
+.phase77-table th { text-align: right; color: #64748b; font-size: .82rem; padding: 4px 10px; }
+.phase77-table td { background: #f8fafc; border-top: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; padding: 10px; vertical-align: top; }
+.phase77-table td:first-child { border-right: 1px solid #e2e8f0; border-radius: 0 12px 12px 0; }
+.phase77-table td:last-child { border-left: 1px solid #e2e8f0; border-radius: 12px 0 0 12px; }
+.phase77-table small { display: block; color: #64748b; margin-top: 3px; }
+.phase77-pill.risk-high { background: #fee2e2; color: #991b1b; }
+.phase77-pill.risk-medium { background: #fef3c7; color: #92400e; }
+.phase77-pill.risk-low { background: #dcfce7; color: #166534; }
+.phase77-code { direction: ltr; text-align: left; white-space: pre-wrap; max-height: 680px; overflow: auto; background: #0f172a; color: #e2e8f0; border-radius: 14px; padding: 14px; font-family: Consolas, Monaco, monospace; font-size: .86rem; }
+.phase77-code.diff { max-height: 760px; }
+.phase77-alert { padding: 11px 13px; border-radius: 12px; font-weight: 800; }
+.phase77-alert.danger { background: #fee2e2; color: #991b1b; }
+.phase77-empty { padding: 18px; border-radius: 13px; background: #f8fafc; color: #64748b; text-align: center; }
+.phase77-body .ltr, .phase77-shell .ltr { direction: ltr; unicode-bidi: plaintext; }
+@media (max-width: 1200px) {
+    .phase77-kpi-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .phase77-three-col { grid-template-columns: 1fr; }
+}
+@media (max-width: 900px) {
+    .phase77-page-head,
+    .phase77-two-col,
+    .phase77-two-col.wide-left { grid-template-columns: 1fr; display: grid; }
+    .phase77-kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 560px) {
+    .phase77-kpi-grid { grid-template-columns: 1fr; }
+}

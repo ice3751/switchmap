@@ -1,0 +1,1015 @@
+/*
+ * SwitchMap Phase103R10 dashboard cards Codex-reviewed fix
+ * Scope: the four dashboard summary cards only. Marker: phase103R10-dashboard-cards-codex-reviewed-fix.
+ * Reference geometry: compact 2x2 desktop grid, RTL content, alternating edge accents.
+ * No data, URL, permission, backend, migration, SSH, backup, or restore behavior.
+ */
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .sm-main-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  grid-auto-rows: 392px !important;
+  gap: 18px !important;
+  align-items: stretch !important;
+  direction: ltr !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card {
+  --phase103-accent: #2563eb;
+  --phase103-soft: rgba(37, 99, 235, .08);
+  --phase103-shadow: rgba(37, 99, 235, .12);
+  box-sizing: border-box !important;
+  width: 100% !important;
+  height: 392px !important;
+  min-height: 392px !important;
+  max-height: 392px !important;
+  margin: 0 !important;
+  padding: 22px 24px !important;
+  border: 1px solid #d8e3f0 !important;
+  border-radius: 22px !important;
+  background:
+    radial-gradient(circle at 74% 12%, var(--phase103-soft), transparent 32%),
+    linear-gradient(145deg, #ffffff 0%, #fbfdff 72%, #f7faff 100%) !important;
+  box-shadow: 0 14px 34px rgba(15, 23, 42, .085) !important;
+  overflow: hidden !important;
+  position: relative !important;
+  display: grid !important;
+  grid-template-rows: 56px minmax(0, 1fr) 50px 42px !important;
+  gap: 12px !important;
+  direction: rtl !important;
+  isolation: isolate !important;
+  text-align: right !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card-connectivity {
+  --phase103-accent: #2563eb;
+  --phase103-soft: rgba(37, 99, 235, .09);
+  --phase103-shadow: rgba(37, 99, 235, .14);
+  order: 1 !important;
+  grid-template-rows: 56px minmax(0, 1fr) 42px !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card-critical {
+  --phase103-accent: #ef3f48;
+  --phase103-soft: rgba(239, 63, 72, .085);
+  --phase103-shadow: rgba(239, 63, 72, .15);
+  order: 2 !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card-alarms {
+  --phase103-accent: #64748b;
+  --phase103-soft: rgba(100, 116, 139, .08);
+  --phase103-shadow: rgba(71, 85, 105, .14);
+  order: 3 !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card-topology {
+  --phase103-accent: #f59e0b;
+  --phase103-soft: rgba(245, 158, 11, .09);
+  --phase103-shadow: rgba(245, 158, 11, .15);
+  order: 4 !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 auto 0 0 !important;
+  width: 5px !important;
+  border-radius: 22px 0 0 22px !important;
+  background: var(--phase103-accent) !important;
+  box-shadow: 0 0 18px var(--phase103-shadow) !important;
+  z-index: 5 !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card-critical::before,
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card-topology::before {
+  inset: 0 0 0 auto !important;
+  border-radius: 0 22px 22px 0 !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card > * {
+  min-width: 0 !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card-top {
+  height: 56px !important;
+  display: grid !important;
+  grid-template-columns: 94px minmax(0, 1fr) !important;
+  align-items: start !important;
+  gap: 14px !important;
+  direction: ltr !important;
+  position: relative !important;
+  z-index: 4 !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-detail-link {
+  box-sizing: border-box !important;
+  width: 92px !important;
+  min-width: 92px !important;
+  height: 42px !important;
+  min-height: 42px !important;
+  padding: 0 13px !important;
+  border: 1px solid #cfdef0 !important;
+  border-radius: 13px !important;
+  background: rgba(255, 255, 255, .94) !important;
+  box-shadow: 0 6px 15px rgba(15, 23, 42, .035) !important;
+  color: #165bc2 !important;
+  font-size: 12.5px !important;
+  line-height: 1 !important;
+  font-weight: 800 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+  direction: rtl !important;
+  text-decoration: none !important;
+  white-space: nowrap !important;
+  cursor: pointer !important;
+  transition: border-color .18s ease, box-shadow .18s ease, color .18s ease !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-detail-link::before {
+  content: "‹" !important;
+  color: currentColor !important;
+  font-size: 20px !important;
+  line-height: 1 !important;
+  transform: translateY(-1px) !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-detail-link:hover {
+  border-color: #9fc2ed !important;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, .09) !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-detail-link:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, .22) !important;
+  outline-offset: 2px !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card-titlebox {
+  min-width: 0 !important;
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: flex-end !important;
+  gap: 13px !important;
+  direction: ltr !important;
+  text-align: right !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card-titlebox > div {
+  min-width: 0 !important;
+  padding-top: 2px !important;
+  direction: rtl !important;
+  text-align: right !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card-titlebox h2 {
+  max-width: 100% !important;
+  margin: 0 !important;
+  color: #071a35 !important;
+  font-size: 25px !important;
+  line-height: 1.1 !important;
+  font-weight: 900 !important;
+  letter-spacing: -.045em !important;
+  text-align: right !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card-titlebox p {
+  max-width: 100% !important;
+  margin: 6px 0 0 !important;
+  color: #63748b !important;
+  font-size: 12px !important;
+  line-height: 1.3 !important;
+  font-weight: 650 !important;
+  text-align: right !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card-connectivity .phase103-card-titlebox p {
+  color: #51647d !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card-connectivity .phase103-card-titlebox p > span + *,
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card-connectivity .phase103-card-titlebox p {
+  color: #53657d !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-status-dot {
+  width: 7px !important;
+  height: 7px !important;
+  margin-inline: 4px !important;
+  border-radius: 50% !important;
+  display: inline-block !important;
+  vertical-align: middle !important;
+  background: var(--phase103-accent) !important;
+  box-shadow: 0 0 0 3px var(--phase103-soft) !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card-connectivity .phase103-status-dot {
+  background: #16b85b !important;
+  box-shadow: 0 0 0 3px rgba(22, 184, 91, .10) !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-status-ok {
+  color: #16a553 !important;
+  font-weight: 800 !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card-icon {
+  flex: 0 0 52px !important;
+  width: 52px !important;
+  height: 52px !important;
+  border-radius: 16px !important;
+  background-color: var(--phase103-accent) !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-size: 30px 30px !important;
+  box-shadow: 0 12px 22px var(--phase103-shadow) !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-icon-connectivity {
+  background-image: url("../brand/phase103/icons/card-connectivity.svg") !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-icon-urgent {
+  background-image: url("../brand/phase103/icons/card-urgent.svg") !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-icon-alarms {
+  background-image: url("../brand/phase103/icons/card-alarms.svg") !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-icon-topology {
+  background-image: url("../brand/phase103/icons/card-topology.svg") !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-primary {
+  min-width: 0 !important;
+  min-height: 0 !important;
+  display: grid !important;
+  grid-template-columns: 138px minmax(0, 1fr) !important;
+  align-items: center !important;
+  gap: 20px !important;
+  direction: ltr !important;
+  position: relative !important;
+  z-index: 3 !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-primary > div:first-child {
+  min-width: 0 !important;
+  align-self: center !important;
+  direction: rtl !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-big-number {
+  display: block !important;
+  max-width: 100% !important;
+  color: #061a34 !important;
+  font-size: 62px !important;
+  line-height: .9 !important;
+  font-weight: 900 !important;
+  letter-spacing: -.05em !important;
+  direction: ltr !important;
+  text-align: left !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-big-number.is-red {
+  color: #ef3f48 !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-metric-label {
+  display: block !important;
+  margin-top: 12px !important;
+  color: #43546b !important;
+  font-size: 12.5px !important;
+  line-height: 1.25 !important;
+  font-weight: 750 !important;
+  direction: rtl !important;
+  text-align: left !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-connectivity-primary {
+  grid-template-columns: 138px minmax(0, 1fr) !important;
+  align-items: stretch !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-metric-stack {
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-connectivity-details {
+  min-width: 0 !important;
+  align-self: center !important;
+  padding-top: 30px !important;
+  direction: rtl !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-ring {
+  --phase103-ring: 0%;
+  flex: 0 0 82px !important;
+  width: 82px !important;
+  height: 82px !important;
+  margin-inline-start: 2px !important;
+  border-radius: 50% !important;
+  display: grid !important;
+  place-items: center !important;
+  background:
+    radial-gradient(circle, #fff 0 60%, transparent 61%),
+    conic-gradient(#2873dc 0 var(--phase103-ring), #dbe6f4 var(--phase103-ring) 100%) !important;
+  box-shadow: 0 8px 18px rgba(37, 99, 235, .10) !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-ring-inner {
+  width: 58px !important;
+  height: 58px !important;
+  border-radius: 50% !important;
+  background: #fff !important;
+  color: #061a34 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 3px !important;
+  text-align: center !important;
+  line-height: 1 !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-ring-inner strong {
+  color: #061a34 !important;
+  font-size: 20px !important;
+  line-height: 1 !important;
+  font-weight: 900 !important;
+  direction: ltr !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-ring-inner span {
+  color: #64748b !important;
+  font-size: 9.5px !important;
+  line-height: 1 !important;
+  font-weight: 700 !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-meter {
+  width: 100% !important;
+  height: 10px !important;
+  margin: 0 0 18px !important;
+  border-radius: 999px !important;
+  background: #dce6f2 !important;
+  box-shadow: inset 0 1px 2px rgba(15, 23, 42, .08) !important;
+  overflow: hidden !important;
+  direction: ltr !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-meter span {
+  display: block !important;
+  height: 100% !important;
+  border-radius: inherit !important;
+  background: linear-gradient(90deg, #4393ef 0%, #2469dc 72%, #1d5ed0 100%) !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-chips {
+  min-width: 0 !important;
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: stretch !important;
+  justify-content: flex-end !important;
+  gap: 8px !important;
+  direction: rtl !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-chip {
+  box-sizing: border-box !important;
+  min-width: 0 !important;
+  min-height: 44px !important;
+  padding: 8px 10px !important;
+  border: 1px solid #d7e3f1 !important;
+  border-radius: 13px !important;
+  background: rgba(255, 255, 255, .94) !important;
+  box-shadow: 0 5px 13px rgba(15, 23, 42, .025) !important;
+  color: #172940 !important;
+  font-size: 11.5px !important;
+  line-height: 1.15 !important;
+  font-weight: 750 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  direction: rtl !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-connectivity-details .phase103-chip {
+  flex: 1 1 0 !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-chip b {
+  flex: 0 0 auto !important;
+  color: #071a35 !important;
+  font-size: 15px !important;
+  font-weight: 900 !important;
+  direction: ltr !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-chip .dot {
+  flex: 0 0 7px !important;
+  width: 7px !important;
+  height: 7px !important;
+  border-radius: 50% !important;
+  background: var(--chip-color, #94a3b8) !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-chip.ok {
+  --chip-color: #18b35a;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-chip.danger {
+  --chip-color: #ef3f48;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-chip.muted {
+  --chip-color: #94a3b8;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card-critical .phase103-primary,
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card-alarms .phase103-primary {
+  grid-template-columns: 132px minmax(0, 1fr) !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card-critical .phase103-chips {
+  max-width: 230px !important;
+  align-self: end !important;
+  justify-self: end !important;
+  margin-bottom: 10px !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card-critical .phase103-chip {
+  min-width: 96px !important;
+  min-height: 42px !important;
+  border-color: #f3d7db !important;
+  background: rgba(255, 250, 250, .90) !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card-alarms .phase103-chips {
+  max-width: 240px !important;
+  align-self: end !important;
+  justify-self: end !important;
+  margin-bottom: 8px !important;
+  gap: 10px !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card-alarms .phase103-chip {
+  position: relative !important;
+  min-width: 106px !important;
+  min-height: 64px !important;
+  padding: 10px 34px 10px 12px !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+  border-color: #d7e0eb !important;
+  background: rgba(249, 251, 253, .92) !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card-alarms .phase103-chip.danger {
+  border-color: #fac5cc !important;
+  background: rgba(255, 246, 247, .92) !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card-alarms .phase103-chip.muted {
+  border-color: #f4ce8b !important;
+  background: rgba(255, 250, 240, .92) !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card-alarms .phase103-chip::after {
+  content: "" !important;
+  position: absolute !important;
+  inset-inline-end: 10px !important;
+  top: 50% !important;
+  width: 20px !important;
+  height: 20px !important;
+  transform: translateY(-50%) !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-size: contain !important;
+  opacity: .9 !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card-alarms .phase103-chip.muted::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23e99a00' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3 2.8 20h18.4L12 3Z'/%3E%3Cpath d='M12 9v5M12 17.5h.01'/%3E%3C/svg%3E") !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card-alarms .phase103-chip.danger::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ef3f48' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 22c4.4 0 8-3.2 8-7.5 0-3.5-2.2-6.5-5-8.5.1 2-1 3.7-2.5 4.8.2-3.2-1.5-6.4-4.6-8.3.1 3.3-3.9 5.4-3.9 10.5C4 18 7.6 22 12 22Z'/%3E%3C/svg%3E") !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-list {
+  min-width: 0 !important;
+  min-height: 0 !important;
+  display: block !important;
+  position: relative !important;
+  z-index: 3 !important;
+  overflow: hidden !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-list .phase66-list-item,
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-list .sm-main-list-item {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  height: 50px !important;
+  min-height: 50px !important;
+  max-height: 50px !important;
+  margin: 0 !important;
+  padding: 0 13px !important;
+  border: 1px solid #d6e2f0 !important;
+  border-inline-end: 4px solid var(--phase103-accent) !important;
+  border-radius: 14px !important;
+  background: rgba(255, 255, 255, .95) !important;
+  box-shadow: 0 5px 14px rgba(15, 23, 42, .025) !important;
+  color: #071a35 !important;
+  text-decoration: none !important;
+  display: grid !important;
+  grid-template-columns: minmax(92px, 1fr) auto minmax(0, 1.7fr) 14px !important;
+  align-items: center !important;
+  column-gap: 10px !important;
+  direction: ltr !important;
+  overflow: hidden !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-list .phase66-list-item + .phase66-list-item,
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-list .sm-main-list-item + .sm-main-list-item {
+  display: none !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-list .phase66-list-item::after,
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-list .sm-main-list-item::after {
+  content: "›" !important;
+  grid-column: 4 !important;
+  color: var(--phase103-accent) !important;
+  font-size: 22px !important;
+  line-height: 1 !important;
+  text-align: right !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-list .phase66-list-item strong,
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-list .sm-main-list-item strong {
+  min-width: 0 !important;
+  grid-column: 3 !important;
+  color: #071a35 !important;
+  font-size: 12.5px !important;
+  line-height: 1.2 !important;
+  font-weight: 850 !important;
+  direction: rtl !important;
+  text-align: right !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-list .phase66-list-item small,
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-list .sm-main-list-item small,
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-row-meta {
+  min-width: 0 !important;
+  grid-column: 1 !important;
+  color: #50647f !important;
+  font-size: 11px !important;
+  line-height: 1.2 !important;
+  font-weight: 700 !important;
+  direction: ltr !important;
+  text-align: left !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-row-time {
+  grid-column: 2 !important;
+  padding-inline: 9px !important;
+  border-inline: 1px solid #d5dfeb !important;
+  color: #8291a7 !important;
+  font-size: 10.5px !important;
+  line-height: 1 !important;
+  font-weight: 650 !important;
+  direction: ltr !important;
+  white-space: nowrap !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-empty,
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase66-empty {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  height: 50px !important;
+  min-height: 50px !important;
+  margin: 0 !important;
+  padding: 0 13px !important;
+  border: 1px dashed #d1deed !important;
+  border-radius: 14px !important;
+  background: rgba(250, 252, 255, .90) !important;
+  color: #63748b !important;
+  font-size: 12px !important;
+  line-height: 1.25 !important;
+  font-weight: 700 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  overflow: hidden !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-note {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  height: 42px !important;
+  min-height: 42px !important;
+  margin: 0 !important;
+  padding: 0 14px !important;
+  border: 1px solid #dbe4ef !important;
+  border-radius: 13px !important;
+  background: rgba(248, 250, 253, .93) !important;
+  color: #62738b !important;
+  font-size: 11.5px !important;
+  line-height: 1.25 !important;
+  font-weight: 650 !important;
+  display: grid !important;
+  align-items: center !important;
+  gap: 10px !important;
+  position: relative !important;
+  z-index: 3 !important;
+  overflow: hidden !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-note-text {
+  min-width: 0 !important;
+  direction: rtl !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-note-connectivity {
+  grid-template-columns: 16px minmax(0, 1fr) 112px !important;
+  direction: ltr !important;
+  border-color: #cfdef0 !important;
+  background: rgba(249, 252, 255, .95) !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-note-arrow {
+  color: #71849d !important;
+  font-size: 20px !important;
+  line-height: 1 !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-sparkline {
+  width: 112px !important;
+  height: 28px !important;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='112' height='28' viewBox='0 0 112 28'%3E%3Cpath d='M2 20 14 16 24 19 35 7 47 15 59 12 70 20 82 5 94 15 110 9' fill='none' stroke='%233c82e8' stroke-width='2.1' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M2 24 14 20 24 23 35 11 47 19 59 16 70 24 82 9 94 19 110 13' fill='none' stroke='%239ec4f5' stroke-width='1' opacity='.5'/%3E%3C/svg%3E") center / contain no-repeat !important;
+  opacity: .92 !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-note-warning,
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-note-info {
+  grid-template-columns: 20px minmax(0, 1fr) !important;
+  direction: ltr !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-note-warning {
+  border-color: #f7c9ce !important;
+  background: rgba(255, 246, 247, .92) !important;
+  color: #715b63 !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-note-symbol {
+  width: 18px !important;
+  height: 18px !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-size: contain !important;
+  opacity: .82 !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-note-warning .phase103-note-symbol {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23756570' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 3 4 7v5c0 5 3.4 8.2 8 9.5 4.6-1.3 8-4.5 8-9.5V7l-8-4Z'/%3E%3Cpath d='M12 8v5M12 16h.01'/%3E%3C/svg%3E") !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-note-info .phase103-note-symbol {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236a7c94' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 11v6M12 7.5h.01'/%3E%3C/svg%3E") !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card-topology .phase103-primary {
+  grid-template-columns: 128px minmax(0, 1fr) !important;
+  align-items: end !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card-topology .phase103-primary > div:first-child {
+  align-self: center !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-topology-breakdown {
+  min-width: 0 !important;
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  align-self: end !important;
+  gap: 8px !important;
+  direction: ltr !important;
+  position: relative !important;
+  z-index: 3 !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-topology-pill {
+  box-sizing: border-box !important;
+  min-width: 0 !important;
+  height: 64px !important;
+  padding: 9px 30px 8px 9px !important;
+  border: 1px solid #d7e3f1 !important;
+  border-radius: 13px !important;
+  background: rgba(255, 255, 255, .94) !important;
+  box-shadow: 0 5px 13px rgba(15, 23, 42, .025) !important;
+  color: #0b315a !important;
+  font-size: 11.5px !important;
+  line-height: 1.1 !important;
+  font-weight: 850 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  direction: ltr !important;
+  text-align: left !important;
+  position: relative !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-topology-pill::after {
+  content: "" !important;
+  position: absolute !important;
+  top: 50% !important;
+  right: 8px !important;
+  width: 19px !important;
+  height: 19px !important;
+  transform: translateY(-50%) !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-size: contain !important;
+  opacity: .83 !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-topology-discovery::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230d4c7f' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6.5'/%3E%3Cpath d='m15.5 15.5 5 5'/%3E%3C/svg%3E") !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-topology-sfp::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237688a1' stroke-width='1.8' stroke-linejoin='round'%3E%3Crect x='5' y='7' width='12' height='12' rx='2'/%3E%3Cpath d='M9 7V4h10v10h-2M9 11l4 4M13 11l-4 4'/%3E%3C/svg%3E") !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-topology-link::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237688a1' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m10 13 4-4'/%3E%3Cpath d='M7.5 15.5 5 18a3.5 3.5 0 0 0 5 5l3-3' transform='translate(0 -2)'/%3E%3Cpath d='m16.5 8.5 2.5-2.5a3.5 3.5 0 0 0-5-5l-3 3' transform='translate(0 2)'/%3E%3C/svg%3E") !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-topology-pill small {
+  max-width: 100% !important;
+  color: #4e5f75 !important;
+  font-size: 10px !important;
+  line-height: 1 !important;
+  font-weight: 700 !important;
+  direction: rtl !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-topology-pill b {
+  color: #071a35 !important;
+  font-size: 14px !important;
+  font-weight: 900 !important;
+  direction: ltr !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-visual {
+  position: absolute !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-visual.connectivity {
+  top: 100px !important;
+  right: 32px !important;
+  width: 340px !important;
+  height: 92px !important;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 340 92' fill='none'%3E%3Cpath d='M6 66c44 0 66-6 95-18 30-13 53-7 79 8 27 15 61 14 88-2 23-13 43-30 66-42' stroke='%237eacf0' stroke-width='1.6' opacity='.36'/%3E%3Cpath d='M8 75c37-8 67-2 96 6 31 9 54-9 78-22 28-16 59 12 92 16 24 3 42-4 60-14' stroke='%239fc2f2' stroke-width='1.2' stroke-dasharray='5 5' opacity='.34'/%3E%3Cg fill='%23fff' stroke='%237eacf0' stroke-width='2'%3E%3Ccircle cx='102' cy='48' r='5'/%3E%3Ccircle cx='180' cy='56' r='4'/%3E%3Ccircle cx='270' cy='53' r='6'/%3E%3Ccircle cx='334' cy='12' r='4'/%3E%3C/g%3E%3C/svg%3E") center / contain no-repeat !important;
+  opacity: .48 !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-visual.radar {
+  top: 82px !important;
+  right: 70px !important;
+  width: 270px !important;
+  height: 190px !important;
+  border-radius: 50% !important;
+  background:
+    radial-gradient(circle at 58% 54%, rgba(239, 63, 72, .46) 0 5px, transparent 6px),
+    linear-gradient(155deg, transparent 0 53%, rgba(239, 63, 72, .24) 53.2% 53.8%, transparent 54%),
+    repeating-radial-gradient(circle at 58% 54%, transparent 0 27px, rgba(239, 63, 72, .17) 28px 29px, transparent 30px 43px) !important;
+  opacity: .50 !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-visual.bars {
+  top: 118px !important;
+  right: 210px !important;
+  width: 148px !important;
+  height: 106px !important;
+  background:
+    linear-gradient(to top, rgba(100, 116, 139, .18) 0 45%, transparent 45%) 8px 100% / 9px 100% no-repeat,
+    linear-gradient(to top, rgba(100, 116, 139, .25) 0 66%, transparent 66%) 31px 100% / 9px 100% no-repeat,
+    linear-gradient(to top, rgba(100, 116, 139, .16) 0 34%, transparent 34%) 54px 100% / 9px 100% no-repeat,
+    linear-gradient(to top, rgba(100, 116, 139, .28) 0 78%, transparent 78%) 77px 100% / 9px 100% no-repeat,
+    linear-gradient(to top, rgba(100, 116, 139, .17) 0 57%, transparent 57%) 100px 100% / 9px 100% no-repeat !important;
+  opacity: .55 !important;
+}
+
+#sm-main-dashboard[data-phase103-dashboard-cards] .phase103-topology-visual {
+  position: absolute !important;
+  top: 92px !important;
+  right: 38px !important;
+  width: 360px !important;
+  height: 118px !important;
+  background: url("../brand/phase103/icons/card-topology-map.svg") center / contain no-repeat !important;
+  opacity: .56 !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #sm-main-dashboard[data-phase103-dashboard-cards] .phase103-detail-link {
+    transition: none !important;
+  }
+}
+
+@media (max-width: 1080px) {
+  #sm-main-dashboard[data-phase103-dashboard-cards] .sm-main-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-auto-rows: 370px !important;
+  }
+
+  #sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card {
+    height: 370px !important;
+    min-height: 370px !important;
+    max-height: 370px !important;
+  }
+}
+
+@media (max-width: 620px) {
+  #sm-main-dashboard[data-phase103-dashboard-cards] .sm-main-grid {
+    grid-auto-rows: auto !important;
+    gap: 14px !important;
+  }
+
+  #sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card,
+  #sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card-connectivity {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    padding: 18px !important;
+    grid-template-rows: auto auto auto auto !important;
+    gap: 14px !important;
+  }
+
+  #sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card-connectivity {
+    grid-template-rows: auto auto auto !important;
+  }
+
+  #sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card-top {
+    grid-template-columns: 82px minmax(0, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  #sm-main-dashboard[data-phase103-dashboard-cards] .phase103-detail-link {
+    width: 80px !important;
+    min-width: 80px !important;
+  }
+
+  #sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card-titlebox {
+    gap: 9px !important;
+  }
+
+  #sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card-titlebox h2 {
+    font-size: 21px !important;
+  }
+
+  #sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card-icon {
+    flex-basis: 46px !important;
+    width: 46px !important;
+    height: 46px !important;
+    border-radius: 14px !important;
+    background-size: 27px 27px !important;
+  }
+
+  #sm-main-dashboard[data-phase103-dashboard-cards] .phase103-primary,
+  #sm-main-dashboard[data-phase103-dashboard-cards] .phase103-connectivity-primary,
+  #sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card-critical .phase103-primary,
+  #sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card-alarms .phase103-primary,
+  #sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card-topology .phase103-primary {
+    grid-template-columns: 112px minmax(0, 1fr) !important;
+    gap: 12px !important;
+  }
+
+  #sm-main-dashboard[data-phase103-dashboard-cards] .phase103-big-number {
+    font-size: 48px !important;
+  }
+
+  #sm-main-dashboard[data-phase103-dashboard-cards] .phase103-chips {
+    flex-wrap: wrap !important;
+  }
+
+  #sm-main-dashboard[data-phase103-dashboard-cards] .phase103-connectivity-details .phase103-chip {
+    flex: 1 1 92px !important;
+  }
+
+  #sm-main-dashboard[data-phase103-dashboard-cards] .phase103-list .phase66-list-item,
+  #sm-main-dashboard[data-phase103-dashboard-cards] .phase103-list .sm-main-list-item {
+    grid-template-columns: minmax(76px, .8fr) minmax(0, 1.5fr) 12px !important;
+  }
+
+  #sm-main-dashboard[data-phase103-dashboard-cards] .phase103-list .phase66-list-item strong,
+  #sm-main-dashboard[data-phase103-dashboard-cards] .phase103-list .sm-main-list-item strong {
+    grid-column: 2 !important;
+  }
+
+  #sm-main-dashboard[data-phase103-dashboard-cards] .phase103-list .phase66-list-item::after,
+  #sm-main-dashboard[data-phase103-dashboard-cards] .phase103-list .sm-main-list-item::after {
+    grid-column: 3 !important;
+  }
+
+  #sm-main-dashboard[data-phase103-dashboard-cards] .phase103-row-time {
+    display: none !important;
+  }
+
+  #sm-main-dashboard[data-phase103-dashboard-cards] .phase103-note-connectivity {
+    grid-template-columns: 14px minmax(0, 1fr) 76px !important;
+  }
+
+  #sm-main-dashboard[data-phase103-dashboard-cards] .phase103-sparkline {
+    width: 76px !important;
+  }
+
+  #sm-main-dashboard[data-phase103-dashboard-cards] .phase103-topology-visual {
+    right: 22px !important;
+    width: 250px !important;
+  }
+}
+
+@media (max-width: 440px) {
+  #sm-main-dashboard[data-phase103-dashboard-cards] .phase103-primary,
+  #sm-main-dashboard[data-phase103-dashboard-cards] .phase103-connectivity-primary,
+  #sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card-critical .phase103-primary,
+  #sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card-alarms .phase103-primary,
+  #sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card-topology .phase103-primary {
+    grid-template-columns: 1fr !important;
+  }
+
+  #sm-main-dashboard[data-phase103-dashboard-cards] .phase103-big-number,
+  #sm-main-dashboard[data-phase103-dashboard-cards] .phase103-metric-label {
+    text-align: right !important;
+  }
+
+  #sm-main-dashboard[data-phase103-dashboard-cards] .phase103-metric-stack {
+    flex-direction: row !important;
+    align-items: center !important;
+  }
+
+  #sm-main-dashboard[data-phase103-dashboard-cards] .phase103-connectivity-details {
+    padding-top: 0 !important;
+  }
+
+  #sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card-critical .phase103-chips,
+  #sm-main-dashboard[data-phase103-dashboard-cards] .phase103-card-alarms .phase103-chips {
+    max-width: none !important;
+    justify-self: stretch !important;
+    justify-content: flex-start !important;
+  }
+
+  #sm-main-dashboard[data-phase103-dashboard-cards] .phase103-topology-breakdown {
+    width: 100% !important;
+  }
+
+  #sm-main-dashboard[data-phase103-dashboard-cards] .phase103-visual,
+  #sm-main-dashboard[data-phase103-dashboard-cards] .phase103-topology-visual {
+    display: none !important;
+  }
+}

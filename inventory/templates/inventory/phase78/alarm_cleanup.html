@@ -1,0 +1,166 @@
+{% extends "inventory/base.html" %}
+{% load static %}
+{% block title %}Alarm Cleanup | SwitchMap{% endblock %}
+{% block body_class %}phase77-body phase78-body{% endblock %}
+{% block content %}
+<section class="phase77-shell phase78-shell">
+    <header class="phase77-page-head">
+        <div>
+            <p class="phase77-eyebrow">Phase 78</p>
+            <h1>Operational Alarm Cleanup</h1>
+            <p>تفکیک آلارم واقعی از Stale Candidate؛ بدون تغییر در Alarm Center اصلی.</p>
+        </div>
+        <div class="phase77-head-actions">
+            <span>آخرین بررسی: <b class="ltr">{{ now_text }}</b></span>
+            <form method="post" action="{% url 'inventory:phase78_alarm_recheck' %}">
+                {% csrf_token %}
+                <button class="phase77-btn" type="submit">Recheck</button>
+            </form>
+            <a class="phase77-btn secondary" href="{% url 'inventory:alarm_center' %}?status=active">Alarm Center</a>
+        </div>
+    </header>
+
+    <section class="phase77-kpi-grid phase78-kpi-grid">
+        <article class="phase77-kpi {% if summary.critical_count %}is-danger{% elif summary.active_count %}is-warning{% endif %}">
+            <small>Active Alarms</small>
+            <strong>{{ summary.active_count }}</strong>
+            <span class="phase78-severity-split" aria-label="Critical and warning alarm totals">
+                <!-- PHASE78_1_ALARM_BADGE_UI -->
+                <span class="phase78-badge phase78-badge-critical"><span class="ltr">{{ summary.critical_count }}</span> Critical</span>
+                <span class="phase78-badge phase78-badge-warning"><span class="ltr">{{ summary.warning_count }}</span> Warning</span>
+            </span>
+        </article>
+        <article class="phase77-kpi {% if summary.stale_candidate_count %}is-warning{% endif %}">
+            <small>Stale Candidates</small>
+            <strong>{{ summary.stale_candidate_count }}</strong>
+            <span>قابل Resolve دستی</span>
+        </article>
+        <article class="phase77-kpi">
+            <small>Current Conditions</small>
+            <strong>{{ summary.current_count }}</strong>
+            <span>هنوز در DB دیده می‌شود</span>
+        </article>
+        <article class="phase77-kpi {% if summary.needs_recheck_count %}is-warning{% endif %}">
+            <small>Needs Recheck</small>
+            <strong>{{ summary.needs_recheck_count }}</strong>
+            <span>Last seen بالای 60 دقیقه</span>
+        </article>
+        <article class="phase77-kpi {% if summary.snmp_timeout_devices %}is-danger{% endif %}">
+            <small>SNMP Timeout</small>
+            <strong>{{ summary.snmp_timeout_devices|length }}</strong>
+            <span>Device با خطای SNMP</span>
+        </article>
+        <article class="phase77-kpi">
+            <small>Manual / Unknown</small>
+            <strong>{{ summary.manual_count }}</strong>
+            <span>نیازمند بررسی دستی</span>
+        </article>
+    </section>
+
+    <section class="phase77-two-col wide-left">
+        <article class="phase77-panel">
+            <header>
+                <h2>Stale Candidates</h2>
+                {% if stale_candidates %}
+                    <form method="post" action="{% url 'inventory:phase78_alarm_resolve_stale' %}" onsubmit="return confirm('فقط Stale Candidate های تشخیص‌داده‌شده Resolve می‌شوند. ادامه می‌دهی؟');">
+                        {% csrf_token %}
+                        <button class="phase77-btn secondary" type="submit">Resolve Stale Candidates</button>
+                    </form>
+                {% endif %}
+            </header>
+            <div class="phase78-note">این بخش هیچ Poll شبکه‌ای انجام نمی‌دهد؛ فقط وضعیت فعلی DB را با Alarmهای فعال مقایسه می‌کند.</div>
+            <div class="phase77-list">
+                {% for alarm in stale_candidates %}
+                    <a class="phase77-row severity-warning" href="{% url 'inventory:alarm_center' %}?status=active&alarm={{ alarm.id }}#alarm-{{ alarm.id }}">
+                        <span>
+                            <b>{{ alarm.title }}</b>
+                            <small>{% if alarm.switch %}{{ alarm.switch.name }}{% else %}SwitchMap{% endif %}{% if alarm.port %} · {{ alarm.port.interface_name }}{% endif %} · {{ alarm.phase78_reason }}</small>
+                            <small class="ltr">{{ alarm.fingerprint }}</small>
+                        </span>
+                        <em>{{ alarm.phase78_state_label }}</em>
+                    </a>
+                {% empty %}
+                    <div class="phase77-empty">Stale Candidate فعالی دیده نشد.</div>
+                {% endfor %}
+            </div>
+        </article>
+
+        <article class="phase77-panel">
+            <header><h2>SNMP Timeout Devices</h2><a href="{% url 'inventory:alarm_center' %}?category=snmp&status=active">SNMP Alarms</a></header>
+            <div class="phase77-list compact">
+                {% for sw in summary.snmp_timeout_devices %}
+                    <a class="phase77-row severity-critical" href="{% url 'inventory:switch_detail' sw.id %}">
+                        <span><b>{{ sw.name }}</b><small class="ltr">{{ sw.management_ip }}</small><small>{{ sw.snmp_last_error|truncatechars:90 }}</small></span>
+                        <em>{{ sw.snmp_last_poll_text }}</em>
+                    </a>
+                {% empty %}
+                    <div class="phase77-empty">Device با SNMP Error ثبت نشده است.</div>
+                {% endfor %}
+            </div>
+        </article>
+    </section>
+
+    <section class="phase77-three-col">
+        <article class="phase77-panel">
+            <header><h2>By Category</h2></header>
+            <div class="phase77-stat-list">
+                {% for item in summary.by_category %}
+                    <span><b>{{ item.total }}</b> {{ item.category }}</span>
+                {% empty %}
+                    <div class="phase77-empty">آلارم فعالی وجود ندارد.</div>
+                {% endfor %}
+            </div>
+        </article>
+        <article class="phase77-panel">
+            <header><h2>By Device</h2></header>
+            <div class="phase77-list compact">
+                {% for item in summary.by_switch %}
+                    <div class="phase77-row"><span><b>{{ item.switch__name }}</b><small class="ltr">{{ item.switch__management_ip }}</small></span><em>{{ item.total }}</em></div>
+                {% empty %}<div class="phase77-empty">آلارم Device محور وجود ندارد.</div>{% endfor %}
+            </div>
+        </article>
+        <article class="phase77-panel">
+            <header><h2>Cleanup Rule</h2></header>
+            <div class="phase78-rulebox">
+                <b>Current</b><span>شرط خطا هنوز در DB دیده می‌شود.</span>
+                <b>Stale Candidate</b><span>Alarm فعال است ولی شرط خطا در DB فعلی دیده نمی‌شود.</span>
+                <b>Needs Recheck</b><span>آخرین مشاهده آلارم بیشتر از 60 دقیقه قبل بوده.</span>
+            </div>
+        </article>
+    </section>
+
+    <article class="phase77-panel">
+        <header><h2>Operational Alarms</h2><a href="{% url 'inventory:phase78_alarm_cleanup_status_json' %}">status.json</a></header>
+        <div class="phase78-table-wrap">
+            <table class="phase77-table phase78-table">
+                <thead>
+                    <tr>
+                        <th>Alarm</th>
+                        <th>Target</th>
+                        <th>Severity</th>
+                        <th>Category</th>
+                        <th>State</th>
+                        <th>Last Seen</th>
+                        <th>Reason</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for alarm in operational_alarms %}
+                        <tr>
+                            <td><a href="{% url 'inventory:alarm_center' %}?status=active&alarm={{ alarm.id }}#alarm-{{ alarm.id }}"><b>{{ alarm.title }}</b></a><small class="ltr">{{ alarm.fingerprint }}</small></td>
+                            <td>{% if alarm.switch %}{{ alarm.switch.name }}{% else %}-{% endif %}{% if alarm.port %}<small>{{ alarm.port.interface_name }}</small>{% endif %}</td>
+                            <td><span class="phase77-pill severity-{{ alarm.severity }}">{{ alarm.get_severity_display }}</span></td>
+                            <td>{{ alarm.get_category_display }}</td>
+                            <td><span class="phase77-pill {% if alarm.phase78_state == 'current' %}risk-high{% else %}risk-medium{% endif %}">{{ alarm.phase78_state_label }}</span>{% if alarm.phase78_needs_recheck %}<small>Needs Recheck</small>{% endif %}</td>
+                            <td class="ltr">{{ alarm.last_seen_text }}</td>
+                            <td>{{ alarm.phase78_reason|truncatechars:140 }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="7"><div class="phase77-empty">آلارم عملیاتی فعالی وجود ندارد.</div></td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </article>
+</section>
+{% endblock %}

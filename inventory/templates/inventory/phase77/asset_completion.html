@@ -1,0 +1,13 @@
+{% extends "inventory/base.html" %}
+{% block title %}Asset Completion | SwitchMap{% endblock %}
+{% block body_class %}phase77-body{% endblock %}
+{% block content %}
+<section class="phase77-shell">
+    <header class="phase77-page-head"><div><p class="phase77-eyebrow">Phase 77</p><h1>تکمیل مستندات پورت‌ها</h1><p>تمرکز روی پورت‌های ناقص برای تبدیل SwitchMap به Source of Truth.</p></div><a class="phase77-btn" href="{% url 'inventory:asset_documentation' %}">Asset Documentation</a></header>
+    <form class="phase77-filterbar" method="get"><select name="status"><option value="">همه وضعیت‌ها</option>{% for value,label in status_choices %}<option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select><button class="phase77-btn secondary" type="submit">فیلتر</button></form>
+    <section class="phase77-panel">
+        <table class="phase77-table"><thead><tr><th>Switch</th><th>Total</th><th>Documented</th><th>Partial</th><th>Undocumented</th><th>Needs Review</th><th>%</th></tr></thead><tbody>{% for row in rows %}<tr><td><a href="{% url 'inventory:switch_ports_table' row.switch_id %}">{{ row.switch__name }}</a></td><td>{{ row.total }}</td><td>{{ row.documented }}</td><td>{{ row.partial }}</td><td>{{ row.undocumented }}</td><td>{{ row.needs_review }}</td><td><b>{{ row.percent }}%</b></td></tr>{% empty %}<tr><td colspan="7">داده‌ای وجود ندارد.</td></tr>{% endfor %}</tbody></table>
+    </section>
+    <section class="phase77-panel"><header><h2>نمونه پورت‌های هدف</h2></header><div class="phase77-list compact">{% for port in ports %}<a class="phase77-row" href="{% url 'inventory:port_edit' port.id %}?next=assets"><span><b>{{ port.switch.name }} · {{ port.interface_name }}</b><small>{{ port.description|default:"-" }} · {{ port.owner|default:"-" }}</small></span><em>{{ port.get_documentation_status_display }}</em></a>{% empty %}<div class="phase77-empty">موردی نیست.</div>{% endfor %}</div></section>
+</section>
+{% endblock %}

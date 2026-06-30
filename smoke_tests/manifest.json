@@ -1,0 +1,19 @@
+{
+  "schema_version": "phase94r3_verification_baseline_v1",
+  "mode": "read_only_no_visible_test_data_no_network_no_ssh_no_backup_no_restore_no_service",
+  "visible_test_data_created": "NO",
+  "current": [
+    "smoke_tests/run_smoke.py"
+  ],
+  "production": [
+    "smoke_tests/run_smoke.py"
+  ],
+  "phase94": [
+    "smoke_tests/run_smoke.py"
+  ],
+  "notes": {
+    "summary": "This manifest intentionally does not reference historical missing smoke files.",
+    "runner": "The runner invokes Phase94R3 read-only guards only.",
+    "safety": "No Switch, Port, Alarm, Backup, Credential, Scheduled Task, Service, SSH, SNMP, or Restore object is created or modified."
+  }
+}

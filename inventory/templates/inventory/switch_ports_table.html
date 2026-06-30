@@ -1,0 +1,269 @@
+{% extends "inventory/base.html" %}
+
+{% block title %}جدول پورت‌ها | {{ switch.name }}{% endblock %}
+{% block page_title %}جدول پورت‌های {{ switch.name }}{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle"><span class="ltr">{{ switch.management_ip }}</span></p>{% endblock %}
+{% block page_actions %}
+<div class="toolbar-group">
+    <a class="btn btn-secondary" href="{% url 'inventory:switch_detail' switch.id %}">نقشه پورت‌ها</a>
+    <a class="btn btn-secondary" href="{% url 'inventory:asset_documentation' %}?switch={{ switch.id }}">Assets</a>
+    <a class="btn btn-secondary" href="{% url 'inventory:switch_list' %}">داشبورد</a>
+</div>
+{% endblock %}
+
+{% block content %}
+<section class="surface-card search-panel ui-compact-panel">
+    <form class="search-form wrap" method="get">
+        <input class="input wide" type="text" name="q" value="{{ search_query|default:query }}" placeholder="جستجو در پورت، VLAN، Trunk، MAC، Neighbor، Device ...">
+        <select class="input select" name="filter">
+            {% for value, label in filter_options %}
+                <option value="{{ value }}" {% if filter_query == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        <button class="btn btn-primary" type="submit">اعمال</button>
+        {% if search_query or filter_query %}<a class="btn btn-ghost" href="{% url 'inventory:switch_ports_table' switch.id %}">پاک کردن</a>{% endif %}
+    </form>
+</section>
+
+{% if swmap_can_ssh %}
+<details class="surface-card bulk-ssh-panel ui-collapsible" data-bulk-ssh-panel>
+    <summary class="ui-collapsible-summary">
+        <span>
+            <strong>Bulk SSH روی پورت‌های انتخابی</strong>
+            <small>رمز SSH ذخیره نمی‌شود؛ Trunk / Uplink نیاز به تأیید دارد.</small>
+        </span>
+        <span class="status-pill warn">Operator / Admin</span>
+    </summary>
+    <div class="ui-collapsible-body">
+    <form class="bulk-ssh-form" method="post" action="{% url 'inventory:switch_bulk_ssh_action' switch.id %}" data-bulk-ssh-form>
+        {% csrf_token %}
+        <input type="hidden" name="all_ports" value="0" data-bulk-all-ports>
+        <div class="bulk-ssh-grid">
+            <div class="field-row">
+                <label>Action</label>
+                <select class="input" name="action" required>
+                    {% for action_value, action_title in swmap_ssh_actions %}
+                        <option value="{{ action_value }}">{{ action_title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="field-row">
+                <label>Value</label>
+                <input class="input ltr" type="text" name="value" placeholder="VLAN / Description">
+            </div>
+            <div class="field-row">
+                <label>SSH Username</label>
+                <input class="input ltr" type="text" name="ssh_username" value="{{ default_ssh_username|default:switch.ssh_username|default:'admin' }}" autocomplete="username" required>
+            </div>
+            <div class="field-row">
+                <label>SSH Password</label>
+                <input class="input ltr" type="password" name="ssh_password" autocomplete="current-password" required>
+            </div>
+            <div class="field-row">
+                <label>Enable Password</label>
+                <input class="input ltr" type="password" name="enable_password" placeholder="اختیاری">
+            </div>
+        </div>
+        <div class="bulk-ssh-options">
+            <label class="check-row"><input type="checkbox" name="force" value="1"> اجازه تغییر روی Trunk</label>
+            <label class="check-row risk-confirm"><input type="checkbox" name="confirmed" value="1"> تأیید نهایی عملیات حساس</label>
+            <label class="check-row risk-confirm"><input type="checkbox" name="bulk_risk_confirmed" value="1"> تأیید Bulk روی Uplink / Trunk / Neighbor</label>
+        </div>
+        <div class="bulk-ssh-actions">
+            <button class="btn btn-secondary" type="button" data-select-visible-ports>انتخاب همه پورت‌های جدول</button>
+            <button class="btn btn-ghost" type="button" data-clear-selected-ports>لغو انتخاب</button>
+            <button class="btn btn-primary" type="submit" data-bulk-selected-submit>اجرای SSH روی پورت‌های انتخابی</button>
+            <button class="btn btn-danger" type="button" data-bulk-all-submit>اجرای SSH روی تمام پورت‌های سوییچ</button>
+        </div>
+    </form>
+    <div class="bulk-ssh-result" data-bulk-ssh-result></div>
+    </div>
+</details>
+{% endif %}
+
+<section class="surface-card table-panel ui-data-panel">
+    <div class="table-title-row compact-title-row">
+        <div>
+            <h3>پورت‌ها</h3>
+            <span class="inline-state">انتخاب چندتایی فقط برای Operator / Admin فعال است.</span>
+        </div>
+    </div>
+    <div class="table-wrap">
+        <table class="data-table bulk-port-table">
+            <thead>
+                <tr>
+                    {% if swmap_can_ssh %}<th><input type="checkbox" data-toggle-all-port-checks title="انتخاب همه"></th>{% endif %}
+                    <th>Interface</th>
+                    <th>Status</th>
+                    <th>Mode</th>
+                    <th>Access VLAN</th>
+                    <th>Voice VLAN</th>
+                    <th>Native VLAN</th>
+                    <th>Trunk VLANs</th>
+                    <th>PoE</th>
+                    <th>Neighbor</th>
+                    <th>MAC Count</th>
+                    <th>Device</th>
+                    <th>Description</th>
+                    <th>Owner</th>
+                    <th>Doc</th>
+                    <th>Rack</th>
+                    <th>Cable</th>
+                    <th>IP</th>
+                    {% if swmap_can_edit_port %}<th>Manual Edit</th>{% endif %}
+                    <th>History</th>
+                    {% if swmap_can_ssh %}<th>SSH</th>{% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for port in ports %}
+                    <tr>
+                        {% if swmap_can_ssh %}<td><input type="checkbox" name="port_ids" value="{{ port.id }}" data-port-check form="bulk-port-selection-shadow"></td>{% endif %}
+                        <td class="ltr strong">{{ port.interface_name }}</td>
+                        <td>{{ port.get_status_display }}</td>
+                        <td>{{ port.get_port_mode_display }}</td>
+                        <td>{{ port.access_vlan|default:"-" }}</td>
+                        <td>{{ port.voice_vlan|default:"-" }}</td>
+                        <td>{{ port.native_vlan|default:"-" }}</td>
+                        <td class="ltr">{{ port.trunk_vlans|default:"-" }}</td>
+                        <td>{{ port.poe_summary }}</td>
+                        <td class="ltr">{% if port.neighbor_device %}{{ port.neighbor_device }} / {{ port.neighbor_port|default:"-" }}{% else %}-{% endif %}</td>
+                        <td>{{ port.mac_count }}</td>
+                        <td>{{ port.connected_device|default:"-" }}</td>
+                        <td>{{ port.description|default:"-" }}</td>
+                        <td>{{ port.owner|default:"-" }}</td>
+                        <td><span class="status-pill doc-{{ port.documentation_status }}">{{ port.get_documentation_status_display }}</span></td>
+                        <td class="ltr">{% if port.rack or port.rack_unit %}{{ port.rack|default:"-" }} {{ port.rack_unit|default:"" }}{% else %}-{% endif %}</td>
+                        <td class="ltr">{{ port.cable_label|default:"-" }}</td>
+                        <td class="ltr">{{ port.ip_address|default:"-" }}</td>
+                        {% if swmap_can_edit_port %}<td><a class="table-link" href="{% url 'inventory:port_edit' port.id %}?next=table">ویرایش</a></td>{% endif %}
+                        <td><a class="table-link" href="{% url 'inventory:port_documentation_history' port.id %}">History</a></td>
+                        {% if swmap_can_ssh %}<td><a class="table-link" href="{% url 'inventory:port_ssh_helper' port.id %}">SSH</a></td>{% endif %}
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="17">پورتی پیدا نشد.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+{% if swmap_can_ssh %}
+<script>
+(function(){
+    const panel = document.querySelector('[data-bulk-ssh-panel]');
+    if (!panel) return;
+    const form = panel.querySelector('[data-bulk-ssh-form]');
+    const resultBox = panel.querySelector('[data-bulk-ssh-result]');
+    const allPortsInput = panel.querySelector('[data-bulk-all-ports]');
+    const selectVisibleBtn = panel.querySelector('[data-select-visible-ports]');
+    const clearSelectedBtn = panel.querySelector('[data-clear-selected-ports]');
+    const allSubmitBtn = panel.querySelector('[data-bulk-all-submit]');
+    const toggleAll = document.querySelector('[data-toggle-all-port-checks]');
+
+    function portChecks(){
+        return Array.from(document.querySelectorAll('[data-port-check]'));
+    }
+
+    function selectedChecks(){
+        return portChecks().filter(function(item){ return item.checked; });
+    }
+
+    function escapeHtml(value){
+        return String(value || '').replace(/[&<>"']/g, function(ch){
+            return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];
+        });
+    }
+
+    function setBusy(isBusy){
+        Array.from(form.querySelectorAll('button, input, select')).forEach(function(el){
+            if (el.hasAttribute('data-bulk-all-ports')) return;
+            el.disabled = isBusy;
+        });
+        portChecks().forEach(function(el){ el.disabled = isBusy; });
+        if (toggleAll) toggleAll.disabled = isBusy;
+    }
+
+    function renderResult(payload){
+        const rows = (payload.results || []).map(function(item){
+            const cls = item.ok ? 'ok' : 'fail';
+            const status = item.ok ? 'OK' : 'FAILED';
+            return '<tr class="' + cls + '">' +
+                '<td class="ltr">' + escapeHtml(item.interface) + '</td>' +
+                '<td>' + status + '</td>' +
+                '<td>' + escapeHtml(item.message) + '</td>' +
+                '</tr>';
+        }).join('');
+        resultBox.innerHTML = '<div class="bulk-result-summary ' + (payload.ok ? 'ok' : 'fail') + '">' +
+            escapeHtml(payload.message || '-') + '</div>' +
+            '<div class="table-wrap compact"><table class="data-table"><thead><tr><th>Interface</th><th>Status</th><th>Message</th></tr></thead><tbody>' +
+            rows + '</tbody></table></div>';
+    }
+
+    if (selectVisibleBtn) {
+        selectVisibleBtn.addEventListener('click', function(){
+            portChecks().forEach(function(item){ item.checked = true; });
+            if (toggleAll) toggleAll.checked = true;
+        });
+    }
+
+    if (clearSelectedBtn) {
+        clearSelectedBtn.addEventListener('click', function(){
+            portChecks().forEach(function(item){ item.checked = false; });
+            if (toggleAll) toggleAll.checked = false;
+        });
+    }
+
+    if (toggleAll) {
+        toggleAll.addEventListener('change', function(){
+            portChecks().forEach(function(item){ item.checked = toggleAll.checked; });
+        });
+    }
+
+    if (allSubmitBtn) {
+        allSubmitBtn.addEventListener('click', function(){
+            if (!window.confirm('اجرای SSH روی تمام پورت‌های این سوییچ انجام شود؟')) return;
+            allPortsInput.value = '1';
+            form.requestSubmit();
+        });
+    }
+
+    form.addEventListener('submit', async function(event){
+        event.preventDefault();
+        const allPorts = allPortsInput.value === '1';
+        const selected = selectedChecks();
+        if (!allPorts && selected.length === 0) {
+            resultBox.innerHTML = '<div class="bulk-result-summary fail">هیچ پورتی انتخاب نشده است.</div>';
+            return;
+        }
+
+        const data = new FormData(form);
+        if (!allPorts) {
+            data.delete('port_ids');
+            selected.forEach(function(item){ data.append('port_ids', item.value); });
+        }
+
+        resultBox.innerHTML = '<div class="bulk-result-summary">در حال اجرای Bulk SSH ...</div>';
+        setBusy(true);
+        try {
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: data,
+                headers: {'X-Requested-With': 'XMLHttpRequest'}
+            });
+            const payload = await response.json();
+            renderResult(payload);
+        } catch (error) {
+            resultBox.innerHTML = '<div class="bulk-result-summary fail">Bulk SSH failed: ' + escapeHtml(error.message) + '</div>';
+        } finally {
+            allPortsInput.value = '0';
+            setBusy(false);
+        }
+    });
+})();
+</script>
+{% endif %}
+{% endblock %}

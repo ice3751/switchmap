@@ -1,0 +1,324 @@
+{% extends "inventory/base.html" %}
+
+{% block title %}SFP Live Monitor{% endblock %}
+{% block page_title %}SFP Live Monitor{% endblock %}
+{% block page_subtitle %}
+<p class="page-subtitle">مانیتورینگ Read-Only پورت‌های SFP / TE برای CRC، Error Counter، Err-disabled، Rx/Tx Power و Temperature</p>
+{% endblock %}
+{% block page_actions %}
+<a class="btn btn-ghost" href="{% url 'inventory:action_logs' %}?tab=cisco">Log Center</a>
+{% endblock %}
+
+{% block content %}
+<section class="summary-bar-grid sfp-summary sfp-summary-phase28" id="sfpSummary">
+    <div class="summary-tile"><span>Total</span><strong data-summary="total">{{ summary.total }}</strong></div>
+    <div class="summary-tile is-error"><span>Problem</span><strong data-summary="problem">{{ summary.problem }}</strong></div>
+    <div class="summary-tile is-up"><span>Healthy</span><strong data-summary="healthy">{{ summary.healthy }}</strong></div>
+    <div class="summary-tile is-disabled"><span>Warning</span><strong data-summary="warning">{{ summary.warning }}</strong></div>
+    <div class="summary-tile is-error"><span>Critical</span><strong data-summary="critical">{{ summary.critical }}</strong></div>
+    <div class="summary-tile is-error"><span>Err-disabled</span><strong data-summary="err_disabled">{{ summary.err_disabled }}</strong></div>
+    <div class="summary-tile is-disabled"><span>CRC Increased</span><strong data-summary="crc_increased">{{ summary.crc_increased }}</strong></div>
+    <div class="summary-tile is-disabled"><span>Input Error</span><strong data-summary="input_error">{{ summary.input_error }}</strong></div>
+    <div class="summary-tile is-disabled"><span>Output Error</span><strong data-summary="output_error">{{ summary.output_error }}</strong></div>
+    <div class="summary-tile is-disabled"><span>Power Abnormal</span><strong><b data-summary="rx_power_abnormal">{{ summary.rx_power_abnormal }}</b>/<b data-summary="tx_power_abnormal">{{ summary.tx_power_abnormal }}</b></strong></div>
+</section>
+
+{% if swmap_can_sfp_poll %}
+<details class="surface-card search-panel sfp-control-card ui-collapsible">
+    <summary class="ui-collapsible-summary">
+        <span>
+            <strong>SFP Poll</strong>
+            <small>Poll Now / Start Live فقط هنگام باز بودن صفحه</small>
+        </span>
+        <span class="status-pill muted" id="sfpLiveState">Live خاموش است.</span>
+    </summary>
+    <div class="ui-collapsible-body">
+        <form id="sfpPollForm" class="sfp-poll-form" method="post" action="{% url 'inventory:sfp_monitor_poll' %}">
+            {% csrf_token %}
+            <div class="sfp-form-grid">
+                <div>
+                    <label>Switch</label>
+                    <select class="input" name="switch" id="sfpSwitchSelect">
+                        <option value="">همه سوییچ‌های فعال</option>
+                        {% for switch in switches %}
+                            <option value="{{ switch.id }}" {% if selected_switch == switch.id|stringformat:'s' %}selected{% endif %}>{{ switch.name }} - {{ switch.management_ip }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label>SSH Username</label>
+                    <input class="input ltr" type="text" name="ssh_username" value="{{ default_ssh_username }}" autocomplete="username">
+                </div>
+                <div>
+                    <label>SSH Password</label>
+                    <input class="input ltr" type="password" name="ssh_password" autocomplete="current-password">
+                </div>
+                <div>
+                    <label>Enable Password</label>
+                    <input class="input ltr" type="password" name="enable_password" autocomplete="off" placeholder="اختیاری">
+                </div>
+                <div>
+                    <label>Interval</label>
+                    <select class="input" id="sfpInterval">
+                        <option value="60" selected>60 ثانیه</option>
+                        <option value="120">120 ثانیه</option>
+                        <option value="300">300 ثانیه</option>
+                    </select>
+                </div>
+            </div>
+            <div class="sfp-control-actions">
+                <button class="btn btn-primary" type="submit">Poll Now</button>
+                <button class="btn btn-secondary" type="button" id="sfpAutoStart">Start Live</button>
+                <button class="btn btn-ghost" type="button" id="sfpAutoStop" disabled>Stop</button>
+            </div>
+        </form>
+    </div>
+</details>
+{% else %}
+<section class="surface-card search-panel sfp-control-card ui-compact-panel">
+    <h3>SFP Poll</h3>
+    <p class="page-subtitle">نقش فعلی فقط اجازه مشاهده Snapshot های موجود را دارد.</p>
+</section>
+{% endif %}
+
+<section class="surface-card table-panel ui-data-panel">
+    <div class="table-title-row">
+        <h3>جزئیات کامل SFP ها</h3>
+        <span class="inline-state">Dashboard فقط مشکل‌دارها را نشان می‌دهد؛ این صفحه همه SFP ها را نگه می‌دارد.</span>
+    </div>
+    <div class="table-wrap">
+        <table class="data-table sfp-monitor-table sfp-monitor-table-phase28">
+            <thead>
+                <tr>
+                    <th>Switch</th>
+                    <th>Port</th>
+                    <th>Health</th>
+                    <th>Alert</th>
+                    <th>Status</th>
+                    <th>CRC/FCS Δ</th>
+                    <th>Input Δ</th>
+                    <th>Output Δ</th>
+                    <th>OutDiscard Δ</th>
+                    <th>Rx dBm</th>
+                    <th>Tx dBm</th>
+                    <th>Temp</th>
+                    <th>Prev Poll</th>
+                    <th>Last Poll</th>
+                    <th>History</th>
+                    <th>Media</th>
+                    <th>Note</th>
+                </tr>
+            </thead>
+            <tbody id="sfpTableBody">
+                {% for item in snapshots %}
+                    <tr class="sfp-row sfp-health-{{ item.health_state }} {% if item.has_issue %}sfp-row-has-issue{% endif %}">
+                        <td><a class="table-link" href="{% url 'inventory:switch_detail' item.switch.id %}">{{ item.switch.name }}</a></td>
+                        <td class="ltr strong">{{ item.interface_name }}</td>
+                        <td>{% if item.health_state == 'healthy' %}<span class="status-pill ok">Healthy</span>{% elif item.health_state == 'critical' %}<span class="status-pill warn">Critical</span>{% elif item.health_state == 'warning' %}<span class="status-pill muted">Warning</span>{% else %}<span class="status-pill muted">Unknown</span>{% endif %}</td>
+                        <td>
+                            {% if item.issue_tags %}
+                                <div class="sfp-alert-tags">
+                                    {% for tag in item.issue_tags %}<span class="sfp-alert-tag">{{ tag }}</span>{% endfor %}
+                                </div>
+                            {% else %}
+                                <span class="sfp-alert-ok">OK</span>
+                            {% endif %}
+                        </td>
+                        <td class="ltr">{{ item.link_status|default:"-" }}</td>
+                        <td class="ltr {% if item.fcs_delta > 0 %}sfp-delta-bad{% endif %}">{{ item.fcs_delta }}</td>
+                        <td class="ltr {% if item.input_error_delta > 0 %}sfp-delta-bad{% endif %}">{{ item.input_error_delta }}</td>
+                        <td class="ltr {% if item.output_error_delta > 0 %}sfp-delta-bad{% endif %}">{{ item.output_error_delta }}</td>
+                        <td class="ltr {% if item.out_discard_delta > 0 %}sfp-delta-bad{% endif %}">{{ item.out_discard_delta }}</td>
+                        <td class="ltr">{{ item.rx_power_dbm|default:"-" }}</td>
+                        <td class="ltr">{{ item.tx_power_dbm|default:"-" }}</td>
+                        <td class="ltr">{{ item.temperature_c|default:"-" }}</td>
+                        <td class="ltr">{{ item.previous_poll_text }}</td>
+                        <td class="ltr">{{ item.poll_time_text }}</td>
+                        <td class="ltr sfp-history-mini" title="{{ item.history_text }}">{{ item.history_text }}</td>
+                        <td class="ltr">{{ item.media_type|default:"-" }}</td>
+                        <td>{{ item.health_note|default:"-" }}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="17">هنوز SFP Poll ثبت نشده است.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="surface-card table-panel sfp-note-card">
+    <h3>Scope این فاز</h3>
+    <p>این صفحه Read-Only است. رمز SSH فقط داخل فرم Poll استفاده می‌شود و ذخیره نمی‌شود. History کوتاه برای هر SFP حداکثر 20 Poll آخر نگهداری می‌کند.</p>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function(){
+    const form = document.getElementById('sfpPollForm');
+    if (!form) return;
+    const startButton = document.getElementById('sfpAutoStart');
+    const stopButton = document.getElementById('sfpAutoStop');
+    const intervalSelect = document.getElementById('sfpInterval');
+    const state = document.getElementById('sfpLiveState');
+    const tableBody = document.getElementById('sfpTableBody');
+    let timerId = null;
+    let countdownId = null;
+    let running = false;
+    let nextPollAt = null;
+
+    function escapeHtml(value){
+        return String(value || '').replace(/[&<>"']/g, function(ch){
+            return ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'})[ch];
+        });
+    }
+
+    function healthPill(health){
+        if (health === 'healthy') return '<span class="status-pill ok">Healthy</span>';
+        if (health === 'critical') return '<span class="status-pill warn">Critical</span>';
+        if (health === 'warning') return '<span class="status-pill muted">Warning</span>';
+        return '<span class="status-pill muted">Unknown</span>';
+    }
+
+    function setSummary(summary){
+        Object.keys(summary || {}).forEach(function(key){
+            const el = document.querySelector('[data-summary="' + key + '"]');
+            if (el) el.textContent = summary[key];
+        });
+    }
+
+    function alertTags(row){
+        const tags = row.issue_tags || [];
+        if (!tags.length) return '<span class="sfp-alert-ok">OK</span>';
+        return '<div class="sfp-alert-tags">' + tags.map(function(tag){
+            return '<span class="sfp-alert-tag">' + escapeHtml(tag) + '</span>';
+        }).join('') + '</div>';
+    }
+
+    function historyText(row){
+        const history = row.history || [];
+        if (!history.length) return '-';
+        return history.map(function(item){
+            return item.poll_time + ': CRCΔ=' + item.fcs_delta + ', InΔ=' + item.input_delta + ', OutΔ=' + item.output_delta;
+        }).join(' | ');
+    }
+
+    function renderRows(rows){
+        if (!rows || !rows.length){
+            tableBody.innerHTML = '<tr><td colspan="17">هنوز SFP Poll ثبت نشده است.</td></tr>';
+            return;
+        }
+        tableBody.innerHTML = rows.map(function(row){
+            const switchLink = '/switch/' + row.switch_id + '/';
+            const hist = historyText(row);
+            return '<tr class="sfp-row sfp-health-' + row.health + (row.has_issue ? ' sfp-row-has-issue' : '') + '">' +
+                '<td><a class="table-link" href="' + switchLink + '">' + escapeHtml(row.switch) + '</a></td>' +
+                '<td class="ltr strong">' + escapeHtml(row.interface) + '</td>' +
+                '<td>' + healthPill(row.health) + '</td>' +
+                '<td>' + alertTags(row) + '</td>' +
+                '<td class="ltr">' + escapeHtml(row.status) + '</td>' +
+                '<td class="ltr ' + (row.fcs_delta > 0 ? 'sfp-delta-bad' : '') + '">' + row.fcs_delta + '</td>' +
+                '<td class="ltr ' + (row.input_delta > 0 ? 'sfp-delta-bad' : '') + '">' + row.input_delta + '</td>' +
+                '<td class="ltr ' + (row.output_delta > 0 ? 'sfp-delta-bad' : '') + '">' + row.output_delta + '</td>' +
+                '<td class="ltr ' + (row.out_discard_delta > 0 ? 'sfp-delta-bad' : '') + '">' + row.out_discard_delta + '</td>' +
+                '<td class="ltr">' + (row.rx_power || '-') + '</td>' +
+                '<td class="ltr">' + (row.tx_power || '-') + '</td>' +
+                '<td class="ltr">' + (row.temperature || '-') + '</td>' +
+                '<td class="ltr">' + escapeHtml(row.previous_poll || '-') + '</td>' +
+                '<td class="ltr">' + escapeHtml(row.poll_time) + '</td>' +
+                '<td class="ltr sfp-history-mini" title="' + escapeHtml(hist) + '">' + escapeHtml(hist) + '</td>' +
+                '<td class="ltr">' + escapeHtml(row.media_type) + '</td>' +
+                '<td>' + escapeHtml(row.health_note) + '</td>' +
+            '</tr>';
+        }).join('');
+    }
+
+    function setButtons(){
+        startButton.disabled = running;
+        stopButton.disabled = !running;
+    }
+
+    function stopLive(message){
+        running = false;
+        if (timerId) window.clearTimeout(timerId);
+        if (countdownId) window.clearInterval(countdownId);
+        timerId = null;
+        countdownId = null;
+        nextPollAt = null;
+        setButtons();
+        state.textContent = message || 'Live خاموش است.';
+    }
+
+    function countdownText(){
+        if (!running || !nextPollAt) return;
+        const remain = Math.max(0, Math.ceil((nextPollAt - Date.now()) / 1000));
+        state.textContent = 'Live روشن است. Poll بعدی: ' + remain + 's';
+    }
+
+    async function pollOnce(){
+        const formData = new FormData(form);
+        state.textContent = 'در حال Poll ...';
+        const response = await fetch(form.action, {
+            method: 'POST',
+            body: formData,
+            headers: {'X-Requested-With': 'XMLHttpRequest'}
+        });
+        const data = await response.json();
+        if (!response.ok || !data.ok){
+            throw new Error(data.message || 'SFP Poll failed');
+        }
+        setSummary(data.summary);
+        renderRows(data.snapshots);
+        state.textContent = data.message;
+    }
+
+    function scheduleNext(){
+        if (!running) return;
+        const seconds = parseInt(intervalSelect.value || '60', 10);
+        nextPollAt = Date.now() + seconds * 1000;
+        countdownText();
+        timerId = window.setTimeout(async function(){
+            if (document.hidden){
+                scheduleNext();
+                return;
+            }
+            try{
+                await pollOnce();
+            }catch(error){
+                stopLive(error.message);
+                return;
+            }
+            scheduleNext();
+        }, seconds * 1000);
+    }
+
+    function startLive(){
+        const password = form.querySelector('[name="ssh_password"]');
+        if (password && !String(password.value || '').trim()){
+            state.textContent = 'برای Live، SSH Password را وارد کن.';
+            return;
+        }
+        if (running) return;
+        running = true;
+        setButtons();
+        pollOnce().then(scheduleNext).catch(function(error){
+            stopLive(error.message);
+        });
+        countdownId = window.setInterval(countdownText, 1000);
+    }
+
+    form.addEventListener('submit', async function(event){
+        event.preventDefault();
+        try{
+            await pollOnce();
+        }catch(error){
+            state.textContent = error.message;
+        }
+    });
+    startButton.addEventListener('click', startLive);
+    stopButton.addEventListener('click', function(){ stopLive('Live متوقف شد.'); });
+    window.addEventListener('beforeunload', function(){ stopLive(''); });
+    setButtons();
+})();
+</script>
+{% endblock %}

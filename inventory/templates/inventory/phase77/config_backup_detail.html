@@ -1,0 +1,12 @@
+{% extends "inventory/base.html" %}
+{% block title %}Config Snapshot | SwitchMap{% endblock %}
+{% block body_class %}phase77-body{% endblock %}
+{% block content %}
+<section class="phase77-shell">
+    <header class="phase77-page-head"><div><p class="phase77-eyebrow">Phase 77</p><h1>{{ snapshot.switch.name }} · {{ snapshot.get_config_type_display }}</h1><p class="ltr">{{ snapshot.created_at|date:'Y-m-d H:i:s' }} · {{ snapshot.content_hash }}</p></div><div class="phase77-head-actions"><a class="phase77-btn secondary" href="{% url 'inventory:config_backups' %}">بازگشت</a><a class="phase77-btn" href="{% url 'inventory:config_backup_download' snapshot.id %}">Download</a></div></header>
+    <section class="phase77-two-col">
+        <article class="phase77-panel"><header><h2>Diff نسبت به قبلی</h2></header>{% if snapshot.diff_text %}<pre class="phase77-code diff">{{ snapshot.diff_text }}</pre>{% else %}<div class="phase77-empty">Snapshot قبلی برای Diff وجود ندارد یا تغییر ثبت نشده است.</div>{% endif %}</article>
+        <article class="phase77-panel"><header><h2>Config</h2></header><pre class="phase77-code">{{ snapshot.content }}</pre></article>
+    </section>
+</section>
+{% endblock %}

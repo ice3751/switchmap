@@ -1,0 +1,110 @@
+{% load switchmap_extras %}
+<details class="surface-card device-browser-shell">
+    <summary class="device-browser-summary">
+        <span>نمای تجهیزات و نقشه پورت‌ها</span>
+        <small>برای نمایش جزئیات و عملیات پورت باز کن.</small>
+    </summary>
+<section class="switch-list-grid compact-device-grid">
+{% for switch in switches %}
+    {% switch_ports switch as ports %}
+    {% switch_port_summary switch as summary %}
+    {% switch_port_groups switch as groups %}
+    {% object_first switch "name,hostname,title" "Switch" as switch_name %}
+    {% object_first switch "model,device_model,type" "Cisco Catalyst 3850" as switch_model %}
+    {% object_first switch "ip_address,ip,management_ip,address" "" as switch_ip %}
+    {% object_first switch "location,room,site" "" as switch_location %}
+    {% object_first switch "rack,rack_name" "" as switch_rack %}
+    {% object_first switch "last_poll,last_polled_at,last_seen,last_snmp_poll,snmp_last_poll" "-" as switch_last_poll %}
+    {% object_first switch "poe,poe_status,poe_budget" "-" as switch_poe %}
+
+    <article class="surface-card sm-switch-card" data-switch-card data-switch-id="{{ switch.id }}" data-refresh-url="{% url 'inventory:switch_refresh_step' switch.id %}" data-search="{{ switch_name }} {{ switch_ip }} {{ switch_model }} {{ switch_location }} {{ switch_rack }} {{ switch.vendor }} {{ switch.get_vendor_display }} {{ switch.device_family }} {{ switch.get_device_family_display }} {{ switch.device_role }} {{ switch.get_device_role_display }} {{ switch.site }} {{ switch.topology_position }} {% for port in ports %} {{ port|port_label }} {{ port|port_device }} {{ port|port_title }} {{ port|port_neighbor }} {{ port.neighbor_port }} {{ port.access_vlan }} {{ port.native_vlan }} {{ port.voice_vlan }} {{ port.trunk_vlans }} {{ port.mac_addresses }} {{ port.neighbor_ip }} {{ port.neighbor_device }} {{ port.snmp_raw_name }} {{ port.snmp_alias }} {{ port.interface_name }} {{ port.room }} {{ port.rack }} {{ port.patch_panel }} {{ port.cable_label }} {{ port.asset_tag }} {% endfor %}">
+        <header class="sm-switch-card-head">
+            <div class="sm-switch-identity">
+                <div class="switch-avatar">
+                    <span>{% if switch.vendor == "mikrotik" %}MikroTik{% else %}Cisco{% endif %}</span>
+                    <strong>{{ switch_model|model_badge }}</strong>
+                </div>
+                <div class="sm-switch-title">
+                    <h2><a class="switch-title-link" href="{% url 'inventory:switch_detail' switch.id %}">{{ switch_name }}</a></h2>
+                    <p><span class="ltr">{{ switch_ip|default:"-" }}</span>{% if switch_location %} • {{ switch_location }}{% endif %}</p>
+                </div>
+            </div>
+            <div class="switch-head-status">
+                {% if switch.dashboard_alarm_count %}
+                    <a class="switch-alert-chip {% if switch.dashboard_alarm_critical_count %}is-critical{% else %}is-warning{% endif %}" href="{% url 'inventory:alarm_center' %}?status=active&switch={{ switch.id }}">
+                        Alarm {{ switch.dashboard_alarm_count }}
+                        {% if switch.dashboard_alarm_critical_count %}<small>C: {{ switch.dashboard_alarm_critical_count }}</small>{% endif %}
+                    </a>
+                {% endif %}
+                {% if switch.snmp_last_error %}
+                    <span class="status-pill warn">SNMP Error</span>
+                {% elif switch.snmp_enabled %}
+                    <span class="status-pill ok">SNMP OK</span>
+                {% else %}
+                    <span class="status-pill muted">SNMP Off</span>
+                {% endif %}
+                <div class="smart-refresh-mini" data-refresh-card-state="idle">
+                    <strong data-refresh-status>Ready</strong>
+                    <span data-refresh-step>بدون عملیات</span>
+                    <small>SNMP: <b data-refresh-snmp-last>{{ switch.dashboard_snmp_last_poll_text|default:"-" }}</b></small>
+                    <small>Discovery: <b data-refresh-discovery-last>{{ switch.dashboard_discovery_last_poll_text|default:"-" }}</b></small>
+                </div>
+            </div>
+        </header>
+
+        <details class="sm-switch-extra">
+            <summary>اطلاعات بیشتر</summary>
+            <div class="meta-grid">
+                <div class="meta-card"><span>IP</span><strong class="ltr">{{ switch_ip|default:"-" }}</strong></div>
+                <div class="meta-card"><span>Last Poll</span><strong>{{ switch.dashboard_last_poll_text|default:"-" }}</strong></div>
+                <div class="meta-card"><span>Uplinks</span><strong>{{ summary.uplink }}</strong></div>
+                <div class="meta-card"><span>PoE</span><strong>{{ switch_poe|default:"-" }}</strong></div>
+                <div class="meta-card"><span>Trunk</span><strong>{{ summary.trunk }}</strong></div>
+                <div class="meta-card"><span>Location</span><strong>{{ switch_location|default:"-" }}</strong></div>
+            </div>
+            <div class="mini-stats-grid">
+                <div class="mini-stat"><span>کل</span><strong>{{ summary.total }}</strong></div>
+                <div class="mini-stat is-up"><span>فعال</span><strong>{{ summary.up }}</strong></div>
+                <div class="mini-stat is-down"><span>قطع</span><strong>{{ summary.down }}</strong></div>
+                <div class="mini-stat is-disabled"><span>غیرفعال</span><strong>{{ summary.disabled }}</strong></div>
+                <div class="mini-stat is-error"><span>خطا</span><strong>{{ summary.error }}</strong></div>
+            </div>
+            {% if switch.dashboard_alarm_count %}
+                <div class="switch-alarm-inline-list">
+                    {% for alarm in switch.dashboard_alarm_titles %}
+                        <a class="switch-alarm-inline-item alarm-dash-{{ alarm.severity }}" href="{% url 'inventory:alarm_center' %}?status=active&switch={{ switch.id }}">
+                            <b>{{ alarm.title }}</b>
+                            <span>{% if alarm.port %}{{ alarm.port.interface_name }}{% else %}{{ alarm.get_category_display }}{% endif %}</span>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <div class="smart-refresh-detail" data-refresh-detail>
+                <div><span>مرحله فعلی</span><strong data-refresh-detail-step>Ready</strong></div>
+                <div><span>آخرین نتیجه</span><strong data-refresh-detail-result>-</strong></div>
+                <div><span>خطا</span><strong data-refresh-detail-error>{{ switch.snmp_last_error|default:"-" }}</strong></div>
+            </div>
+            <div class="card-actions-inline">
+                {% if swmap_can_refresh %}<button type="button" class="btn btn-primary js-refresh-one-switch">Refresh همین سوییچ</button>{% endif %}
+                <a class="btn btn-secondary" href="{% url 'inventory:switch_detail' switch.id %}">نقشه کامل</a>
+                <a class="btn btn-secondary" href="{% url 'inventory:switch_ports_table' switch.id %}">جدول پورت‌ها</a>
+                {% if swmap_can_admin %}<a class="btn btn-ghost" href="{% url 'inventory:switch_edit' switch.id %}">ویرایش سوییچ</a>{% endif %}
+            </div>
+        </details>
+
+        {% include "inventory/includes/device_visual.html" with map_mode="dashboard" switch_obj=switch switch_name=switch_name switch_ip=switch_ip switch_user=switch.ssh_username top_ports=switch.dashboard_top_ports bottom_ports=switch.dashboard_bottom_ports uplink_ports=switch.dashboard_uplink_ports %}
+
+        <div class="legend compact-legend">
+            <span><i class="dot up"></i>فعال</span>
+            <span><i class="dot down"></i>قطع</span>
+            <span><i class="dot disabled"></i>غیرفعال</span>
+            <span><i class="dot error"></i>خطا</span>
+            <span><i class="dot trunk"></i>Trunk</span>
+            <span><i class="dot uplink"></i>Uplink</span>
+        </div>
+    </article>
+{% empty %}
+    <section class="surface-card empty-card">هیچ سوییچی ثبت نشده است.</section>
+{% endfor %}
+</section>
+</details>

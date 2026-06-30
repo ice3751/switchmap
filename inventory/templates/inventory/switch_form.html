@@ -1,0 +1,62 @@
+{% extends "inventory/base.html" %}
+
+{% block title %}ویرایش سوییچ | SwitchMap{% endblock %}
+{% block page_title %}ویرایش سوییچ{% endblock %}
+{% block page_subtitle %}
+<p class="page-subtitle"><span class="ltr">{{ switch.management_ip }}</span> • {{ switch.name }}</p>
+{% endblock %}
+{% block page_actions %}
+<div class="toolbar-group">
+    <a class="btn btn-secondary" href="{% url 'inventory:switch_detail' switch.id %}">بازگشت به نقشه</a>
+    <a class="btn btn-secondary" href="{% url 'inventory:switch_list' %}">داشبورد</a>
+</div>
+{% endblock %}
+
+{% block content %}
+<section class="surface-card switch-edit-card">
+    <form method="post" class="switch-edit-form">
+        {% csrf_token %}
+        {% if form.non_field_errors %}
+            <div class="form-error-box">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        <div class="form-section-title">مشخصات اصلی</div>
+        <div class="form-grid-3">
+            <div class="field-row"><label for="{{ form.name.id_for_label }}">Name</label>{{ form.name }}{{ form.name.errors }}</div>
+            <div class="field-row"><label for="{{ form.management_ip.id_for_label }}">Management IP</label>{{ form.management_ip }}{{ form.management_ip.errors }}</div>
+            <div class="field-row"><label for="{{ form.model.id_for_label }}">Model</label>{{ form.model }}{{ form.model.errors }}</div>
+            <div class="field-row"><label for="{{ form.vendor.id_for_label }}">Vendor</label>{{ form.vendor }}{{ form.vendor.errors }}</div>
+            <div class="field-row"><label for="{{ form.device_family.id_for_label }}">Device Family</label>{{ form.device_family }}{{ form.device_family.errors }}</div>
+            <div class="field-row"><label for="{{ form.device_role.id_for_label }}">Device Role</label>{{ form.device_role }}{{ form.device_role.errors }}</div>
+            <div class="field-row"><label for="{{ form.site.id_for_label }}">Site</label>{{ form.site }}{{ form.site.errors }}</div>
+            <div class="field-row"><label for="{{ form.location.id_for_label }}">Location</label>{{ form.location }}{{ form.location.errors }}</div>
+            <div class="field-row"><label for="{{ form.topology_position.id_for_label }}">Topology Position</label>{{ form.topology_position }}{{ form.topology_position.errors }}</div>
+            <div class="field-row"><label for="{{ form.winbox_port.id_for_label }}">Winbox Port</label>{{ form.winbox_port }}{{ form.winbox_port.errors }}</div>
+            <div class="field-row"><label for="{{ form.port_count.id_for_label }}">Port Count</label>{{ form.port_count }}{{ form.port_count.errors }}</div>
+        </div>
+
+        <div class="form-section-title">SNMP / SSH</div>
+        <div class="form-grid-3">
+            <label class="check-row">{{ form.snmp_enabled }} SNMP Enabled</label>
+            <div class="field-row"><label for="{{ form.snmp_community.id_for_label }}">SNMP Community</label>{{ form.snmp_community }}{{ form.snmp_community.errors }}</div>
+            <div class="field-row"><label for="{{ form.snmp_port.id_for_label }}">SNMP Port</label>{{ form.snmp_port }}{{ form.snmp_port.errors }}</div>
+            <div class="field-row"><label for="{{ form.snmp_timeout.id_for_label }}">SNMP Timeout</label>{{ form.snmp_timeout }}{{ form.snmp_timeout.errors }}</div>
+            <label class="check-row">{{ form.ssh_enabled }} SSH Enabled</label>
+            <div class="field-row"><label for="{{ form.ssh_username.id_for_label }}">SSH Username</label>{{ form.ssh_username }}{{ form.ssh_username.errors }}</div>
+            <div class="field-row"><label for="{{ form.ssh_port.id_for_label }}">SSH Port</label>{{ form.ssh_port }}{{ form.ssh_port.errors }}</div>
+        </div>
+
+        <div class="form-section-title">وضعیت و توضیحات</div>
+        <div class="form-grid-2">
+            <label class="check-row">{{ form.needs_review }} Needs Review</label>
+            <label class="check-row">{{ form.is_active }} Active</label>
+        </div>
+        <div class="field-row"><label for="{{ form.notes.id_for_label }}">Notes</label>{{ form.notes }}{{ form.notes.errors }}</div>
+
+        <div class="form-actions-row">
+            <button class="btn btn-primary" type="submit">ذخیره تغییرات</button>
+            <a class="btn btn-secondary" href="{% url 'inventory:switch_detail' switch.id %}">انصراف</a>
+        </div>
+    </form>
+</section>
+{% endblock %}

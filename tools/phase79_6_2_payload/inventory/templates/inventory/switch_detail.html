@@ -1,0 +1,164 @@
+{% extends "inventory/base.html" %}
+{% load switchmap_extras %}
+
+{% block title %}{{ switch.name }} | SwitchMap{% endblock %}
+{% block page_title %}{{ switch.name }}{% endblock %}
+{% block page_subtitle %}
+<p class="page-subtitle"><span class="ltr">{{ switch.management_ip }}</span> • {{ switch.model }}{% if switch.location %} • {{ switch.location }}{% endif %}</p>
+{% endblock %}
+{% block page_actions %}
+<div class="toolbar-group">
+    <a class="btn btn-secondary" href="{% url 'inventory:switch_list' %}">داشبورد</a>
+    <a class="btn btn-secondary" href="{% url 'inventory:switch_ports_table' switch.id %}">جدول پورت‌ها</a>
+    {% if swmap_can_admin %}<a class="btn btn-ghost" href="{% url 'inventory:switch_edit' switch.id %}">ویرایش سوییچ</a>{% endif %}
+</div>
+{% endblock %}
+
+{% block content %}
+<section class="summary-bar-grid compact-summary">
+    <div class="summary-tile"><span>کل</span><strong>{{ port_summary.total }}</strong></div>
+    <div class="summary-tile"><span>فعال</span><strong>{{ port_summary.up }}</strong></div>
+    <div class="summary-tile"><span>قطع</span><strong>{{ port_summary.down }}</strong></div>
+    <div class="summary-tile"><span>Trunk</span><strong>{{ port_summary.trunk }}</strong></div>
+    <div class="summary-tile"><span>Neighbor</span><strong>{{ port_summary.neighbors }}</strong></div>
+    <div class="summary-tile"><span>MAC</span><strong>{{ port_summary.mac_ports }}</strong></div>
+</section>
+
+{% if swmap_can_refresh %}
+<section class="surface-card control-toolbar-card">
+    <div class="toolbar-group wrap">
+        <form method="post" action="{% url 'inventory:switch_snmp_test' switch.id %}">{% csrf_token %}<button class="btn btn-secondary" type="submit">SNMP Test</button></form>
+        <form method="post" action="{% url 'inventory:switch_poll_now' switch.id %}">{% csrf_token %}<button class="btn btn-primary" type="submit">Poll Ports</button></form>
+        <form method="post" action="{% url 'inventory:switch_discovery_now' switch.id %}">{% csrf_token %}<button class="btn btn-secondary" type="submit">Poll CDP/LLDP/MAC</button></form>
+        <form method="post" action="{% url 'inventory:switch_sync_snmp_ports' switch.id %}">{% csrf_token %}<button class="btn btn-ghost" type="submit">Add SFP / Missing Ports</button></form>
+    </div>
+    {% if switch.snmp_last_error %}<div class="inline-note error-text">{{ switch.snmp_last_error }}</div>{% endif %}
+</section>
+{% endif %}
+
+<section class="sm-fullmap-layout">
+    <div class="surface-card sm-map-card">
+        <div class="sm-map-card-head">
+            <div class="sm-switch-identity">
+                <div class="switch-avatar"><span>{% if switch.vendor == "mikrotik" %}MikroTik{% else %}Cisco{% endif %}</span><strong>{{ switch.model|model_badge }}</strong></div>
+                <div class="sm-switch-title">
+                    <h2>{{ switch.name }}</h2>
+                    <p><span class="ltr">{{ switch.management_ip }}</span>{% if switch.location %} • {{ switch.location }}{% endif %}</p>
+                </div>
+            </div>
+            <div class="legend compact-legend">
+                <span><i class="dot up"></i>فعال</span>
+                <span><i class="dot down"></i>قطع</span>
+                <span><i class="dot disabled"></i>غیرفعال</span>
+                <span><i class="dot error"></i>خطا</span>
+                <span><i class="dot trunk"></i>Trunk</span>
+                <span><i class="dot uplink"></i>Uplink</span>
+            </div>
+        </div>
+
+        {% include "inventory/includes/device_visual.html" with map_mode="full" switch_obj=switch switch_name=switch.name switch_ip=switch.management_ip switch_user=switch.ssh_username top_ports=top_ports bottom_ports=bottom_ports uplink_ports=uplink_ports %}
+    </div>
+
+    <aside class="surface-card detail-side-panel" data-sm-port-detail>
+        <div class="panel-section port-modal-info">
+            <h3 data-detail-title>یک پورت را انتخاب کن</h3>
+            <div class="port-modal-section-title">
+                <span>مشخصات اصلی</span>
+                <strong data-detail="status">-</strong>
+            </div>
+            <div class="key-grid compact-grid port-main-grid">
+                <div class="key-item"><span>Mode</span><strong data-detail="port_mode">-</strong></div>
+                <div class="key-item"><span>Device</span><strong data-detail="device">-</strong></div>
+                <div class="key-item"><span>PoE</span><strong data-detail="poe_summary">-</strong></div>
+                <div class="key-item"><span>MAC Count</span><strong data-detail="mac_count">-</strong></div>
+            </div>
+
+            <div class="port-modal-section-title compact-title"><span>VLAN و شبکه</span></div>
+            <div class="key-grid compact-grid port-main-grid">
+                <div class="key-item"><span>Access VLAN</span><strong data-detail="access_vlan">-</strong></div>
+                <div class="key-item"><span>Voice VLAN</span><strong data-detail="voice_vlan">-</strong></div>
+                <div class="key-item"><span>Native VLAN</span><strong data-detail="native_vlan">-</strong></div>
+                <div class="key-item key-item-wide"><span>Trunk VLANs</span><strong class="ltr" data-detail="trunk_vlans">-</strong></div>
+            </div>
+
+            <div class="port-modal-section-title compact-title"><span>Neighbor و شناسایی</span></div>
+            <div class="key-grid compact-grid port-main-grid">
+                <div class="key-item key-item-wide"><span>Neighbor</span><strong class="ltr" data-detail="neighbor">-</strong></div>
+                <div class="key-item"><span>Neighbor Source</span><strong data-detail="neighbor_source">-</strong></div>
+                <div class="key-item"><span>IP</span><strong class="ltr" data-detail="ip_address">-</strong></div>
+                <div class="key-item key-item-wide"><span>MAC</span><strong class="ltr" data-detail="mac_address">-</strong></div>
+                <div class="key-item key-item-wide"><span>Description</span><strong data-detail="description">-</strong></div>
+            </div>
+
+            <div class="phase79-lc-card" data-phase79-lc-card>
+                    <div class="phase79-lc-head">
+                        <strong>Last Connected Device</strong>
+                        <small data-detail="last_connection_event_type">-</small>
+                    </div>
+                    <div class="phase79-lc-body is-empty" data-phase79-last-connected>
+                        <div class="phase79-lc-empty">سابقه اتصال واقعی برای این پورت ثبت نشده است.</div>
+                    </div>
+                </div>
+
+            <div class="port-refresh-box detail-refresh-box">
+                <div><span>آخرین Update</span><strong data-detail="updated_at">-</strong></div>
+                <div><span>آخرین SNMP</span><strong data-detail="snmp_last_poll">-</strong></div>
+                <div><span>آخرین Discovery</span><strong data-detail="discovery_last_poll">-</strong></div>
+            </div>
+
+            <div class="modal-links-row top-margin">
+                {% if swmap_can_edit_port %}<a class="btn btn-secondary" data-detail-link="edit_url" href="#">ویرایش مستندات</a>{% endif %}
+                <a class="btn btn-ghost" data-detail-link="table_url" href="#">جدول پورت‌ها</a>
+            </div>
+        </div>
+
+        {% if swmap_can_ssh %}
+        <details class="panel-section surface-soft ssh-action-box port-action-panel detail-ssh-collapsible">
+            <summary>
+                <span>عملیات SSH</span>
+                <small>برای تغییر VLAN / PoE / Shutdown باز کن.</small>
+            </summary>
+            <div class="detail-ssh-body">
+                <form class="stack-form js-dashboard-ssh-form" data-action-url="{% url 'inventory:switchmap_ajax_ssh_port_action' %}" data-preview-url="{% url 'inventory:ssh_action_preview' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="switch_id" value="{{ switch.id }}">
+                    <input type="hidden" name="switch_ip" value="{{ switch.management_ip }}">
+                    <input type="hidden" name="port_id" value="">
+                    <input type="hidden" name="interface" value="">
+                    <input type="hidden" name="interface_name" value="">
+                    <div class="field-row"><label>Action</label>
+                        <select class="input js-ssh-action-select" name="action">
+                            {% for action_value, action_title in swmap_ssh_actions %}
+                                <option value="{{ action_value }}">{{ action_title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="field-row"><label>Value</label><input class="input js-ssh-action-value" type="text" name="value" placeholder="VLAN / Description"><div class="field-help js-ssh-action-help"></div></div>
+                    <label class="check-row"><input type="checkbox" name="force" value="1"> اجازه تغییر روی Trunk / Uplink</label>
+                    <label class="check-row risk-confirm"><input type="checkbox" name="confirmed" value="1"> تأیید نهایی عملیات حساس</label>
+                    <div class="command-preview-box">
+                        <div class="command-preview-title">Command Preview</div>
+                        <pre class="ltr" data-command-preview>ابتدا پورت و Action را انتخاب کن.</pre>
+                        <div class="field-help risk-text" data-risk-text></div>
+                    </div>
+                    <div class="field-row"><label>SSH Username</label><input class="input" type="text" name="username" value="{{ switch.ssh_username|default:'admin' }}" autocomplete="username"></div>
+                    <div class="field-row"><label>SSH Password</label><input class="input" type="password" name="password" autocomplete="current-password"></div>
+                    <div class="field-row"><label>Enable Password</label><input class="input" type="password" name="enable_password" placeholder="اختیاری"></div>
+                    <button class="btn btn-primary btn-block" type="submit">اجرای تغییر</button>
+                </form>
+                <div class="inline-result compact-result" data-role="result"></div>
+            </div>
+        </details>
+        {% endif %}
+
+        <details class="panel-section sm-log-details">
+            <summary>آخرین تغییرها</summary>
+            <div class="log-list">
+                {% for log in switch.port_action_logs.all|slice:":12" %}
+                    <div class="log-item {% if log.success %}ok{% else %}fail{% endif %}"><strong>{{ log.port.interface_name }}</strong><span>{{ log.action }}</span><small>{{ log.created_at|date:"Y-m-d H:i" }}</small></div>
+                {% empty %}<div class="muted-note">تغییری ثبت نشده است.</div>{% endfor %}
+            </div>
+        </details>
+    </aside>
+</section>
+{% endblock %}

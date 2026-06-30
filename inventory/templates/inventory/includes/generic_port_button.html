@@ -1,0 +1,42 @@
+{% load switchmap_extras %}
+{% port_edit_url port as p_edit_url %}
+<button type="button"
+        class="dynamic-port {{ port|port_css_class }}{% if port|port_label|lower|slice:':3' == 'sfp' or port|port_label|lower|slice:':4' == 'qsfp' %} is-fiber{% endif %}"
+        title="{{ port|port_title }}"
+        data-sm-port-button
+        data-port-id="{{ port|port_pk }}"
+        data-switch-id="{{ switch_obj.id }}"
+        data-switch-name="{{ switch_name|default:'' }}"
+        data-switch-ip="{{ switch_ip|default:'' }}"
+        data-switch-user="{{ switch_user|default:'admin' }}"
+        data-interface="{{ port|port_label }}"
+        data-port-label="{{ port.description|default_if_none:'' }}"
+        data-port-description="{{ port|port_description }}"
+        data-search-code="{{ port.description|default_if_none:'' }} {{ port.cable_label|default_if_none:'' }} {{ port.outlet|default_if_none:'' }} {{ port.interface_name|default_if_none:'' }} {{ port.snmp_raw_name|default_if_none:'' }} {{ port.snmp_alias|default_if_none:'' }} {{ port.neighbor_device|default_if_none:'' }} {{ port.neighbor_ip|default_if_none:'' }} {{ port.neighbor_port|default_if_none:'' }}"
+        data-interface-name="{{ port|port_label }}"
+        data-status="{{ port|port_state_label }}"
+        data-port-mode="{{ port|port_mode }}"
+        data-access-vlan="{{ port|port_vlan }}"
+        data-native-vlan="{{ port.native_vlan|default_if_none:'' }}"
+        data-voice-vlan="{{ port.voice_vlan|default_if_none:'' }}"
+        data-trunk-vlans="{{ port.trunk_vlans|default:'' }}"
+        data-neighbor-device="{{ port.neighbor_device|default:'' }}"
+        data-neighbor-port="{{ port.neighbor_port|default:'' }}"
+        data-poe-summary="{{ port|port_poe }}"
+        data-mac-count="{{ port|port_mac_count }}"
+        data-device="{{ port|port_device }}"
+        data-ip-address="{{ port|port_ip }}"
+        data-mac-address="{{ port|port_mac }}"
+        data-description="{{ port|port_description }}"
+        data-neighbor-source="{{ port.neighbor_source|default:'' }}"
+        data-updated-at="{{ port.updated_at|date:'Y-m-d H:i:s'|default:'-' }}"
+        data-snmp-last-poll="{{ port.snmp_last_poll|date:'Y-m-d H:i:s'|default:'-' }}"
+        data-discovery-last-poll="{{ port.discovery_last_poll|date:'Y-m-d H:i:s'|default:'-' }}"
+        data-edit-url="{{ p_edit_url }}"
+        data-map-url="{% url 'inventory:switch_detail' switch_obj.id %}?port={{ port|port_pk }}"
+        data-table-url="{% url 'inventory:switch_ports_table' switch_obj.id %}">
+    <span class="dynamic-port-label">{{ port|port_short_label }}</span>
+    <span class="dynamic-port-subtitle">{% if port.port_mode == 'trunk' %}T{% elif port.access_vlan %}{{ port.access_vlan }}{% elif port.vlan %}{{ port.vlan }}{% else %}-{% endif %}</span>
+</button>
+{# PHASE70_LIMITED_QUICK_SEARCH_FIX: data attributes only; no layout/render change #}
+{# PHASE70_1_SEARCH_EXACT_UI_FIX: data attributes verified only; no layout/render change #}

@@ -1,0 +1,21 @@
+{% extends "inventory/base.html" %}
+{% block title %}SSH Helper | {{ port.interface_name }}{% endblock %}
+{% block page_title %}SSH Helper{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">{{ switch.name }} / <span class="ltr">{{ port.interface_name }}</span></p>{% endblock %}
+{% block content %}
+<section class="surface-card report-section">
+    <div class="key-grid">
+        <div class="key-item"><span>SSH</span><strong class="ltr">{{ ssh_command }}</strong></div>
+        <div class="key-item"><span>URL</span><strong class="ltr">{{ ssh_url }}</strong></div>
+        <div class="key-item"><span>PuTTY</span><strong class="ltr">{{ putty_command }}</strong></div>
+    </div>
+</section>
+<section class="surface-card report-section">
+    <h3>دستورهای پیشنهادی</h3>
+    <div class="code-list">
+        {% for command in interface_commands %}
+            <code>{{ command }}</code>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

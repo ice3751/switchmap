@@ -1,0 +1,285 @@
+{% extends "inventory/base.html" %}
+{% block title %}Logs | SwitchMap{% endblock %}
+{% block page_title %}Log Center{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">نمایش Audit داخلی برنامه و Cisco Syslog با دسته‌بندی.</p>{% endblock %}
+{% block page_actions %}
+<a class="btn btn-secondary" href="{% url 'inventory:action_logs_export_csv' %}?{{ filter_querystring }}">Export Audit CSV</a>
+<a class="btn btn-secondary" href="{% url 'inventory:cisco_syslog_export_csv' %}?{{ cisco_filter_querystring }}">Export Cisco CSV</a>
+{% endblock %}
+
+{% block content %}
+<section class="summary-bar-grid five-cols">
+    <div class="summary-tile"><span>Audit کل</span><strong>{{ total_count }}</strong></div>
+    <div class="summary-tile"><span>Audit موفق</span><strong>{{ ok_count }}</strong></div>
+    <div class="summary-tile"><span>Audit ناموفق</span><strong>{{ fail_count }}</strong></div>
+    <div class="summary-tile"><span>Cisco Syslog</span><strong>{{ cisco_total_count }}</strong></div>
+    <div class="summary-tile"><span>Cisco Error 0-3</span><strong>{{ cisco_error_count }}</strong></div>
+</section>
+
+{% if swmap_can_pull_cisco_logs %}
+<section class="surface-card search-panel">
+    <h3>Pull Cisco Logs از سوییچ</h3>
+    <p class="page-subtitle">Read-Only: با SSH دستور show logging اجرا می‌شود و لاگ‌های جدید بدون تکرار در همین صفحه ثبت می‌شوند.</p>
+    <form class="stack-form" method="post" action="{% url 'inventory:cisco_syslog_pull' %}">
+        {% csrf_token %}
+        <div class="form-grid-two">
+            <div>
+                <label>Switch</label>
+                <select class="input" name="pull_switch" required>
+                    <option value="">انتخاب Switch</option>
+                    {% for switch in switches %}
+                        <option value="{{ switch.id }}">{{ switch.name }} - {{ switch.management_ip }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label>SSH Username</label>
+                <input class="input ltr" type="text" name="ssh_username" value="{{ default_ssh_username|default:'admin' }}" autocomplete="username">
+            </div>
+            <div>
+                <label>SSH Password</label>
+                <input class="input ltr" type="password" name="ssh_password" autocomplete="current-password" required>
+            </div>
+            <div>
+                <label>Enable Password</label>
+                <input class="input ltr" type="password" name="enable_password" placeholder="اختیاری" autocomplete="off">
+            </div>
+        </div>
+        <button class="btn btn-primary" type="submit">Pull Cisco Logs</button>
+    </form>
+</section>
+{% endif %}
+
+{% if swmap_can_import_cisco_logs %}
+<section class="surface-card search-panel">
+    <h3>ورود Cisco Syslog</h3>
+    <p class="page-subtitle">متن نمونه داخل کادر قرار دارد؛ برای تست همان را Import کن یا خروجی واقعی show logging را جایگزین کن.</p>
+    <form class="stack-form" method="post" action="{% url 'inventory:cisco_syslog_import' %}">
+        {% csrf_token %}
+        <div class="form-grid-two">
+            <div>
+                <label>Switch</label>
+                <select class="input" name="switch">
+                    <option value="">نامشخص</option>
+                    {% for switch in switches %}
+                        <option value="{{ switch.id }}">{{ switch.name }} - {{ switch.management_ip }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label>Source IP</label>
+                <input class="input ltr" type="text" name="source_ip" placeholder="اختیاری؛ اگر Switch انتخاب شود خودش پر می‌شود">
+            </div>
+        </div>
+        <textarea class="input ltr" name="raw_text" rows="9">{{ cisco_sample_log_text }}</textarea>
+        <button class="btn btn-primary" type="submit">Import Cisco Logs</button>
+    </form>
+</section>
+{% endif %}
+
+<section class="surface-card search-panel">
+    <h3>فیلتر Cisco Syslog</h3>
+    <form class="search-form" method="get">
+        <button class="btn btn-secondary" type="submit">فیلتر</button>
+        <input class="input" type="search" name="cq" value="{{ cisco_query }}" placeholder="Facility، Mnemonic، Interface، Message ...">
+        <select class="input compact-select" name="c_switch">
+            <option value="" {% if not selected_cisco_switch %}selected{% endif %}>همه سوییچ‌ها</option>
+            {% for switch in switches %}
+                <option value="{{ switch.id }}" {% if selected_cisco_switch == switch.id|stringformat:'s' %}selected{% endif %}>{{ switch.name }}</option>
+            {% endfor %}
+        </select>
+        <select class="input compact-select" name="severity">
+            <option value="" {% if selected_severity == '' %}selected{% endif %}>همه Severity</option>
+            {% for level,label in cisco_severity_options %}
+                <option value="{{ level }}" {% if selected_severity == level %}selected{% endif %}>{{ level }} - {{ label }}</option>
+            {% endfor %}
+        </select>
+        <select class="input compact-select" name="category">
+            <option value="" {% if not selected_category %}selected{% endif %}>همه Category</option>
+            {% for value,label in cisco_categories %}
+                <option value="{{ value }}" {% if selected_category == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        <select class="input compact-select" name="facility">
+            <option value="" {% if not selected_facility %}selected{% endif %}>همه Facility</option>
+            {% for facility in cisco_facilities %}
+                <option value="{{ facility }}" {% if selected_facility == facility %}selected{% endif %}>{{ facility }}</option>
+            {% endfor %}
+        </select>
+        <input class="input compact-select" type="date" name="c_date_from" value="{{ cisco_date_from }}">
+        <input class="input compact-select" type="date" name="c_date_to" value="{{ cisco_date_to }}">
+    </form>
+</section>
+
+<section class="surface-card table-panel">
+    <h3>خلاصه دسته‌بندی Cisco Syslog</h3>
+    <div class="table-wrap">
+        <table class="data-table compact-table">
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>تعداد</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in cisco_category_counts %}
+                    <tr>
+                        <td>{{ item.label }}</td>
+                        <td class="ltr">{{ item.total }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="surface-card table-panel">
+    <h3>همه Cisco Syslog ها</h3>
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>دریافت</th>
+                    <th>Switch</th>
+                    <th>Severity</th>
+                    <th>Category</th>
+                    <th>Facility</th>
+                    <th>Mnemonic</th>
+                    <th>Interface</th>
+                    <th>Message</th>
+                    <th>Raw</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in cisco_page_obj.object_list %}
+                    <tr>
+                        <td class="ltr">{{ log.received_at_text }}</td>
+                        <td>{% if log.switch %}<a class="table-link" href="{% url 'inventory:switch_detail' log.switch.id %}">{{ log.switch.name }}</a>{% else %}<span class="ltr">{{ log.source_ip|default:"-" }}</span>{% endif %}</td>
+                        <td class="ltr">{% if log.severity != None %}{{ log.severity }} - {{ log.severity_label }}{% else %}-{% endif %}</td>
+                        <td>{{ log.category_label }}</td>
+                        <td class="ltr">{{ log.facility|default:"-" }}</td>
+                        <td class="ltr">{{ log.mnemonic|default:"-" }}</td>
+                        <td class="ltr">{{ log.interface_name|default:"-" }}</td>
+                        <td>{{ log.message|default:"-" }}</td>
+                        <td><pre class="table-pre ltr">{{ log.raw_line }}</pre></td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="9">Cisco Syslog ثبت نشده است.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+{% if cisco_page_obj.has_other_pages %}
+<section class="pagination-row">
+    {% if cisco_page_obj.has_previous %}<a class="btn btn-ghost" href="?{{ cisco_filter_querystring }}&c_page={{ cisco_page_obj.previous_page_number }}">قبلی Cisco</a>{% endif %}
+    {% if cisco_page_obj.has_next %}<a class="btn btn-ghost" href="?{{ cisco_filter_querystring }}&c_page={{ cisco_page_obj.next_page_number }}">بعدی Cisco</a>{% endif %}
+</section>
+{% endif %}
+
+<section class="surface-card table-panel">
+    <h3>Audit داخلی SwitchMap</h3>
+    <section class="search-panel">
+        <form class="search-form" method="get">
+            <button class="btn btn-secondary" type="submit">فیلتر</button>
+            <input class="input" type="search" name="q" value="{{ query }}" placeholder="Switch، Port، Action، User، Message ...">
+            <select class="input compact-select" name="status">
+                <option value="" {% if not status %}selected{% endif %}>همه وضعیت‌ها</option>
+                <option value="ok" {% if status == 'ok' %}selected{% endif %}>موفق</option>
+                <option value="fail" {% if status == 'fail' %}selected{% endif %}>ناموفق</option>
+            </select>
+            <select class="input compact-select" name="switch">
+                <option value="" {% if not selected_switch %}selected{% endif %}>همه سوییچ‌ها</option>
+                {% for switch in switches %}
+                    <option value="{{ switch.id }}" {% if selected_switch == switch.id|stringformat:'s' %}selected{% endif %}>{{ switch.name }}</option>
+                {% endfor %}
+            </select>
+            <select class="input compact-select" name="action">
+                <option value="" {% if not selected_action %}selected{% endif %}>همه عملیات‌ها</option>
+                {% for action_value, action_text in actions %}
+                    <option value="{{ action_value }}" {% if selected_action == action_value %}selected{% endif %}>{{ action_text|default:action_value }}</option>
+                {% endfor %}
+            </select>
+            <input class="input compact-select" type="date" name="date_from" value="{{ date_from }}">
+            <input class="input compact-select" type="date" name="date_to" value="{{ date_to }}">
+        </form>
+    </section>
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>زمان</th>
+                    <th>Switch</th>
+                    <th>Port</th>
+                    <th>Action</th>
+                    <th>Value</th>
+                    <th>SSH User</th>
+                    <th>Actor</th>
+                    <th>Role</th>
+                    <th>Client IP</th>
+                    <th>Result</th>
+                    <th>Commands</th>
+                    <th>Message</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in page_obj.object_list %}
+                    <tr>
+                        <td class="ltr">{{ log.created_at_text }}</td>
+                        <td><a class="table-link" href="{% url 'inventory:switch_detail' log.switch.id %}">{{ log.switch.name }}</a></td>
+                        <td class="ltr">{{ log.port.interface_name }}</td>
+                        <td class="ltr">{{ log.action_label|default:log.action }}</td>
+                        <td class="ltr">{{ log.value|default:"-" }}</td>
+                        <td class="ltr">{{ log.ssh_username|default:"-" }}</td>
+                        <td class="ltr">{{ log.actor_username|default:"-" }}</td>
+                        <td class="ltr">{{ log.actor_role|default:"-" }}</td>
+                        <td class="ltr">{{ log.client_ip|default:"-" }}</td>
+                        <td>{% if log.success %}<span class="status-pill ok">OK</span>{% else %}<span class="status-pill warn">Failed</span>{% endif %}</td>
+                        <td><pre class="table-pre ltr">{{ log.commands|default:"-" }}</pre></td>
+                        <td>{{ log.message|default:"-" }}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="12">Audit لاگی ثبت نشده است.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+{% if page_obj.has_other_pages %}
+<section class="pagination-row">
+    {% if page_obj.has_previous %}<a class="btn btn-ghost" href="?{{ filter_querystring }}&page={{ page_obj.previous_page_number }}">قبلی Audit</a>{% endif %}
+    {% if page_obj.has_next %}<a class="btn btn-ghost" href="?{{ filter_querystring }}&page={{ page_obj.next_page_number }}">بعدی Audit</a>{% endif %}
+</section>
+{% endif %}
+
+<section class="surface-card table-panel">
+    <h3>دسته‌بندی Cisco Log</h3>
+    <div class="table-wrap">
+        <table class="data-table compact-table">
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>نمونه Cisco Facility / Mnemonic</th>
+                    <th>کاربرد</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Interface / Link</td><td class="ltr">LINK, LINEPROTO, GBIC, SFP</td><td>Up/Down، تغییر Line Protocol، مشکل لینک یا ماژول</td></tr>
+                <tr><td>Security / Login / AAA</td><td class="ltr">SEC_LOGIN, AAA, AUTH, RADIUS, TACACS</td><td>ورود، خطای احراز هویت، رویدادهای امنیتی</td></tr>
+                <tr><td>Configuration</td><td class="ltr">SYS-5-CONFIG_I, PARSER</td><td>تغییر Config و اجرای دستور</td></tr>
+                <tr><td>STP / Loop / Topology</td><td class="ltr">SPANTREE, STP, LOOP, BPDU, UDLD</td><td>Loop، تغییر Root، تغییر Topology، خطای STP</td></tr>
+                <tr><td>VLAN / Trunk</td><td class="ltr">VLAN, TRUNK, VTP, DTP</td><td>VLAN، Trunk، VTP/DTP</td></tr>
+                <tr><td>PoE / Power</td><td class="ltr">ILPOWER, POE, POWER</td><td>برق پورت، دستگاه PoE، خطای توان</td></tr>
+                <tr><td>Environment / Power / Fan</td><td class="ltr">ENV, FAN, TEMP, PSU</td><td>فن، دما، پاور، سلامت سخت‌افزار</td></tr>
+                <tr><td>Stack / Module</td><td class="ltr">STACK, MODULE, PLATFORM</td><td>Stack، ماژول، سخت‌افزار</td></tr>
+                <tr><td>Routing</td><td class="ltr">OSPF, EIGRP, BGP, HSRP</td><td>Route و پروتکل‌های لایه ۳</td></tr>
+                <tr><td>CDP / LLDP / SNMP</td><td class="ltr">CDP, LLDP, SNMP</td><td>Discovery و مانیتورینگ</td></tr>
+                <tr><td>DHCP / IP</td><td class="ltr">DHCP, ARP, DUPADDR</td><td>IP، DHCP، ARP، آدرس تکراری</td></tr>
+                <tr><td>System</td><td class="ltr">SYS, CLOCK, NTP, RELOAD, BOOT</td><td>سیستم، زمان، Boot/Reload</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

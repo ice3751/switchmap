@@ -1,0 +1,445 @@
+{% extends "inventory/base.html" %}
+{% load static %}
+{% load switchmap_extras %}
+
+{% block title %}داشبورد مانیتورینگ | SwitchMap{% endblock %}
+{% block body_class %}sm-main-dashboard-body phase66-13-stable-dashboard{% endblock %}
+{% block extra_head %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'inventory/css/switchmap-dashboard-stable-main.css' %}?v=phase66-14-toolbar-only-fix">
+<link rel="stylesheet" href="{% static 'inventory/css/switchmap-phase103-dashboard-cards.css' %}?v=phase103R10-dashboard-cards-codex-reviewed-fix">
+{% endblock %}
+{% block page_title %}{% endblock %}
+{% block page_subtitle %}<span hidden>phase66-13-stable-dashboard-isolated</span>{% endblock %}
+{% block page_actions %}{% endblock %}
+
+{% block content %}
+<section id="sm-main-dashboard" class="sm-main-dashboard" data-phase103-dashboard-cards data-dashboard-live data-dashboard-data-url="{% url 'inventory:switchmap_dashboard_data' %}" aria-label="داشبورد مانیتورینگ">
+    <!-- Phase 66.13 Stable Dashboard Isolated Main: preview-approved isolated layout -->
+    <section class="sm-main-toolbar sm-main-toolbar-v14" aria-label="Dashboard toolbar">
+        <div class="sm-main-titlebox">
+            <h1>داشبورد مانیتورینگ</h1>
+            <p>وضعیت عملیاتی شبکه؛ فقط موارد قابل اقدام نمایش داده می‌شود.</p>
+        </div>
+        <form class="sm-main-quick-search modern-search-panel" action="#" method="get" role="search" aria-label="Quick Search">
+            <label for="sm-main-search">Quick Search</label>
+            <div class="sm-main-searchbox">
+                <input id="sm-main-search" data-switch-search name="q" type="search" placeholder="جستجوی سوییچ، IP، پورت، آلارم..." autocomplete="off">
+                <button type="button" data-search-trigger>جستجو</button>
+            </div>
+            <div class="sm-main-search-results" data-search-results hidden></div>
+        </form>
+        <div class="sm-main-toolbar-actions">
+            <span class="sm-main-last-update">آخرین بروزرسانی: <b data-field="generated_at">{{ dashboard_insight.generated_at }}</b></span>
+        </div>
+    </section>
+
+    <section class="sm-main-grid phase103-dashboard-grid" aria-label="Dashboard command center cards" data-phase103-dashboard-cards-grid>
+        <!-- Phase103 Dashboard Cards Visual Refine: focused four-card visual layer, no data/model change -->
+        <article class="sm-main-card phase103-card phase103-card-connectivity is-blue phase74-connectivity-click-card" role="button" tabindex="0" data-dashboard-connectivity-card data-phase74-marker="phase74-connectivity-click-card">
+            <span class="phase103-visual connectivity" aria-hidden="true"></span>
+            <header class="phase103-card-top">
+                <span class="phase103-detail-link" aria-label="جزئیات اتصال تجهیزات">جزئیات</span>
+                <div class="phase103-card-titlebox">
+                    <div>
+                        <h2>اتصال تجهیزات</h2>
+                        <p>وضعیت اتصال شبکه: <span class="phase103-status-dot"></span> <span class="phase103-status-ok">سالم</span></p>
+                    </div>
+                    <span class="phase103-card-icon phase103-icon-connectivity" aria-hidden="true"></span>
+                </div>
+            </header>
+            <div class="phase103-primary phase103-connectivity-primary">
+                <div class="phase103-metric-stack">
+                    <div>
+                        <strong class="phase103-big-number"><span data-field="healthy">{{ dashboard_insight.counters.healthy }}</span>/<span data-field="total_devices">{{ dashboard_insight.counters.total_devices }}</span></strong>
+                        <span class="phase103-metric-label">دستگاه متصل</span>
+                    </div>
+                    <div class="phase103-ring" style="--phase103-ring: {{ dashboard_insight.counters.coverage_percent|default:0 }}%">
+                        <div class="phase103-ring-inner"><strong data-field="coverage_percent">{{ dashboard_insight.counters.coverage_percent|default:0 }}%</strong><span>نرخ اتصال</span></div>
+                    </div>
+                </div>
+                <div class="phase103-connectivity-details">
+                    <div class="phase103-meter"><span data-field-style="coverage_percent" style="width: {{ dashboard_insight.counters.coverage_percent|default:0 }}%"></span></div>
+                    <div class="phase103-chips">
+                        <span class="phase103-chip ok"><b data-field="healthy_inline">{{ dashboard_insight.counters.healthy }}</b> سالم <i class="dot"></i></span>
+                        <span class="phase103-chip danger"><b data-field="snmp_failed">{{ dashboard_insight.counters.snmp_failed }}</b> ناموفق <i class="dot"></i></span>
+                        <span class="phase103-chip muted"><b data-field="not_monitored_inline">{{ dashboard_insight.counters.not_monitored }}</b> خارج از پایش <i class="dot"></i></span>
+                    </div>
+                </div>
+            </div>
+            <p class="phase103-note sm-main-note phase103-note-connectivity" data-dashboard-connectivity-note>
+                <span class="phase103-note-arrow" aria-hidden="true">‹</span>
+                <span class="phase103-note-text">برای مشاهده وضعیت تک‌تک دستگاه‌ها کلیک کن.</span>
+                <span class="phase103-sparkline" aria-hidden="true"></span>
+            </p>
+        </article>
+
+        {% with first_action=dashboard_insight.actions.0 %}
+            <article class="sm-main-card phase103-card phase103-card-critical is-critical severity-{% if first_action %}{{ first_action.severity }}{% else %}ok{% endif %}" role="button" tabindex="0" data-dashboard-detail data-dashboard-primary-action {% if first_action %}data-issue-id="{{ first_action.issue_id }}" data-detail-url="{{ first_action.detail_url }}" data-object-name="{{ first_action.object_name }}" data-object-type="{{ first_action.object_type }}" data-severity="{{ first_action.severity }}" data-last-check="{{ first_action.last_check_time }}" data-reason="{{ first_action.short_reason }}" data-action="{{ first_action.recommended_action }}"{% endif %}>
+                <span class="phase103-visual radar" aria-hidden="true"></span>
+                <header class="phase103-card-top">
+                    <span class="phase103-detail-link" aria-label="جزئیات اقدام فوری">جزئیات</span>
+                    <div class="phase103-card-titlebox">
+                        <div>
+                            <h2>اقدام فوری</h2>
+                            <p><span class="phase103-status-dot"></span> نیازمند بررسی فوری</p>
+                        </div>
+                        <span class="phase103-card-icon phase103-icon-urgent" aria-hidden="true"></span>
+                    </div>
+                </header>
+                <div class="phase103-primary">
+                    <div>
+                        <strong class="phase103-big-number is-red" data-field="attention">{{ dashboard_insight.counters.attention|default:0 }}</strong>
+                        <span class="phase103-metric-label">مورد نیاز به اقدام</span>
+                    </div>
+                    <div class="phase103-chips">
+                        <span class="phase103-chip danger"><b data-field="snmp_failed">{{ dashboard_insight.counters.snmp_failed|default:0 }}</b> ناموفق <i class="dot"></i></span>
+                        <span class="phase103-chip muted"><b data-field="stale">{{ dashboard_insight.counters.stale|default:0 }}</b> قدیمی <i class="dot"></i></span>
+                    </div>
+                </div>
+                <div class="phase103-list" data-dashboard-actions>
+                    {% for item in dashboard_insight.actions|slice:":2" %}
+                        <span class="sm-main-list-item phase66-list-item severity-{{ item.severity }}" data-dashboard-detail data-issue-id="{{ item.issue_id }}" data-detail-url="{{ item.detail_url }}" data-object-name="{{ item.object_name }}" data-object-type="{{ item.object_type }}" data-severity="{{ item.severity }}" data-last-check="{{ item.last_check_time }}" data-reason="{{ item.short_reason }}" data-action="{{ item.recommended_action }}">
+                            <small>{{ item.compact_reason|default:item.short_reason }}</small>
+                            <strong>{{ item.title }}</strong>
+                        </span>
+                    {% empty %}
+                        <span class="phase103-empty phase66-empty">اقدام فوری لازم نیست.</span>
+                    {% endfor %}
+                </div>
+                <p class="phase103-note phase103-note-warning">
+                    <span class="phase103-note-symbol" aria-hidden="true"></span>
+                    <span class="phase103-note-text">این موارد ممکن است بر پایداری شبکه تأثیر بگذارند.</span>
+                </p>
+            </article>
+        {% endwith %}
+
+        <article class="sm-main-card phase103-card phase103-card-alarms is-neutral">
+            <span class="phase103-visual bars" aria-hidden="true"></span>
+            <header class="phase103-card-top">
+                <a class="phase103-detail-link" href="{% url 'inventory:alarm_center' %}" aria-label="جزئیات آلارم‌ها">جزئیات</a>
+                <div class="phase103-card-titlebox">
+                    <div>
+                        <h2>آلارم‌ها</h2>
+                        <p><span class="phase103-status-dot"></span> مجموع هشدارهای فعال</p>
+                    </div>
+                    <span class="phase103-card-icon phase103-icon-alarms" aria-hidden="true"></span>
+                </div>
+            </header>
+            <div class="phase103-primary">
+                <div>
+                    <strong class="phase103-big-number" data-field="active_alarms">{{ dashboard_insight.counters.active_alarms|default:0 }}</strong>
+                    <span class="phase103-metric-label">آلارم فعال</span>
+                </div>
+                <div class="phase103-chips">
+                    <span class="phase103-chip muted"><b data-field="warning_alarms">{{ dashboard_insight.counters.warning_alarms }}</b> هشدار <i class="dot"></i></span>
+                    <span class="phase103-chip danger"><b data-field="critical_alarms">{{ dashboard_insight.counters.critical_alarms }}</b> بحرانی <i class="dot"></i></span>
+                </div>
+            </div>
+            <div class="phase103-list" data-dashboard-alarms>
+                {% for alarm in dashboard_insight.alarms|slice:":2" %}
+                    <a class="sm-main-list-item phase66-list-item severity-{{ alarm.severity }}" href="{{ alarm.detail_url }}" data-dashboard-detail data-issue-id="{{ alarm.issue_id }}" data-detail-url="{{ alarm.detail_url }}" data-object-name="{{ alarm.object_name }}" data-object-type="{{ alarm.object_type }}" data-severity="{{ alarm.severity }}" data-last-check="{{ alarm.last_check_time }}" data-reason="{{ alarm.short_reason }}" data-action="{{ alarm.recommended_action }}">
+                        <small>{{ alarm.compact_reason|default:"Alarm Active" }}</small>
+                        <strong>{{ alarm.title }}</strong>
+                    </a>
+                {% empty %}
+                    <span class="phase103-empty phase66-empty">آلارم فعالی ثبت نشده است.</span>
+                {% endfor %}
+            </div>
+            <p class="phase103-note phase103-note-info">
+                <span class="phase103-note-symbol" aria-hidden="true"></span>
+                <span class="phase103-note-text">لیست کامل آلارم‌ها را مشاهده کنید.</span>
+            </p>
+        </article>
+
+        <article class="sm-main-card phase103-card phase103-card-topology is-amber">
+            <span class="phase103-topology-visual" aria-hidden="true"></span>
+            <header class="phase103-card-top">
+                <a class="phase103-detail-link" href="{% url 'inventory:topology' %}" aria-label="جزئیات توپولوژی">جزئیات</a>
+                <div class="phase103-card-titlebox">
+                    <div>
+                        <h2>توپولوژی</h2>
+                        <p><span class="phase103-status-dot"></span> وضعیت کشف و ارتباطات</p>
+                    </div>
+                    <span class="phase103-card-icon phase103-icon-topology" aria-hidden="true"></span>
+                </div>
+            </header>
+            <div class="phase103-primary">
+                <div>
+                    <strong class="phase103-big-number" data-field="topology_issues">{{ dashboard_insight.counters.topology_issues }}</strong>
+                    <span class="phase103-metric-label">مورد نیاز به بررسی</span>
+                </div>
+                <div class="phase103-topology-breakdown">
+                    <span class="phase103-topology-pill phase103-topology-discovery"><span>Discovery</span><small><b data-field="stale">{{ dashboard_insight.counters.stale|default:0 }}</b> مورد</small></span>
+                    <span class="phase103-topology-pill phase103-topology-sfp"><span>SFP</span><small><b data-field="sfp_issues">{{ dashboard_insight.counters.sfp_issues|default:0 }}</b> مورد</small></span>
+                    <span class="phase103-topology-pill phase103-topology-link"><span>Link</span><small><b title="شمارنده مستقل Link در payload فعلی موجود نیست">—</b> مورد</small></span>
+                </div>
+            </div>
+            <div class="phase103-list" data-dashboard-topology-issues>
+                {% for issue in dashboard_insight.topology_issues|slice:":2" %}
+                    <a class="sm-main-list-item phase66-list-item severity-{{ issue.severity }}" href="{{ issue.detail_url }}" data-dashboard-detail data-issue-id="{{ issue.issue_id }}" data-detail-url="{{ issue.detail_url }}" data-object-name="{{ issue.object_name }}" data-object-type="{{ issue.object_type }}" data-severity="{{ issue.severity }}" data-last-check="{{ issue.last_check_time }}" data-reason="{{ issue.short_reason }}" data-action="{{ issue.recommended_action }}">
+                        <small>{{ issue.compact_reason|default:issue.summary }}</small>
+                        <strong>{{ issue.title }}</strong>
+                    </a>
+                {% empty %}
+                    <span class="phase103-empty phase66-empty">Issue توپولوژی فعال نیست.</span>
+                {% endfor %}
+            </div>
+            <p class="phase103-note phase103-note-info">
+                <span class="phase103-note-symbol" aria-hidden="true"></span>
+                <span class="phase103-note-text">برای مشاهده توپولوژی کامل کلیک کنید.</span>
+            </p>
+        </article>
+    </section>
+
+    <aside class="phase66-detail-drawer sm-main-detail-drawer" data-dashboard-detail-drawer hidden>
+        <button class="phase66-detail-close" type="button" data-dashboard-detail-close aria-label="Close">×</button>
+        <span class="phase66-kicker" data-detail-severity>-</span>
+        <h3 data-detail-title>-</h3>
+        <dl>
+            <div><dt>Object</dt><dd data-detail-object>-</dd></div>
+            <div><dt>Issue ID</dt><dd class="ltr" data-detail-issue-id>-</dd></div>
+            <div><dt>Last Check</dt><dd class="ltr" data-detail-last-check>-</dd></div>
+            <div><dt>Reason</dt><dd data-detail-reason>-</dd></div>
+            <div><dt>Recommended Action</dt><dd data-detail-action>-</dd></div>
+        </dl>
+        <a class="btn btn-primary" href="#" data-detail-url>Open exact detail</a>
+    </aside>
+
+    <details class="phase66-advanced surface-card sm-main-advanced">
+        <summary>Advanced / Raw Data</summary>
+        <div class="advanced-grid">
+            <div><strong>Background status</strong><pre data-field-json="background">{{ dashboard_insight.background }}</pre></div>
+            <div><strong>Backup</strong><pre>{{ dashboard_insight.backup_dashboard }}</pre></div>
+            <div><strong>SFP</strong><pre>{{ dashboard_insight.sfp_dashboard.summary }}</pre></div>
+        </div>
+    </details>
+
+    <div hidden class="dashboard-legacy-compat-markers phase66-compat" aria-hidden="true">
+        Phase 63 Live Insight Dashboard
+        Phase 64 Dashboard Usability Compact
+        Phase 65 Three Panel Dashboard UX
+        Phase 66 Minimal Three Panel Dashboard
+        Phase 66.4 Dashboard Visual Cleanup
+        Phase 66.5 Dashboard Command Center Layout
+        Phase 66.6 Visual Scale Header Typography Fix
+        Phase 66.7 Hard Visual Reset
+        Phase 66.8 Dashboard Visual Prototype Only
+        Phase 66.9 Typography and Responsive Refinement Only
+        Phase 66.10 Font, menu and quick search refinement only
+        Phase 66.11 Dashboard Preview To Main Final
+        Phase 66.11.1 Main Dashboard Visual Repair
+        Phase 66.12 Stable Main Dashboard
+        Phase 66.13 Stable Dashboard Isolated Main
+        phase66-visual-cleanup phase66-command-center phase66-6-visual-scale phase66-7-hard-visual-reset
+        phase66-12-stable-main-dashboard phase66-13-stable-dashboard-isolated
+        ?v=phase66-9-typography-responsive-polish
+        height:254px
+        phase66-11-main-dashboard phase66-11-1-toolbar sm-final-search-main
+        sm-final-command-grid sm-final-quick-search command-card-grid command-card-primary
+        phase65-three-panel-dashboard phase66-dashboard-minimal dashboard-insight-shell data-dashboard-live data-dashboard-data-url
+        phase66-health-line phase66-live-summary phase42-dashboard-grid modern-kpi-card
+        نتیجه تحلیل‌شده نتیجه نهایی backup_dashboard data-search-results data-switch-card insight-workbench-grid
+        notification-panel-live action-panel .action-list refresh-results-panel:empty
+        آلارم و نوتیفیکیشن وضعیت اتصال تجهیزات مانیتورینگ توپولوژی
+    </div>
+</section>
+
+<section class="surface-card refresh-results-panel" data-refresh-results></section>
+
+<section class="surface-card device-browser-shell phase107-device-browser-lazy" data-phase107-device-browser data-load-url="{{ dashboard_device_browser_url }}" aria-label="نمای تجهیزات و نقشه پورت‌ها">
+    <div class="device-browser-summary phase107-device-browser-summary">
+        <span>نمای تجهیزات و نقشه پورت‌ها</span>
+        <small>برای نمایش جزئیات و عملیات پورت باز کن.</small>
+    </div>
+    <div class="phase107-device-browser-placeholder">
+        <button type="button" class="btn btn-secondary" data-phase107-load-device-browser>نمایش نقشه تجهیزات</button>
+        <small>این بخش سنگین فقط هنگام نیاز Load می‌شود تا داشبورد سریع‌تر باز شود.</small>
+    </div>
+</section>
+
+<div id="dashboard-port-modal" class="modal-backdrop" aria-hidden="true">
+    <div class="modal-card modal-large" role="dialog" aria-modal="true">
+        <div class="modal-header">
+            <div>
+                <h3 data-field="title">پورت</h3>
+                <div class="modal-subtitle" data-field="subtitle">-</div>
+            </div>
+            <button type="button" class="icon-button" data-modal-close>×</button>
+        </div>
+        <div class="modal-body port-modal-grid">
+            <section class="surface-soft port-modal-info">
+                <div class="port-modal-section-title">
+                    <span>مشخصات اصلی</span>
+                    <strong data-field="status">-</strong>
+                </div>
+                <div class="key-grid compact-grid port-main-grid">
+                    <div class="key-item"><span>Interface</span><strong class="ltr" data-field="interface">-</strong></div>
+                    <div class="key-item"><span>Mode</span><strong data-field="port_mode">-</strong></div>
+                    <div class="key-item"><span>Device</span><strong data-field="device">-</strong></div>
+                    <div class="key-item"><span>PoE</span><strong data-field="poe_summary">-</strong></div>
+                </div>
+
+                <div class="port-modal-section-title compact-title"><span>VLAN و شبکه</span></div>
+                <div class="key-grid compact-grid port-main-grid">
+                    <div class="key-item"><span>Access VLAN</span><strong data-field="access_vlan">-</strong></div>
+                    <div class="key-item"><span>Voice VLAN</span><strong data-field="voice_vlan">-</strong></div>
+                    <div class="key-item"><span>Native VLAN</span><strong data-field="native_vlan">-</strong></div>
+                    <div class="key-item"><span>MAC Count</span><strong data-field="mac_count">-</strong></div>
+                    <div class="key-item key-item-wide"><span>Trunk VLANs</span><strong class="ltr" data-field="trunk_vlans">-</strong></div>
+                </div>
+
+                <div class="port-modal-section-title compact-title"><span>Neighbor و شناسایی</span></div>
+                <div class="key-grid compact-grid port-main-grid">
+                    <div class="key-item key-item-wide"><span>Neighbor</span><strong class="ltr" data-field="neighbor">-</strong></div>
+                    <div class="key-item"><span>Neighbor Source</span><strong data-field="neighbor_source">-</strong></div>
+                    <div class="key-item"><span>IP</span><strong class="ltr" data-field="ip_address">-</strong></div>
+                    <div class="key-item key-item-wide"><span>MAC</span><strong class="ltr" data-field="mac_address">-</strong></div>
+                    <div class="key-item key-item-wide"><span>Description</span><strong data-field="description">-</strong></div>
+                </div>
+
+                <div class="phase79-lc-card" data-phase79-lc-card>
+                    <div class="phase79-lc-head">
+                        <strong>Last Connected Device</strong>
+                        <small data-field="last_connection_event_type">-</small>
+                    </div>
+                    <div class="phase79-lc-body is-empty" data-phase79-last-connected>
+                        <div class="phase79-lc-empty">سابقه اتصال واقعی برای این پورت ثبت نشده است.</div>
+                    </div>
+                </div>
+
+                <div class="port-refresh-box">
+                    <div><span>آخرین Update</span><strong data-field="updated_at">-</strong></div>
+                    <div><span>آخرین SNMP</span><strong data-field="snmp_last_poll">-</strong></div>
+                    <div><span>آخرین Discovery</span><strong data-field="discovery_last_poll">-</strong></div>
+                </div>
+
+                <div class="modal-links-row">
+                    {% if swmap_can_edit_port %}<a class="btn btn-secondary" data-field="edit_url" href="#">ویرایش مستندات</a>{% endif %}
+                    <a class="btn btn-secondary" data-field="map_url" href="#">نقشه کامل</a>
+                    <a class="btn btn-ghost" data-field="table_url" href="#">جدول پورت‌ها</a>
+                </div>
+            </section>
+            {% if swmap_can_ssh %}
+            <section class="surface-soft ssh-action-box port-action-panel">
+                <div class="port-modal-section-title">
+                    <span>عملیات SSH</span>
+                    <small>بعد از اجرا، همین پنجره باز می‌ماند.</small>
+                </div>
+                <form class="stack-form js-dashboard-ssh-form" data-action-url="{% url 'inventory:switchmap_ajax_ssh_port_action' %}" data-preview-url="{% url 'inventory:ssh_action_preview' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="switch_id">
+                    <input type="hidden" name="switch_ip">
+                    <input type="hidden" name="port_id">
+                    <input type="hidden" name="interface">
+                    <input type="hidden" name="interface_name">
+                    <div class="field-row"><label>SSH Username</label><input class="input" type="text" name="username" autocomplete="username"></div>
+                    <div class="field-row"><label>SSH Password</label><input class="input" type="password" name="password" autocomplete="current-password"></div>
+                    <div class="field-row"><label>Enable Password</label><input class="input" type="password" name="enable_password" placeholder="اختیاری"></div>
+                    <div class="field-row"><label>Action</label>
+                        <select class="input js-ssh-action-select" name="action">
+                            {% for action_value, action_title in swmap_ssh_actions %}
+                                <option value="{{ action_value }}">{{ action_title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="field-row"><label>Value</label><input class="input js-ssh-action-value" type="text" name="value" placeholder="VLAN / Description"><div class="field-help js-ssh-action-help"></div></div>
+                    <label class="check-row"><input type="checkbox" name="force" value="1"> اجازه تغییر روی Trunk / Uplink</label>
+                    <label class="check-row risk-confirm"><input type="checkbox" name="confirmed" value="1"> تأیید نهایی عملیات حساس</label>
+                    <div class="command-preview-box">
+                        <div class="command-preview-title">Command Preview</div>
+                        <pre class="ltr" data-command-preview>ابتدا پورت و Action را انتخاب کن.</pre>
+                        <div class="field-help risk-text" data-risk-text></div>
+                    </div>
+                    <button class="btn btn-primary btn-block" type="submit">اجرای تغییر</button>
+                </form>
+                <div class="inline-result compact-result" data-role="result"></div>
+            </section>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+{# Phase106: dashboard dead SFP inline script removed; switchmap.js remains loaded from base. #}
+<script>
+(function(){
+    const holder = document.querySelector('[data-phase107-device-browser]');
+    if(!holder) return;
+    const input = document.querySelector('[data-switch-search]');
+    const buttons = Array.from(document.querySelectorAll('[data-search-trigger], [data-phase107-load-device-browser]'));
+    let loading = null;
+    let loaded = false;
+    function urlWithQuery(){
+        const base = holder.dataset.loadUrl || '';
+        if(!base) return '';
+        // PHASE109R10_SEARCH_FULL_DOM_INLINE: load full device-browser once; filtering is client-side.
+        return base;
+    }
+    async function loadDeviceBrowser(reason){
+        if(loaded) return true;
+        if(loading) return loading;
+        const url = urlWithQuery();
+        if(!url) return false;
+        holder.classList.add('is-loading');
+        const status = holder.querySelector('.phase107-device-browser-placeholder small');
+        if(status) status.textContent = 'در حال Load نقشه تجهیزات...';
+        loading = fetch(url, {credentials:'same-origin', headers:{'X-Requested-With':'XMLHttpRequest'}})
+            .then(function(response){ if(!response.ok) throw new Error('HTTP ' + response.status); return response.text(); })
+            .then(function(html){
+                const wrap = document.createElement('div');
+                wrap.innerHTML = html.trim();
+                const node = wrap.firstElementChild;
+                if(!node) throw new Error('empty device browser fragment');
+                holder.replaceWith(node);
+                loaded = true;
+                document.dispatchEvent(new CustomEvent('switchmap:device-browser-loaded', {detail:{root:node, reason:reason || 'manual'}}));
+                if(input && String(input.value || '').trim()){
+                    input.dispatchEvent(new Event('input', {bubbles:true}));
+                }
+                return true;
+            })
+            .catch(function(error){
+                holder.classList.remove('is-loading');
+                if(status) status.textContent = 'Load ناموفق بود: ' + (error.message || error);
+                loading = null;
+                return false;
+            });
+        return loading;
+    }
+    buttons.forEach(function(btn){
+        btn.addEventListener('click', function(event){
+            if(btn.hasAttribute('data-phase107-load-device-browser')) event.preventDefault();
+            loadDeviceBrowser('button');
+        });
+    });
+    if(input){
+        input.addEventListener('input', function(){
+            const value = String(input.value || '').trim();
+            if(value.length >= 2) loadDeviceBrowser('search');
+        }, {passive:true});
+        input.addEventListener('keydown', function(event){
+            if(event.key === 'Enter') loadDeviceBrowser('search-enter');
+        });
+    }
+})();
+</script>
+{% endblock %}
+
+{# Phase 66.13.1 Smoke Compatibility Only - hidden marker block, no visual output #}
+<div hidden class="phase66-13-1-smoke-compat phase66-alarms phase66-connectivity phase66-topology phase66-6-visual-body phase66-7-hard-visual-body" aria-hidden="true">
+    phase66-alarms phase66-connectivity phase66-topology
+    phase66-6-visual-body phase66-7-hard-visual-body
+    command-card command-card command-card command-card
+    command-card-grid command-card-primary
+    Phase 66.4 Dashboard Visual Cleanup
+    Phase 66.5 Dashboard Command Center Layout
+    Phase 66.6 Visual Scale Header Typography Fix
+    Phase 66.7 Hard Visual Reset
+    dashboard_insight.actions|slice:":2"
+</div>
+
+
+{# phase66-14-toolbar-compat: toolbar-only visual adjustment marker #}

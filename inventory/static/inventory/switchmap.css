@@ -1,0 +1,5918 @@
+:root{
+    --bg:#eef3f8;
+    --card:#ffffff;
+    --line:#d6e3f2;
+    --text:#071226;
+    --muted:#53657d;
+    --primary:#2563eb;
+    --primary-strong:#1d4ed8;
+    --ok:#22c55e;
+    --down:#9ca3af;
+    --disabled:#facc15;
+    --error:#ef4444;
+    --trunk:#2563eb;
+    --uplink:#7c3aed;
+    --shadow:0 18px 38px rgba(15,23,42,.08);
+    --radius:18px;
+}
+
+*{
+    box-sizing:border-box;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    margin:0;
+    background:radial-gradient(circle at top,#eef6ff 0,#f6f8fb 360px,var(--bg) 900px);
+    font-family:Tahoma,Arial,sans-serif;
+    color:var(--text);
+}
+
+a{
+    color:inherit;
+    text-decoration:none;
+}
+
+.ltr{
+    direction:ltr;
+    text-align:left;
+}
+
+.strong{
+    font-weight:900;
+}
+
+.wrap{
+    flex-wrap:wrap;
+}
+
+.app-header{
+    position:sticky;
+    top:0;
+    z-index:50;
+    min-height:68px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:18px;
+    padding:10px 56px;
+    background:rgba(255,255,255,.94);
+    border-bottom:1px solid var(--line);
+    backdrop-filter:blur(14px);
+    box-shadow:0 8px 28px rgba(15,23,42,.04);
+}
+
+.app-brand{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    direction:ltr;
+}
+
+.brand-mark{
+    width:42px;
+    height:42px;
+    border-radius:13px;
+    background:linear-gradient(135deg,#0ea5e9,#2563eb);
+    color:#fff;
+    display:grid;
+    place-items:center;
+    font-weight:950;
+    font-size:18px;
+}
+
+.brand-title{
+    font-size:23px;
+    font-weight:950;
+}
+
+.brand-subtitle{
+    font-size:12px;
+    color:#486077;
+}
+
+.app-nav{
+    display:flex;
+    align-items:center;
+    gap:0;
+    border:1px solid #cfe0f7;
+    border-radius:16px;
+    background:#fff;
+    padding:4px;
+    overflow:hidden;
+}
+
+.nav-link{
+    min-width:104px;
+    text-align:center;
+    padding:11px 16px;
+    border-radius:12px;
+    font-weight:900;
+    color:#172033;
+}
+
+.nav-link:hover,
+.nav-link.active{
+    background:#eef6ff;
+    color:var(--primary);
+}
+
+.page-shell{
+    max-width:1560px;
+    margin:0 auto;
+    padding:22px 28px 40px;
+}
+
+.page-heading-card,
+.surface-card{
+    background:rgba(255,255,255,.97);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+}
+
+.page-heading-card{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:18px;
+    padding:22px 24px;
+    margin-bottom:18px;
+}
+
+.page-title{
+    margin:0;
+    font-size:30px;
+    font-weight:950;
+}
+
+.page-subtitle{
+    margin:8px 0 0;
+    color:var(--muted);
+    line-height:1.8;
+}
+
+.page-heading-actions,
+.toolbar-group{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+}
+
+.btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    min-height:42px;
+    padding:0 17px;
+    border-radius:12px;
+    border:1px solid transparent;
+    background:#fff;
+    font-family:inherit;
+    font-weight:950;
+    font-size:14px;
+    cursor:pointer;
+    white-space:nowrap;
+}
+
+.btn-primary{
+    background:var(--primary);
+    color:#fff;
+}
+
+.btn-primary:hover{
+    background:var(--primary-strong);
+}
+
+.btn-secondary{
+    background:#eef6ff;
+    border-color:#bfdbfe;
+    color:var(--primary);
+}
+
+.btn-ghost{
+    background:#fff;
+    border-color:var(--line);
+    color:#334155;
+}
+
+.btn-block{
+    width:100%;
+}
+
+.inline-state{
+    font-size:12px;
+    color:var(--muted);
+    font-weight:900;
+}
+
+.input,
+input[type=text],
+input[type=password],
+input[type=number],
+input[type=url],
+input[type=email],
+select,
+textarea{
+    width:100%;
+    min-height:42px;
+    padding:10px 12px;
+    border-radius:12px;
+    border:1px solid #cbd5e1;
+    background:#fff;
+    font-family:Tahoma,Arial,sans-serif;
+    font-size:14px;
+}
+
+.input:focus,
+input:focus,
+select:focus,
+textarea:focus{
+    outline:none;
+    border-color:var(--primary);
+    box-shadow:0 0 0 3px rgba(37,99,235,.12);
+}
+
+.search-panel{
+    padding:16px 18px;
+    margin-bottom:20px;
+}
+
+.search-form{
+    display:flex;
+    gap:10px;
+    align-items:center;
+}
+
+.search-form .input{
+    flex:1;
+}
+
+.switch-list-grid{
+    display:grid;
+    gap:22px;
+}
+
+.sm-switch-card{
+    padding:18px;
+}
+
+.sm-switch-card-head,
+.sm-map-card-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:18px;
+    margin-bottom:14px;
+}
+
+.sm-switch-identity{
+    display:flex;
+    align-items:center;
+    gap:15px;
+    min-width:0;
+}
+
+.switch-avatar{
+    width:86px;
+    height:86px;
+    border-radius:21px;
+    border:1px solid #b9d8ff;
+    background:linear-gradient(145deg,#e5f2ff,#d7ebff);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    color:#0f172a;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.75);
+    flex:0 0 auto;
+}
+
+.switch-avatar span{
+    font-size:12px;
+    color:#385572;
+}
+
+.switch-avatar strong{
+    font-size:26px;
+    line-height:1;
+    margin-top:4px;
+}
+
+.sm-switch-title{
+    min-width:0;
+}
+
+.sm-switch-title h2{
+    margin:0 0 8px;
+    font-size:27px;
+    font-weight:950;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+.switch-title-link:hover{
+    color:var(--primary);
+}
+
+.sm-switch-title p{
+    margin:0;
+    color:var(--muted);
+    line-height:1.8;
+}
+
+.status-pill{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-height:26px;
+    padding:0 10px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:950;
+    white-space:nowrap;
+}
+
+.status-pill.ok{
+    background:#dcfce7;
+    color:#166534;
+}
+
+.status-pill.warn{
+    background:#fee2e2;
+    color:#991b1b;
+}
+
+.status-pill.muted{
+    background:#e2e8f0;
+    color:#475569;
+}
+
+.sm-switch-extra{
+    margin:4px 0 14px;
+    border:1px solid var(--line);
+    border-radius:14px;
+    background:#f8fafc;
+    overflow:hidden;
+}
+
+.sm-switch-extra summary{
+    padding:12px 14px;
+    cursor:pointer;
+    font-weight:950;
+    color:#1e3a8a;
+    list-style:none;
+}
+
+.sm-switch-extra summary::-webkit-details-marker{
+    display:none;
+}
+
+.sm-switch-extra summary:after{
+    content:'＋';
+    float:left;
+    color:var(--primary);
+}
+
+.sm-switch-extra[open] summary:after{
+    content:'－';
+}
+
+.meta-grid,
+.mini-stats-grid,
+.summary-bar-grid{
+    display:grid;
+    gap:10px;
+}
+
+.meta-grid{
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    padding:0 14px 12px;
+}
+
+.meta-card,
+.mini-stat,
+.summary-tile,
+.key-item{
+    background:#f8fafc;
+    border:1px solid var(--line);
+    border-radius:13px;
+    padding:12px;
+}
+
+.meta-card span,
+.mini-stat span,
+.summary-tile span,
+.key-item span{
+    display:block;
+    color:#52657e;
+    font-size:12px;
+    margin-bottom:5px;
+}
+
+.meta-card strong,
+.mini-stat strong,
+.summary-tile strong,
+.key-item strong{
+    font-size:22px;
+    font-weight:950;
+}
+
+.mini-stats-grid{
+    grid-template-columns:repeat(5,minmax(0,1fr));
+    padding:0 14px 12px;
+}
+
+.mini-stat.is-up strong{
+    color:#16a34a;
+}
+
+.mini-stat.is-down strong{
+    color:#475569;
+}
+
+.mini-stat.is-disabled strong{
+    color:#d97706;
+}
+
+.mini-stat.is-error strong{
+    color:#dc2626;
+}
+
+.card-actions-inline{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    padding:0 14px 14px;
+}
+
+.summary-bar-grid{
+    grid-template-columns:repeat(6,minmax(0,1fr));
+    margin-bottom:18px;
+}
+
+.summary-bar-grid.five-cols{
+    grid-template-columns:repeat(5,minmax(0,1fr));
+}
+
+.summary-tile{
+    text-align:center;
+}
+
+.summary-tile strong{
+    font-size:24px;
+}
+
+.control-toolbar-card{
+    padding:14px 16px;
+    margin-bottom:18px;
+}
+
+.toolbar-group{
+    justify-content:flex-end;
+}
+
+.sm-map-card{
+    padding:20px;
+    min-width:0;
+}
+
+.sm-map-card-head{
+    align-items:center;
+    border-bottom:1px solid var(--line);
+    padding-bottom:14px;
+    margin-bottom:16px;
+}
+
+.sm-map-scroll{
+    overflow-x:auto;
+    overflow-y:hidden;
+    padding:14px;
+    border:1px solid #cfe0f7;
+    border-radius:18px;
+    background:#f8fbff;
+}
+
+.sm-chassis{
+    direction:ltr;
+    position:relative;
+    width:max-content;
+    min-width:1400px;
+    display:grid;
+    grid-template-columns:155px 1fr 200px;
+    gap:14px;
+    align-items:center;
+    padding:16px 16px;
+    border:2px solid #aebdca;
+    border-radius:16px;
+    background:
+        linear-gradient(180deg,rgba(255,255,255,.9),rgba(255,255,255,0) 36%),
+        linear-gradient(180deg,#f4f7fa 0%,#e1e8ef 58%,#cfd9e3 100%);
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.95),
+        inset 0 -7px 14px rgba(15,23,42,.12),
+        0 12px 28px rgba(15,23,42,.08);
+}
+
+.sm-chassis:before,
+.sm-chassis:after{
+    content:"";
+    position:absolute;
+    left:14px;
+    right:14px;
+    height:5px;
+    border-radius:999px;
+    background:#aab8c8;
+    opacity:.8;
+}
+
+.sm-chassis:before{
+    top:7px;
+}
+
+.sm-chassis:after{
+    bottom:7px;
+}
+
+.sm-chassis-module{
+    width:150px;
+    min-height:180px;
+    border:1px solid #aab8c8;
+    border-radius:12px;
+    background:linear-gradient(180deg,#eef4fa,#dce6ef);
+    padding:14px 12px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    text-align:left;
+}
+
+.sm-chassis-module strong{
+    font-size:13px;
+    line-height:1.35;
+    color:#071226;
+}
+
+.sm-chassis-module span{
+    font-size:12px;
+    color:#123b63;
+}
+
+.status-leds{
+    display:grid;
+    grid-template-columns:12px 1fr 12px 1fr;
+    gap:8px 7px;
+    align-items:center;
+    direction:ltr;
+}
+
+.status-leds i{
+    width:10px;
+    height:10px;
+    border-radius:50%;
+    background:#22c55e;
+}
+
+.status-leds i.amber{
+    background:#f59e0b;
+}
+
+.status-leds b{
+    font-size:10px;
+    font-weight:900;
+    color:#1e293b;
+}
+
+.sm-chassis-main{
+    width:1000px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+}
+
+.sm-chassis-topline{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:8px;
+    direction:ltr;
+}
+
+.sm-chassis-topline span{
+    font-size:16px;
+    font-weight:950;
+    letter-spacing:8px;
+    color:#111827;
+}
+
+.sm-chassis-topline strong{
+    font-size:16px;
+    font-weight:950;
+    color:#111827;
+}
+
+.sm-port-section-title{
+    display:flex;
+    justify-content:space-between;
+    margin-bottom:8px;
+    font-size:11px;
+    font-weight:950;
+    color:#1f2937;
+}
+
+.sm-port-bank{
+    display:grid;
+    grid-template-columns:repeat(24,36px);
+    grid-auto-rows:34px;
+    gap:8px 6px;
+    width:max-content;
+}
+
+.sm-port{
+    position:relative;
+    width:36px;
+    height:34px;
+    padding:0 2px;
+    border-radius:6px;
+    border:1px solid #7d8b9b;
+    background:linear-gradient(180deg,#cfd8e3,#9aa7b2);
+    color:#071226;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    font-family:Tahoma,Arial,sans-serif;
+    font-size:9px;
+    font-weight:950;
+    line-height:1;
+    cursor:pointer;
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.60),
+        inset 0 -4px 0 rgba(15,23,42,.18);
+    transition:.14s transform,.14s box-shadow;
+}
+
+.sm-port:hover{
+    transform:translateY(-2px);
+    box-shadow:
+        0 8px 16px rgba(15,23,42,.12),
+        inset 0 -4px 0 rgba(15,23,42,.18);
+}
+
+.sm-port span{
+    display:block;
+    width:100%;
+    overflow:visible;
+    text-overflow:clip;
+    white-space:nowrap;
+    direction:ltr;
+    text-align:center;
+    font-size:9px;
+    letter-spacing:-.8px;
+}
+
+.sm-port small{
+    display:block;
+    width:100%;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    font-size:7px;
+    line-height:1;
+    margin-top:2px;
+}
+
+.sm-port:before{
+    content:"";
+    position:absolute;
+    left:4px;
+    top:4px;
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    background:#94a3b8;
+}
+
+.sm-port.port-up:before,
+.sm-port.status-up:before{
+    background:#16a34a;
+}
+
+.sm-port.port-error:before,
+.sm-port.status-error:before{
+    background:#dc2626;
+}
+
+.sm-port.port-disabled:before,
+.sm-port.status-disabled:before{
+    background:#d97706;
+}
+
+.sm-port.port-up,
+.sm-port.status-up{
+    background:linear-gradient(180deg,#22c55e,#16a34a);
+    color:#052e16;
+}
+
+.sm-port.port-down,
+.sm-port.status-down{
+    background:linear-gradient(180deg,#cfd8e3,#9aa7b2);
+    color:#071226;
+}
+
+.sm-port.port-disabled,
+.sm-port.status-disabled{
+    background:linear-gradient(180deg,#fde047,#facc15);
+    color:#422006;
+}
+
+.sm-port.port-error,
+.sm-port.status-error{
+    background:linear-gradient(180deg,#f87171,#ef4444);
+    color:#fff;
+}
+
+.sm-port.port-trunk{
+    outline:2px solid var(--trunk);
+    outline-offset:1px;
+}
+
+.sm-port.port-uplink,
+.sm-uplink-port{
+    outline:2px solid var(--uplink);
+    outline-offset:1px;
+}
+
+.sm-port.selected-port{
+    outline:3px solid #60a5fa;
+    box-shadow:0 0 0 4px rgba(96,165,250,.25);
+}
+
+.sm-uplink-module{
+    width:190px;
+    min-height:180px;
+    border-radius:14px;
+    border:1px solid #334155;
+    background:linear-gradient(180deg,#1f2937,#111827);
+    padding:12px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+}
+
+.sm-uplink-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:8px;
+    margin-bottom:10px;
+    color:#fff;
+    font-size:11px;
+    font-weight:950;
+}
+
+.sm-uplink-bank{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+}
+
+.sm-uplink-port{
+    width:74px;
+    height:42px;
+    background:linear-gradient(180deg,#455568,#263241) !important;
+    color:#f8fafc !important;
+    border-color:#65758a;
+}
+
+.sm-uplink-port span{
+    font-size:10px;
+    letter-spacing:-.4px;
+}
+
+.sm-uplink-port small{
+    color:#e5e7eb;
+    font-size:8px;
+}
+
+.module-empty{
+    color:#94a3b8;
+    text-align:center;
+    font-size:12px;
+    grid-column:1/-1;
+    padding:14px 4px;
+}
+
+.legend{
+    display:flex;
+    align-items:center;
+    justify-content:flex-start;
+    gap:13px;
+    flex-wrap:wrap;
+    font-size:12px;
+    font-weight:900;
+    color:#23344a;
+}
+
+.compact-legend{
+    margin-top:12px;
+}
+
+.dot{
+    width:12px;
+    height:12px;
+    border-radius:50%;
+    display:inline-block;
+    margin-inline-start:5px;
+    vertical-align:-2px;
+}
+
+.dot.up{background:#22c55e}
+.dot.down{background:#9ca3af}
+.dot.disabled{background:#facc15}
+.dot.error{background:#ef4444}
+.dot.trunk{background:#2563eb}
+.dot.uplink{background:#7c3aed}
+
+.sm-fullmap-layout{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) 420px;
+    gap:18px;
+    align-items:start;
+}
+
+.detail-side-panel{
+    padding:18px;
+    position:sticky;
+    top:90px;
+}
+
+.panel-section+.panel-section{
+    margin-top:16px;
+}
+
+.key-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:10px;
+}
+
+.key-item-wide{
+    grid-column:1/-1;
+}
+
+.modal-links-row{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:14px;
+}
+
+.top-margin{
+    margin-top:14px;
+}
+
+.surface-soft{
+    background:#f8fafc;
+    border:1px solid var(--line);
+    border-radius:15px;
+    padding:16px;
+}
+
+.stack-form{
+    display:grid;
+    gap:10px;
+}
+
+.field-row{
+    display:grid;
+    gap:6px;
+}
+
+.field-row label{
+    font-weight:900;
+    font-size:13px;
+    color:#334155;
+}
+
+.field-help{
+    font-size:12px;
+    color:var(--muted);
+}
+
+.inline-result{
+    margin-top:10px;
+    white-space:pre-line;
+    font-weight:900;
+    font-size:13px;
+}
+
+.inline-result.ok{
+    color:#166534;
+}
+
+.inline-result.fail{
+    color:#991b1b;
+}
+
+.sm-log-details{
+    border-top:1px solid var(--line);
+    padding-top:12px;
+}
+
+.sm-log-details summary{
+    cursor:pointer;
+    font-weight:950;
+}
+
+.log-list{
+    display:grid;
+    gap:8px;
+    margin-top:10px;
+}
+
+.log-item{
+    display:grid;
+    gap:2px;
+    padding:10px 12px;
+    border-radius:12px;
+    border:1px solid var(--line);
+    background:#f8fafc;
+}
+
+.log-item.ok{
+    border-color:#bbf7d0;
+}
+
+.log-item.fail{
+    border-color:#fecaca;
+}
+
+.muted-note{
+    color:var(--muted);
+}
+
+.empty-card{
+    padding:24px;
+    text-align:center;
+}
+
+.modal-backdrop{
+    position:fixed;
+    inset:0;
+    background:rgba(15,23,42,.58);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:22px;
+    z-index:1000;
+}
+
+.modal-backdrop.open{
+    display:flex;
+}
+
+.modal-card{
+    width:min(980px,100%);
+    max-height:92vh;
+    overflow:auto;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:20px;
+    box-shadow:0 24px 55px rgba(15,23,42,.32);
+}
+
+.modal-large{
+    width:min(1080px,100%);
+}
+
+.modal-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+    padding:18px 20px;
+    border-bottom:1px solid var(--line);
+}
+
+.modal-header h3{
+    margin:0;
+    font-size:24px;
+}
+
+.modal-subtitle{
+    margin-top:6px;
+    color:var(--muted);
+}
+
+.icon-button{
+    width:40px;
+    height:40px;
+    border-radius:12px;
+    border:1px solid var(--line);
+    background:#fff;
+    font-size:28px;
+    line-height:1;
+    cursor:pointer;
+}
+
+.modal-body{
+    padding:18px 20px;
+}
+
+.two-column-modal{
+    display:grid;
+    grid-template-columns:minmax(0,1.1fr) minmax(320px,.9fr);
+    gap:18px;
+}
+
+.table-panel{
+    padding:0;
+}
+
+.table-wrap{
+    overflow:auto;
+}
+
+.data-table{
+    width:100%;
+    min-width:1180px;
+    border-collapse:collapse;
+}
+
+.data-table th,
+.data-table td{
+    padding:12px 10px;
+    border-bottom:1px solid var(--line);
+    text-align:right;
+    vertical-align:top;
+}
+
+.data-table thead th{
+    position:sticky;
+    top:0;
+    background:#f8fafc;
+    z-index:1;
+    color:#334155;
+}
+
+.data-table tbody tr:hover{
+    background:#f8fafc;
+}
+
+.table-link{
+    color:var(--primary);
+    font-weight:900;
+}
+
+.report-section{
+    padding:18px;
+    margin-bottom:18px;
+}
+
+.form-layout-grid{
+    display:grid;
+    grid-template-columns:minmax(0,1.4fr) minmax(300px,.8fr);
+    gap:18px;
+}
+
+.form-card-main,
+.form-side-info{
+    padding:18px;
+}
+
+.form-grid-two{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:14px;
+}
+
+.field-wide{
+    grid-column:1/-1;
+}
+
+.select{
+    width:220px;
+}
+
+.wide{
+    min-width:360px;
+}
+
+.message-stack{
+    display:grid;
+    gap:10px;
+    margin-bottom:18px;
+}
+
+.flash-message{
+    padding:12px 14px;
+    border-radius:13px;
+    font-weight:900;
+}
+
+.flash-message.success{
+    background:#dcfce7;
+    border:1px solid #86efac;
+    color:#166534;
+}
+
+.flash-message.error{
+    background:#fee2e2;
+    border:1px solid #fca5a5;
+    color:#991b1b;
+}
+
+.flash-message.warning{
+    background:#fef3c7;
+    border:1px solid #fcd34d;
+    color:#92400e;
+}
+
+.flash-message.info{
+    background:#dbeafe;
+    border:1px solid #93c5fd;
+    color:#1e3a8a;
+}
+
+@media(max-width:1300px){
+    .sm-fullmap-layout{
+        grid-template-columns:1fr;
+    }
+
+    .detail-side-panel{
+        position:static;
+    }
+}
+
+@media(max-width:980px){
+    .app-header{
+        height:auto;
+        padding:12px 18px;
+        align-items:stretch;
+        flex-direction:column;
+    }
+
+    .app-nav{
+        width:100%;
+        justify-content:space-between;
+    }
+
+    .nav-link{
+        min-width:0;
+        flex:1;
+    }
+
+    .page-heading-card,
+    .sm-switch-card-head,
+    .sm-map-card-head{
+        align-items:stretch;
+        flex-direction:column;
+    }
+
+    .meta-grid,
+    .mini-stats-grid,
+    .summary-bar-grid,
+    .summary-bar-grid.five-cols{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+
+    .two-column-modal,
+    .form-layout-grid{
+        grid-template-columns:1fr;
+    }
+}
+
+@media(max-width:640px){
+    .page-shell{
+        padding:16px 12px 28px;
+    }
+
+    .page-title{
+        font-size:24px;
+    }
+
+    .toolbar-group,
+    .search-form{
+        align-items:stretch;
+        flex-direction:column;
+    }
+
+    .meta-grid,
+    .mini-stats-grid,
+    .summary-bar-grid,
+    .key-grid,
+    .form-grid-two{
+        grid-template-columns:1fr;
+    }
+
+    .switch-avatar{
+        width:72px;
+        height:72px;
+    }
+
+    .sm-switch-title h2{
+        font-size:22px;
+    }
+}
+
+
+/* SWITCHMAP_16_4_9_CISCO_3850_CLEAN_FACEPLATE_START */
+.sm-map-scroll,
+.sm-dashboard-scroll{
+    direction:ltr;
+    overflow-x:auto;
+    overflow-y:hidden;
+    padding:14px 16px;
+    border:1px solid #cfe0f7;
+    border-radius:18px;
+    background:linear-gradient(180deg,#fbfdff 0%,#f5f9ff 100%);
+}
+
+.sm-dashboard-scroll{
+    margin-top:14px;
+}
+
+.sm-chassis.sm-cisco-3850{
+    --sm-left:112px;
+    --sm-copper:698px;
+    --sm-uplink:108px;
+    --sm-gap:12px;
+    --sm-port-w:24px;
+    --sm-port-h:22px;
+    --sm-port-gap:4px;
+    --sm-block-gap:10px;
+    direction:ltr;
+    position:relative;
+    width:978px;
+    min-width:978px;
+    height:102px;
+    min-height:0;
+    display:grid;
+    grid-template-columns:var(--sm-left) var(--sm-copper) var(--sm-uplink);
+    gap:var(--sm-gap);
+    align-items:center;
+    padding:10px 15px;
+    margin:0 auto;
+    border:1px solid #29313a;
+    border-radius:7px;
+    overflow:hidden;
+    background:
+        linear-gradient(90deg,rgba(255,255,255,.05),rgba(255,255,255,0) 10%,rgba(255,255,255,.06) 50%,rgba(0,0,0,.15) 100%),
+        linear-gradient(180deg,#59616a 0%,#353b42 13%,#242a31 84%,#151a20 100%);
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.35),
+        inset 0 -8px 16px rgba(0,0,0,.28),
+        0 10px 22px rgba(15,23,42,.12);
+}
+
+.sm-chassis.sm-cisco-3850.is-full{
+    --sm-left:124px;
+    --sm-copper:770px;
+    --sm-uplink:120px;
+    --sm-port-w:27px;
+    --sm-port-h:24px;
+    --sm-port-gap:4px;
+    --sm-block-gap:10px;
+    width:1064px;
+    min-width:1064px;
+    height:112px;
+    padding:11px 16px;
+}
+
+.sm-chassis.sm-cisco-3850:before,
+.sm-chassis.sm-cisco-3850:after{
+    content:"";
+    position:absolute;
+    top:50%;
+    width:9px;
+    height:9px;
+    transform:translateY(-50%);
+    border-radius:999px;
+    background:radial-gradient(circle at 35% 35%,#7f8993 0,#4b5560 45%,#151a20 75%,#080b0f 100%);
+    box-shadow:inset 0 1px 1px rgba(255,255,255,.22),0 0 0 1px rgba(0,0,0,.45);
+    opacity:.9;
+}
+
+.sm-chassis.sm-cisco-3850:before{left:10px;right:auto;}
+.sm-chassis.sm-cisco-3850:after{right:10px;left:auto;}
+
+.sm-chassis.sm-cisco-3850 .sm-chassis-module{
+    position:relative;
+    width:var(--sm-left);
+    height:72px;
+    min-height:0;
+    padding:10px 10px 8px 12px;
+    border:1px solid #141a20;
+    border-radius:6px;
+    display:grid;
+    grid-template-columns:1fr;
+    align-content:start;
+    gap:4px;
+    overflow:hidden;
+    text-align:left;
+    background:
+        linear-gradient(180deg,rgba(255,255,255,.09),rgba(255,255,255,0) 28%),
+        linear-gradient(180deg,#3a424b 0%,#20272e 100%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.16),inset 0 -1px 0 rgba(0,0,0,.50);
+}
+
+.sm-chassis.sm-cisco-3850.is-full .sm-chassis-module{
+    height:80px;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-cisco-brand{
+    color:#f8fafc;
+    font-size:16px;
+    font-weight:950;
+    letter-spacing:.7px;
+    line-height:1;
+    text-shadow:0 1px 0 rgba(0,0,0,.65);
+}
+
+.sm-chassis.sm-cisco-3850 .sm-chassis-module strong{
+    color:#f8fafc;
+    font-size:9px;
+    font-weight:900;
+    line-height:1.05;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-chassis-module > span{
+    display:none;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-chassis-module:before{
+    content:"";
+    position:absolute;
+    left:12px;
+    bottom:17px;
+    width:15px;
+    height:15px;
+    border-radius:999px;
+    background:radial-gradient(circle at 38% 30%,#71808d 0,#303943 48%,#111820 72%);
+    box-shadow:0 0 0 1px rgba(0,0,0,.55),inset 0 1px 2px rgba(255,255,255,.18);
+}
+
+.sm-chassis.sm-cisco-3850 .sm-chassis-module:after{
+    content:"3850";
+    position:absolute;
+    right:10px;
+    bottom:8px;
+    color:#f8fafc;
+    font-size:11px;
+    font-weight:950;
+    letter-spacing:.2px;
+}
+
+.sm-chassis.sm-cisco-3850 .status-leds{
+    position:absolute;
+    left:34px;
+    bottom:27px;
+    display:grid;
+    grid-template-columns:repeat(4,6px);
+    gap:4px;
+    align-items:center;
+    direction:ltr;
+}
+
+.sm-chassis.sm-cisco-3850 .status-leds i{
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    background:#22c55e;
+    box-shadow:0 0 4px rgba(34,197,94,.75);
+}
+
+.sm-chassis.sm-cisco-3850 .status-leds i.amber{
+    background:#f6c453;
+    box-shadow:0 0 4px rgba(246,196,83,.65);
+}
+
+.sm-chassis.sm-cisco-3850 .status-leds b{
+    display:none;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-mode-label,
+.sm-chassis.sm-cisco-3850 .sm-chassis-topline,
+.sm-chassis.sm-cisco-3850 .sm-port-section-title{
+    display:none;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-chassis-main{
+    width:var(--sm-copper);
+    min-width:var(--sm-copper);
+    height:auto;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-port-bank{
+    width:var(--sm-copper);
+    min-width:var(--sm-copper);
+    display:flex;
+    flex-direction:column;
+    gap:var(--sm-port-gap);
+    padding:0;
+    border:0;
+    background:transparent;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-port-row{
+    display:flex;
+    align-items:center;
+    gap:var(--sm-port-gap);
+    width:max-content;
+    min-height:var(--sm-port-h);
+}
+
+.sm-chassis.sm-cisco-3850 .sm-port-row .sm-port:nth-child(6n+7){
+    margin-left:var(--sm-block-gap);
+}
+
+.sm-chassis.sm-cisco-3850 .sm-port{
+    --port-led:#8b95a1;
+    position:relative;
+    width:var(--sm-port-w);
+    min-width:var(--sm-port-w);
+    height:var(--sm-port-h);
+    min-height:var(--sm-port-h);
+    padding:0;
+    border:1px solid #67717b;
+    border-radius:3px;
+    overflow:hidden;
+    cursor:pointer;
+    color:#17202a !important;
+    background:linear-gradient(180deg,#e2e8ef 0%,#b6c0ca 47%,#8e9aa5 100%) !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.75),
+        inset 0 -2px 0 rgba(0,0,0,.22),
+        0 1px 1px rgba(0,0,0,.25);
+    transform:none;
+    transition:.12s transform,.12s box-shadow,.12s border-color;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-port:after{
+    content:"";
+    position:absolute;
+    left:4px;
+    right:4px;
+    bottom:4px;
+    height:8px;
+    border-radius:1px;
+    background:linear-gradient(180deg,#495562 0%,#202832 65%,#0f141a 100%);
+    box-shadow:inset 0 1px 1px rgba(255,255,255,.12),0 -1px 0 rgba(255,255,255,.20);
+}
+
+.sm-chassis.sm-cisco-3850 .sm-port:before{
+    content:"";
+    position:absolute;
+    left:4px;
+    top:3px;
+    width:5px;
+    height:5px;
+    border-radius:999px;
+    z-index:2;
+    background:var(--port-led);
+    box-shadow:0 0 3px rgba(34,197,94,.45);
+}
+
+.sm-chassis.sm-cisco-3850 .sm-port span{
+    position:absolute;
+    right:3px;
+    top:2px;
+    z-index:3;
+    display:block;
+    width:auto;
+    max-width:16px;
+    color:#1f2937 !important;
+    font-size:6.5px;
+    font-weight:950;
+    line-height:1;
+    letter-spacing:-.35px;
+    text-align:right;
+    direction:ltr;
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:clip;
+}
+
+.sm-chassis.sm-cisco-3850.is-full .sm-port span{
+    font-size:7px;
+    max-width:18px;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-port small{
+    display:none;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-port:hover{
+    transform:translateY(-1px);
+    border-color:#cbd5e1;
+    box-shadow:
+        0 4px 10px rgba(15,23,42,.18),
+        inset 0 1px 0 rgba(255,255,255,.8),
+        inset 0 -2px 0 rgba(0,0,0,.20);
+}
+
+.sm-chassis.sm-cisco-3850 .sm-port.port-up,
+.sm-chassis.sm-cisco-3850 .sm-port.status-up{--port-led:#18c25e;}
+.sm-chassis.sm-cisco-3850 .sm-port.port-down,
+.sm-chassis.sm-cisco-3850 .sm-port.status-down{--port-led:#87919c;}
+.sm-chassis.sm-cisco-3850 .sm-port.port-disabled,
+.sm-chassis.sm-cisco-3850 .sm-port.status-disabled{--port-led:#f6b51f;}
+.sm-chassis.sm-cisco-3850 .sm-port.port-error,
+.sm-chassis.sm-cisco-3850 .sm-port.status-error{--port-led:#ef4444;}
+
+.sm-chassis.sm-cisco-3850 .sm-port.port-trunk{
+    outline:1px solid #2563eb;
+    outline-offset:1px;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-port.port-uplink,
+.sm-chassis.sm-cisco-3850 .sm-uplink-port{
+    outline:1px solid #7c3aed;
+    outline-offset:1px;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-port.selected-port{
+    outline:2px solid #60a5fa;
+    outline-offset:1px;
+    box-shadow:0 0 0 3px rgba(96,165,250,.22),inset 0 1px 0 rgba(255,255,255,.8);
+}
+
+.sm-chassis.sm-cisco-3850 .sm-uplink-module{
+    position:relative;
+    width:var(--sm-uplink);
+    height:64px;
+    min-height:0;
+    padding:17px 8px 7px;
+    border:1px solid #69737d;
+    border-radius:4px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:
+        linear-gradient(180deg,rgba(255,255,255,.35),rgba(255,255,255,0) 28%),
+        linear-gradient(180deg,#cfd8e1 0%,#87939f 100%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.65),inset 0 -2px 0 rgba(0,0,0,.22);
+}
+
+.sm-chassis.sm-cisco-3850.is-full .sm-uplink-module{
+    height:70px;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-uplink-module:before{
+    content:"C3850-NM";
+    position:absolute;
+    top:4px;
+    left:8px;
+    right:8px;
+    color:#263241;
+    font-size:7px;
+    font-weight:950;
+    line-height:1;
+    text-align:left;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-uplink-head{
+    display:none;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-uplink-bank{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    grid-auto-rows:min-content;
+    gap:5px;
+    width:100%;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-uplink-port{
+    width:43px;
+    min-width:43px;
+    height:22px;
+    min-height:22px;
+    border-color:#5e6872;
+    border-radius:2px;
+    background:linear-gradient(180deg,#e2e8ef 0%,#aeb9c3 52%,#84909c 100%) !important;
+    color:#17202a !important;
+}
+
+.sm-chassis.sm-cisco-3850.is-full .sm-uplink-port{
+    width:48px;
+    min-width:48px;
+    height:24px;
+    min-height:24px;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-uplink-port:after{
+    left:8px;
+    right:8px;
+    bottom:5px;
+    height:7px;
+    background:linear-gradient(180deg,#43505c 0%,#202832 70%,#111820 100%);
+}
+
+.sm-chassis.sm-cisco-3850 .sm-uplink-port span{
+    right:4px;
+    top:2px;
+    max-width:32px;
+    color:#253140 !important;
+    font-size:6px;
+    letter-spacing:-.45px;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-uplink-port small{
+    display:none;
+}
+
+.sm-chassis.sm-cisco-3850 .module-empty{
+    grid-column:1/-1;
+    align-self:center;
+    color:#334155;
+    font-size:9px;
+    font-weight:900;
+    text-align:center;
+}
+
+@media(max-width:1100px){
+    .sm-chassis.sm-cisco-3850,
+    .sm-chassis.sm-cisco-3850.is-full{
+        margin:0;
+    }
+}
+/* SWITCHMAP_16_4_9_CISCO_3850_CLEAN_FACEPLATE_END */
+
+/* SWITCHMAP_16_4_10_CISCO_3850_FACEPLATE_FINAL_START */
+.sm-map-scroll,
+.sm-dashboard-scroll{
+    direction:ltr;
+    overflow-x:auto;
+    overflow-y:hidden;
+    padding:16px 18px;
+    border:1px solid #cfe0f7;
+    border-radius:18px;
+    background:linear-gradient(180deg,#fbfdff 0%,#f6faff 100%);
+}
+
+.sm-dashboard-scroll{
+    margin-top:14px;
+}
+
+.sm-chassis.sm-cisco-3850{
+    --sm-left:130px;
+    --sm-copper:820px;
+    --sm-uplink:126px;
+    --sm-gap:14px;
+    --sm-port-w:29px;
+    --sm-port-h:25px;
+    --sm-port-gap:5px;
+    --sm-block-gap:14px;
+    direction:ltr;
+    position:relative;
+    width:1128px;
+    min-width:1128px;
+    height:132px;
+    min-height:0;
+    display:grid;
+    grid-template-columns:var(--sm-left) var(--sm-copper) var(--sm-uplink);
+    gap:var(--sm-gap);
+    align-items:center;
+    padding:15px 20px;
+    margin:0 auto;
+    border:1px solid #1f2933;
+    border-radius:8px;
+    overflow:hidden;
+    background:
+        linear-gradient(180deg,rgba(255,255,255,.18) 0%,rgba(255,255,255,.04) 16%,rgba(0,0,0,.12) 100%),
+        linear-gradient(90deg,#2e343b 0%,#4f5760 4%,#2a3037 13%,#20262d 78%,#11161c 100%);
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.34),
+        inset 0 -12px 22px rgba(0,0,0,.32),
+        0 14px 28px rgba(15,23,42,.15);
+}
+
+.sm-chassis.sm-cisco-3850.is-full{
+    --sm-left:142px;
+    --sm-copper:900px;
+    --sm-uplink:138px;
+    --sm-port-w:32px;
+    --sm-port-h:28px;
+    --sm-port-gap:5px;
+    --sm-block-gap:15px;
+    width:1236px;
+    min-width:1236px;
+    height:145px;
+    padding:16px 22px;
+}
+
+.sm-chassis.sm-cisco-3850:before,
+.sm-chassis.sm-cisco-3850:after{
+    content:"";
+    position:absolute;
+    top:50%;
+    width:11px;
+    height:11px;
+    transform:translateY(-50%);
+    border-radius:50%;
+    background:radial-gradient(circle at 35% 35%,#717b86 0,#3d4650 46%,#0f141a 78%);
+    box-shadow:inset 0 1px 1px rgba(255,255,255,.22),0 0 0 1px rgba(0,0,0,.45);
+    opacity:.9;
+}
+
+.sm-chassis.sm-cisco-3850:before{left:12px;right:auto;}
+.sm-chassis.sm-cisco-3850:after{right:12px;left:auto;}
+
+.sm-chassis.sm-cisco-3850 .sm-chassis-module{
+    position:relative;
+    width:var(--sm-left);
+    height:92px;
+    min-height:0;
+    padding:12px 13px 10px;
+    border:1px solid #111820;
+    border-radius:6px;
+    display:grid;
+    grid-template-columns:1fr;
+    grid-template-rows:auto auto 1fr auto;
+    align-content:start;
+    gap:5px;
+    overflow:hidden;
+    text-align:left;
+    background:
+        linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,0) 24%),
+        linear-gradient(180deg,#4b5560 0%,#202832 100%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 0 -5px 12px rgba(0,0,0,.28);
+}
+
+.sm-chassis.sm-cisco-3850.is-full .sm-chassis-module{
+    height:100px;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-cisco-brand{
+    display:block;
+    color:#f8fafc;
+    font-family:Georgia,'Times New Roman',serif;
+    font-size:22px;
+    font-weight:950;
+    letter-spacing:1px;
+    line-height:1;
+    text-shadow:0 1px 1px rgba(0,0,0,.75);
+}
+
+.sm-chassis.sm-cisco-3850 .sm-chassis-module strong{
+    display:block;
+    color:#ffffff;
+    font-size:10px;
+    font-weight:900;
+    line-height:1;
+    opacity:.96;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-chassis-module > span:not(.sm-mode-label){
+    display:none;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-mode-label{
+    position:absolute;
+    right:12px;
+    bottom:10px;
+    display:block;
+    color:#ffffff;
+    font-size:12px;
+    font-weight:950;
+    line-height:1;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-mode-label:before{
+    content:"3850";
+}
+
+.sm-chassis.sm-cisco-3850 .status-leds{
+    position:absolute;
+    left:13px;
+    bottom:9px;
+    display:grid;
+    grid-template-columns:9px 9px;
+    gap:5px;
+    width:max-content;
+}
+
+.sm-chassis.sm-cisco-3850 .status-leds i{
+    display:block;
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:#22c55e;
+    box-shadow:0 0 5px rgba(34,197,94,.75),inset 0 1px 0 rgba(255,255,255,.45);
+}
+
+.sm-chassis.sm-cisco-3850 .status-leds i.amber{
+    background:#f7c948;
+    box-shadow:0 0 5px rgba(247,201,72,.72),inset 0 1px 0 rgba(255,255,255,.45);
+}
+
+.sm-chassis.sm-cisco-3850 .status-leds b{
+    display:none;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-chassis-topline,
+.sm-chassis.sm-cisco-3850 .sm-port-section-title{
+    display:none;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-chassis-main{
+    position:relative;
+    width:var(--sm-copper);
+    min-width:var(--sm-copper);
+    height:82px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:10px 12px;
+    border:1px solid rgba(11,18,26,.55);
+    border-radius:5px;
+    background:
+        linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,0) 32%),
+        linear-gradient(180deg,#3f4852 0%,#242b33 100%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.14),inset 0 -4px 8px rgba(0,0,0,.24);
+}
+
+.sm-chassis.sm-cisco-3850.is-full .sm-chassis-main{
+    height:90px;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-port-bank{
+    width:max-content;
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    gap:var(--sm-port-gap);
+    padding:0;
+    border:0;
+    background:transparent;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-port-row{
+    display:flex;
+    align-items:center;
+    gap:var(--sm-port-gap);
+    width:max-content;
+    min-height:var(--sm-port-h);
+}
+
+.sm-chassis.sm-cisco-3850 .sm-port-row .sm-port:nth-child(6n+7){
+    margin-left:var(--sm-block-gap);
+}
+
+.sm-chassis.sm-cisco-3850 .sm-port{
+    --port-led:#7e8791;
+    position:relative;
+    width:var(--sm-port-w);
+    min-width:var(--sm-port-w);
+    height:var(--sm-port-h);
+    min-height:var(--sm-port-h);
+    padding:0;
+    border:1px solid #606a75;
+    border-radius:3px;
+    overflow:hidden;
+    cursor:pointer;
+    color:#1d2732 !important;
+    background:
+        linear-gradient(180deg,rgba(255,255,255,.45),rgba(255,255,255,0) 34%),
+        linear-gradient(180deg,#d8e0e8 0%,#a7b2bd 50%,#7f8b96 100%) !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.72),
+        inset 0 -3px 0 rgba(0,0,0,.22),
+        0 1px 1px rgba(0,0,0,.32);
+    transform:none;
+    transition:.12s transform,.12s box-shadow,.12s border-color;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-port:after{
+    content:"";
+    position:absolute;
+    left:5px;
+    right:5px;
+    bottom:4px;
+    height:9px;
+    border-radius:1px;
+    background:linear-gradient(180deg,#4a5662 0%,#202831 72%,#0f141a 100%);
+    box-shadow:inset 0 1px 1px rgba(255,255,255,.12),0 -1px 0 rgba(255,255,255,.18);
+}
+
+.sm-chassis.sm-cisco-3850 .sm-port:before{
+    content:"";
+    position:absolute;
+    left:4px;
+    top:3px;
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    z-index:2;
+    background:var(--port-led);
+    box-shadow:0 0 5px color-mix(in srgb,var(--port-led) 55%,transparent),inset 0 1px 0 rgba(255,255,255,.5);
+}
+
+.sm-chassis.sm-cisco-3850 .sm-port span{
+    position:absolute;
+    right:4px;
+    top:3px;
+    z-index:3;
+    display:block;
+    width:auto;
+    max-width:19px;
+    color:#1f2937 !important;
+    font-family:Tahoma,Arial,sans-serif;
+    font-size:7.5px;
+    font-weight:950;
+    line-height:1;
+    letter-spacing:-.4px;
+    text-align:right;
+    direction:ltr;
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:clip;
+}
+
+.sm-chassis.sm-cisco-3850.is-full .sm-port span{
+    font-size:8px;
+    max-width:22px;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-port small{
+    display:none;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-port:hover{
+    transform:translateY(-1px);
+    border-color:#dbeafe;
+    box-shadow:0 5px 11px rgba(15,23,42,.22),inset 0 1px 0 rgba(255,255,255,.76),inset 0 -3px 0 rgba(0,0,0,.20);
+}
+
+.sm-chassis.sm-cisco-3850 .sm-port.port-up,
+.sm-chassis.sm-cisco-3850 .sm-port.status-up{--port-led:#22c55e;}
+.sm-chassis.sm-cisco-3850 .sm-port.port-down,
+.sm-chassis.sm-cisco-3850 .sm-port.status-down{--port-led:#7f8790;}
+.sm-chassis.sm-cisco-3850 .sm-port.port-disabled,
+.sm-chassis.sm-cisco-3850 .sm-port.status-disabled{--port-led:#f59e0b;}
+.sm-chassis.sm-cisco-3850 .sm-port.port-error,
+.sm-chassis.sm-cisco-3850 .sm-port.status-error{--port-led:#ef4444;}
+
+.sm-chassis.sm-cisco-3850 .sm-port.port-trunk{
+    outline:2px solid rgba(37,99,235,.9);
+    outline-offset:1px;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-port.port-uplink,
+.sm-chassis.sm-cisco-3850 .sm-uplink-port{
+    outline:2px solid rgba(124,58,237,.9);
+    outline-offset:1px;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-port.selected-port{
+    outline:3px solid #60a5fa;
+    outline-offset:2px;
+    box-shadow:0 0 0 4px rgba(96,165,250,.22),inset 0 1px 0 rgba(255,255,255,.8);
+}
+
+.sm-chassis.sm-cisco-3850 .sm-uplink-module{
+    position:relative;
+    width:var(--sm-uplink);
+    height:82px;
+    min-height:0;
+    padding:19px 11px 9px;
+    border:1px solid rgba(11,18,26,.65);
+    border-radius:5px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:
+        linear-gradient(180deg,rgba(255,255,255,.30),rgba(255,255,255,0) 30%),
+        linear-gradient(180deg,#cbd5df 0%,#8b98a5 100%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.6),inset 0 -4px 8px rgba(0,0,0,.22);
+}
+
+.sm-chassis.sm-cisco-3850.is-full .sm-uplink-module{
+    height:90px;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-uplink-module:before{
+    content:"C3850-NM";
+    position:absolute;
+    top:6px;
+    left:10px;
+    right:10px;
+    color:#263241;
+    font-size:8px;
+    font-weight:950;
+    line-height:1;
+    text-align:left;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-uplink-head{
+    display:none;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-uplink-bank{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    grid-auto-rows:min-content;
+    gap:6px;
+    width:100%;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-uplink-port{
+    width:48px;
+    min-width:48px;
+    height:25px;
+    min-height:25px;
+    border-color:#56616d;
+    border-radius:3px;
+    background:
+        linear-gradient(180deg,rgba(255,255,255,.44),rgba(255,255,255,0) 32%),
+        linear-gradient(180deg,#d7dfe8 0%,#a8b3be 52%,#7d8995 100%) !important;
+    color:#17202a !important;
+}
+
+.sm-chassis.sm-cisco-3850.is-full .sm-uplink-port{
+    width:53px;
+    min-width:53px;
+    height:28px;
+    min-height:28px;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-uplink-port:after{
+    left:9px;
+    right:9px;
+    bottom:5px;
+    height:8px;
+    background:linear-gradient(180deg,#43505c 0%,#202832 70%,#111820 100%);
+}
+
+.sm-chassis.sm-cisco-3850 .sm-uplink-port span{
+    right:5px;
+    top:3px;
+    max-width:38px;
+    color:#253140 !important;
+    font-size:6.5px;
+    letter-spacing:-.45px;
+}
+
+.sm-chassis.sm-cisco-3850 .module-empty{
+    grid-column:1/-1;
+    align-self:center;
+    color:#334155;
+    font-size:9px;
+    font-weight:900;
+    text-align:center;
+}
+
+@media(max-width:1280px){
+    .sm-chassis.sm-cisco-3850{
+        margin:0;
+    }
+}
+/* SWITCHMAP_16_4_10_CISCO_3850_FACEPLATE_FINAL_END */
+
+/* --- SwitchMap 17-21 additions --- */
+.refresh-results-panel{
+    display:none;
+    padding:14px 16px;
+    margin-bottom:18px;
+}
+.refresh-results-panel:not(:empty){
+    display:block;
+}
+.refresh-line{
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    padding:9px 10px;
+    border-radius:10px;
+    border:1px solid var(--line);
+    margin-bottom:8px;
+    background:#fff;
+    direction:ltr;
+}
+.refresh-line.ok{
+    border-color:#bbf7d0;
+    background:#f0fdf4;
+}
+.refresh-line.fail{
+    border-color:#fecaca;
+    background:#fef2f2;
+}
+.check-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    min-height:34px;
+    padding:7px 9px;
+    border:1px solid #dbe7f5;
+    border-radius:10px;
+    background:#fff;
+    font-size:13px;
+    font-weight:800;
+    color:#334155;
+}
+.check-row input{
+    width:auto;
+    min-height:auto;
+}
+.risk-confirm{
+    border-color:#fecaca;
+    background:#fff7f7;
+}
+.command-preview-box{
+    border:1px solid #dbe7f5;
+    border-radius:12px;
+    background:#f8fafc;
+    padding:10px;
+}
+.command-preview-title{
+    font-size:12px;
+    font-weight:950;
+    color:#475569;
+    margin-bottom:6px;
+}
+.command-preview-box pre,
+.table-pre{
+    margin:0;
+    white-space:pre-wrap;
+    word-break:break-word;
+    font-family:Consolas,Monaco,monospace;
+    font-size:12px;
+    line-height:1.65;
+}
+.risk-text{
+    margin-top:6px;
+    color:#b91c1c;
+    font-weight:900;
+}
+.compact-select{
+    max-width:180px;
+}
+.pagination-row{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    margin-top:18px;
+}
+.report-count-grid{
+    grid-template-columns:repeat(8,minmax(120px,1fr));
+}
+.report-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:18px;
+}
+.report-section{
+    padding:18px;
+}
+.report-section h3,
+.topology-panel h3,
+.table-panel h3{
+    margin:0 0 14px;
+    font-size:18px;
+    font-weight:950;
+}
+.compact-table th,
+.compact-table td{
+    padding:9px 10px;
+    font-size:13px;
+}
+.topology-panel{
+    padding:18px;
+    margin-bottom:18px;
+}
+.topology-link-list{
+    display:grid;
+    gap:10px;
+}
+.topology-link{
+    display:grid;
+    grid-template-columns:minmax(180px,1fr) 42px minmax(180px,1fr) minmax(130px,.6fr);
+    align-items:center;
+    gap:10px;
+    padding:12px;
+    border-radius:14px;
+    border:1px solid var(--line);
+    background:#fff;
+}
+.topology-link.internal{
+    border-color:#bfdbfe;
+    background:#eff6ff;
+}
+.topology-link.external{
+    border-color:#fde68a;
+    background:#fffbeb;
+}
+.topology-node{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+    padding:10px;
+    border-radius:12px;
+    background:rgba(255,255,255,.82);
+    border:1px solid rgba(203,213,225,.8);
+}
+.topology-node strong{
+    font-size:15px;
+    font-weight:950;
+}
+.topology-node span,
+.topology-meta span{
+    font-size:12px;
+    color:#475569;
+}
+.topology-arrow{
+    text-align:center;
+    font-size:24px;
+    font-weight:950;
+    color:var(--primary);
+    direction:ltr;
+}
+.topology-meta{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+    align-items:flex-start;
+}
+@media (max-width:1100px){
+    .report-count-grid,
+    .report-grid{
+        grid-template-columns:1fr;
+    }
+    .topology-link{
+        grid-template-columns:1fr;
+    }
+    .topology-arrow{
+        transform:rotate(90deg);
+    }
+}
+
+/* --- SwitchMap 19.1 smart refresh + compact reports --- */
+.switch-head-status{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+    justify-content:flex-end;
+}
+.smart-refresh-mini{
+    min-width:180px;
+    display:grid;
+    gap:3px;
+    padding:8px 10px;
+    border:1px solid #dbe7f5;
+    border-radius:14px;
+    background:#f8fafc;
+    color:#334155;
+    text-align:right;
+}
+.smart-refresh-mini strong{
+    font-size:13px;
+    font-weight:950;
+}
+.smart-refresh-mini span,
+.smart-refresh-mini small{
+    font-size:11px;
+    color:#64748b;
+}
+.smart-refresh-mini[data-refresh-card-state="running"]{
+    border-color:#bfdbfe;
+    background:#eff6ff;
+}
+.smart-refresh-mini[data-refresh-card-state="ok"]{
+    border-color:#bbf7d0;
+    background:#f0fdf4;
+}
+.smart-refresh-mini[data-refresh-card-state="fail"]{
+    border-color:#fecaca;
+    background:#fef2f2;
+}
+.smart-refresh-detail{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:10px;
+    margin:12px 0;
+}
+.smart-refresh-detail div{
+    display:grid;
+    gap:5px;
+    padding:10px;
+    border:1px solid #dbe7f5;
+    border-radius:13px;
+    background:#f8fafc;
+}
+.smart-refresh-detail span{
+    font-size:12px;
+    color:#64748b;
+}
+.smart-refresh-detail strong{
+    font-size:13px;
+    font-weight:950;
+    word-break:break-word;
+}
+.refresh-line.running{
+    border-color:#bfdbfe;
+    background:#eff6ff;
+}
+.report-accordion-list{
+    display:grid;
+    gap:12px;
+}
+.report-accordion-item{
+    padding:0;
+    overflow:hidden;
+}
+.report-accordion-item summary{
+    min-height:58px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:0 18px;
+    cursor:pointer;
+    font-weight:950;
+    list-style:none;
+}
+.report-accordion-item summary::-webkit-details-marker{
+    display:none;
+}
+.report-accordion-item summary::before{
+    content:'+';
+    width:28px;
+    height:28px;
+    display:grid;
+    place-items:center;
+    border-radius:9px;
+    background:#eef6ff;
+    color:var(--primary);
+    font-weight:950;
+    order:3;
+}
+.report-accordion-item[open] summary::before{
+    content:'−';
+}
+.report-accordion-item summary span{
+    flex:1;
+    font-size:16px;
+}
+.report-accordion-item summary strong{
+    min-width:52px;
+    height:30px;
+    display:grid;
+    place-items:center;
+    border-radius:999px;
+    background:#eef2ff;
+    color:#1d4ed8;
+    direction:ltr;
+}
+.report-accordion-item .table-wrap{
+    border-top:1px solid var(--line);
+    padding:12px;
+}
+.app-header{
+    min-height:62px;
+    padding-top:8px;
+    padding-bottom:8px;
+}
+.page-heading-card{
+    padding:18px 20px;
+}
+.page-title{
+    font-size:26px;
+}
+.sm-switch-card{
+    padding:16px;
+}
+@media(max-width:900px){
+    .switch-head-status{
+        justify-content:stretch;
+    }
+    .smart-refresh-mini{
+        width:100%;
+    }
+    .smart-refresh-detail{
+        grid-template-columns:1fr;
+    }
+}
+
+
+/* Phase 19.2 - Auto Refresh */
+.auto-refresh-control{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:4px 8px;
+    border:1px solid var(--border-color, #cfe0f5);
+    border-radius:12px;
+    background:rgba(255,255,255,.65);
+    color:var(--text-muted, #516179);
+    font-size:12px;
+}
+.auto-refresh-select{
+    min-width:112px;
+    height:32px;
+    padding:2px 8px;
+    font-size:12px;
+}
+.auto-refresh-countdown{
+    min-width:116px;
+    text-align:center;
+}
+.smart-refresh-mini[data-refresh-card-state="scheduled"]{
+    border-color:#8ec5ff;
+    background:linear-gradient(135deg,#eef7ff,#ffffff);
+}
+.smart-refresh-mini[data-refresh-card-state="running"]{
+    border-color:#3b82f6;
+    background:linear-gradient(135deg,#eaf2ff,#ffffff);
+}
+.smart-refresh-mini[data-refresh-card-state="ok"]{
+    border-color:#86efac;
+    background:linear-gradient(135deg,#edfff4,#ffffff);
+}
+.smart-refresh-mini[data-refresh-card-state="fail"]{
+    border-color:#fca5a5;
+    background:linear-gradient(135deg,#fff1f2,#ffffff);
+}
+
+/* SWITCHMAP_23_UI_OVERHAUL_START */
+:root{
+    --bg:#e8eef6;
+    --card:#ffffff;
+    --card-soft:#f8fbff;
+    --line:#d7e3f4;
+    --text:#071226;
+    --muted:#5b6b82;
+    --primary:#2563eb;
+    --primary-strong:#1d4ed8;
+    --sidebar:#0b1220;
+    --sidebar-2:#111c30;
+    --sidebar-line:rgba(148,163,184,.22);
+    --shadow:0 16px 34px rgba(15,23,42,.08);
+    --shadow-soft:0 8px 20px rgba(15,23,42,.05);
+    --radius:18px;
+}
+body{
+    min-height:100vh;
+    background:
+        radial-gradient(circle at 18% 0%,rgba(37,99,235,.12),transparent 310px),
+        linear-gradient(180deg,#f4f8fc 0%,#e8eef6 100%);
+    color:var(--text);
+}
+.app-frame{
+    display:grid;
+    grid-template-columns:282px minmax(0,1fr);
+    min-height:100vh;
+}
+.app-sidebar{
+    position:sticky;
+    top:0;
+    height:100vh;
+    padding:20px 16px;
+    background:
+        radial-gradient(circle at 30% 0%,rgba(37,99,235,.38),transparent 245px),
+        linear-gradient(180deg,var(--sidebar) 0%,var(--sidebar-2) 100%);
+    color:#e5edf7;
+    border-left:1px solid rgba(255,255,255,.07);
+    box-shadow:-10px 0 30px rgba(15,23,42,.18);
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+    overflow:auto;
+}
+.app-main{
+    min-width:0;
+}
+.app-sidebar .app-brand{
+    direction:ltr;
+    justify-content:flex-end;
+    padding:8px 8px 18px;
+    border-bottom:1px solid var(--sidebar-line);
+}
+.app-sidebar .brand-mark{
+    width:48px;
+    height:48px;
+    border-radius:16px;
+    background:linear-gradient(135deg,#38bdf8,#2563eb 65%,#1e40af);
+    box-shadow:0 12px 24px rgba(37,99,235,.34);
+}
+.app-sidebar .brand-title{
+    color:#ffffff;
+    font-size:24px;
+    letter-spacing:.2px;
+}
+.app-sidebar .brand-subtitle{
+    color:#9fb2ce;
+}
+.app-frame .app-nav{
+    display:grid;
+    gap:8px;
+    padding:0;
+    border:0;
+    border-radius:0;
+    background:transparent;
+    overflow:visible;
+}
+.app-frame .nav-link{
+    min-width:0;
+    width:100%;
+    min-height:48px;
+    display:flex;
+    align-items:center;
+    justify-content:flex-start;
+    gap:12px;
+    padding:0 14px;
+    border-radius:14px;
+    color:#cbd8ea;
+    text-align:right;
+    background:transparent;
+    border:1px solid transparent;
+}
+.app-frame .nav-link:hover{
+    color:#ffffff;
+    background:rgba(255,255,255,.075);
+    border-color:rgba(255,255,255,.07);
+}
+.app-frame .nav-link.active{
+    color:#ffffff;
+    background:linear-gradient(135deg,rgba(37,99,235,.95),rgba(14,165,233,.78));
+    box-shadow:0 12px 24px rgba(37,99,235,.22);
+}
+.nav-icon{
+    width:30px;
+    height:30px;
+    display:grid;
+    place-items:center;
+    border-radius:10px;
+    background:rgba(255,255,255,.08);
+    color:#eaf2ff;
+    font-size:15px;
+    flex:none;
+}
+.sidebar-note{
+    margin-top:auto;
+    display:grid;
+    gap:6px;
+    padding:14px;
+    border:1px solid var(--sidebar-line);
+    border-radius:16px;
+    background:rgba(255,255,255,.055);
+    color:#d7e3f4;
+}
+.sidebar-note strong{
+    font-size:13px;
+    font-weight:950;
+}
+.sidebar-note span{
+    font-size:11px;
+    color:#9fb2ce;
+    direction:ltr;
+    text-align:left;
+}
+.page-shell{
+    max-width:1680px;
+    padding:28px 30px 46px;
+}
+.page-heading-card{
+    position:relative;
+    overflow:hidden;
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    align-items:center;
+    padding:24px 26px;
+    background:rgba(255,255,255,.86);
+    border:1px solid rgba(203,213,225,.75);
+    box-shadow:var(--shadow-soft);
+    backdrop-filter:blur(14px);
+}
+.page-heading-card:before{
+    content:"";
+    position:absolute;
+    inset:0 0 auto 0;
+    height:4px;
+    background:linear-gradient(90deg,#38bdf8,#2563eb,#7c3aed);
+}
+.page-title{
+    font-size:30px;
+    letter-spacing:-.5px;
+}
+.page-subtitle{
+    max-width:760px;
+    color:#627089;
+}
+.page-heading-actions{
+    justify-content:flex-end;
+}
+.btn{
+    border-radius:13px;
+    min-height:42px;
+    box-shadow:none;
+    transition:.14s transform,.14s box-shadow,.14s background,.14s border-color;
+}
+.btn:hover{
+    transform:translateY(-1px);
+    box-shadow:0 8px 18px rgba(15,23,42,.08);
+}
+.btn-primary{
+    background:linear-gradient(135deg,#2563eb,#1d4ed8);
+    border-color:#1d4ed8;
+}
+.btn-secondary{
+    background:#eef6ff;
+    border-color:#bfdbfe;
+}
+.btn-ghost{
+    background:#fff;
+    border-color:#d7e3f4;
+}
+.dashboard-actions{
+    justify-content:flex-end;
+}
+.refresh-command-card{
+    display:flex;
+    align-items:center;
+    gap:9px;
+    padding:7px;
+    border:1px solid #d7e3f4;
+    border-radius:16px;
+    background:#f8fbff;
+}
+.dashboard-overview-grid{
+    display:grid;
+    grid-template-columns:1.25fr repeat(3,1fr);
+    gap:14px;
+    margin-bottom:18px;
+}
+.overview-card{
+    min-height:112px;
+    display:grid;
+    align-content:center;
+    gap:8px;
+    padding:18px;
+    border:1px solid rgba(203,213,225,.82);
+    border-radius:20px;
+    background:rgba(255,255,255,.9);
+    box-shadow:var(--shadow-soft);
+    overflow:hidden;
+    position:relative;
+}
+.overview-card:after{
+    content:"";
+    position:absolute;
+    width:110px;
+    height:110px;
+    border-radius:999px;
+    left:-42px;
+    top:-38px;
+    background:rgba(37,99,235,.06);
+}
+.overview-card span{
+    color:#64748b;
+    font-size:12px;
+    font-weight:900;
+}
+.overview-card strong{
+    font-size:28px;
+    font-weight:950;
+    color:#071226;
+    line-height:1;
+}
+.overview-card small{
+    color:#64748b;
+    font-size:12px;
+    line-height:1.8;
+}
+.overview-primary{
+    color:#fff;
+    background:
+        radial-gradient(circle at 10% 10%,rgba(255,255,255,.20),transparent 120px),
+        linear-gradient(135deg,#1d4ed8,#0f172a);
+    border-color:rgba(37,99,235,.2);
+}
+.overview-primary span,
+.overview-primary small,
+.overview-primary strong{
+    color:#fff;
+}
+.search-panel{
+    padding:14px;
+    margin-bottom:18px;
+    background:rgba(255,255,255,.88);
+    box-shadow:var(--shadow-soft);
+}
+.search-form{
+    display:grid;
+    grid-template-columns:150px minmax(0,1fr);
+    gap:10px;
+}
+.search-form .input{
+    min-height:46px;
+    border-radius:14px;
+    background:#fbfdff;
+}
+.refresh-results-panel:not(:empty){
+    display:grid;
+    gap:8px;
+}
+.refresh-line{
+    direction:rtl;
+    border-radius:14px;
+    box-shadow:0 4px 12px rgba(15,23,42,.04);
+}
+.switch-list-grid{
+    display:grid;
+    gap:22px;
+}
+.sm-switch-card{
+    padding:18px;
+    background:rgba(255,255,255,.92);
+    border:1px solid rgba(203,213,225,.78);
+    box-shadow:var(--shadow);
+}
+.sm-switch-card-head{
+    padding:0 0 16px;
+    border-bottom:1px solid #e2e8f0;
+    margin-bottom:14px;
+}
+.sm-switch-identity{
+    align-items:center;
+}
+.switch-avatar{
+    width:86px;
+    height:86px;
+    border-radius:20px;
+    background:linear-gradient(135deg,#e0f2fe,#dbeafe);
+    border:1px solid #bfdbfe;
+    box-shadow:0 12px 26px rgba(37,99,235,.10);
+}
+.switch-avatar strong{
+    font-size:26px;
+}
+.sm-switch-title h2{
+    font-size:28px;
+    letter-spacing:-.4px;
+}
+.sm-switch-title p{
+    color:#40516b;
+}
+.switch-head-status{
+    align-items:stretch;
+}
+.status-pill{
+    border-radius:999px;
+    padding:8px 12px;
+    min-height:34px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    font-size:12px;
+    font-weight:950;
+}
+.status-pill.ok{
+    color:#166534;
+    background:#dcfce7;
+    border:1px solid #86efac;
+}
+.status-pill.warn{
+    color:#991b1b;
+    background:#fee2e2;
+    border:1px solid #fecaca;
+}
+.status-pill.muted{
+    color:#475569;
+    background:#f1f5f9;
+    border:1px solid #cbd5e1;
+}
+.smart-refresh-mini{
+    min-width:210px;
+    padding:10px 12px;
+    border-radius:16px;
+    background:#f8fbff;
+}
+.smart-refresh-mini strong{
+    font-size:14px;
+}
+.sm-switch-extra{
+    margin-bottom:14px;
+    border:1px solid #dbe7f5;
+    border-radius:16px;
+    overflow:hidden;
+    background:#f8fbff;
+}
+.sm-switch-extra summary{
+    min-height:46px;
+    padding:0 16px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    cursor:pointer;
+    list-style:none;
+    font-weight:950;
+    color:#1e3a8a;
+}
+.sm-switch-extra summary::-webkit-details-marker{display:none;}
+.sm-switch-extra summary:before{
+    content:"+";
+    width:28px;
+    height:28px;
+    display:grid;
+    place-items:center;
+    border-radius:10px;
+    background:#e0edff;
+    color:#2563eb;
+    order:2;
+}
+.sm-switch-extra[open] summary:before{content:"−";}
+.sm-switch-extra .meta-grid,
+.sm-switch-extra .mini-stats-grid,
+.sm-switch-extra .smart-refresh-detail,
+.sm-switch-extra .card-actions-inline{
+    margin:12px 14px;
+}
+.meta-card,
+.mini-stat,
+.smart-refresh-detail div,
+.key-item,
+.summary-tile{
+    border-radius:15px;
+    background:#fbfdff;
+    border:1px solid #e2e8f0;
+    box-shadow:none;
+}
+.sm-map-scroll,
+.sm-dashboard-scroll{
+    border-radius:20px;
+    padding:16px 18px;
+    background:
+        linear-gradient(90deg,rgba(15,23,42,.035) 1px,transparent 1px),
+        linear-gradient(180deg,#fdfefe,#f4f8ff);
+    background-size:24px 24px,auto;
+    border:1px solid #d7e3f4;
+}
+.sm-dashboard-scroll{
+    min-height:166px;
+    display:flex;
+    align-items:center;
+}
+.sm-chassis.sm-cisco-3850{
+    filter:drop-shadow(0 14px 22px rgba(15,23,42,.17));
+}
+.legend{
+    justify-content:flex-end;
+    color:#334155;
+}
+.compact-legend{
+    padding:4px 2px 0;
+}
+.dot{
+    margin-inline-start:5px;
+    box-shadow:0 0 0 3px rgba(255,255,255,.78);
+}
+.modal-backdrop{
+    background:rgba(3,7,18,.68);
+    backdrop-filter:blur(5px);
+}
+.modal-card{
+    border-radius:24px;
+    border:1px solid rgba(226,232,240,.92);
+    box-shadow:0 26px 70px rgba(2,6,23,.38);
+}
+.modal-header{
+    background:linear-gradient(180deg,#ffffff,#f8fbff);
+}
+.modal-header h3{
+    font-size:24px;
+}
+.surface-soft{
+    background:#fbfdff;
+    border-color:#dbe7f5;
+}
+.command-preview-box{
+    background:#0f172a;
+    border-color:#1e293b;
+    color:#dbeafe;
+}
+.command-preview-title{
+    color:#93c5fd;
+}
+.command-preview-box pre{
+    color:#e2e8f0;
+}
+.table-panel,
+.topology-panel,
+.report-accordion-item{
+    background:rgba(255,255,255,.92);
+    border-color:rgba(203,213,225,.78);
+    box-shadow:var(--shadow-soft);
+}
+.data-table{
+    border-collapse:separate;
+    border-spacing:0;
+}
+.data-table th,
+.data-table td{
+    border-bottom:1px solid #e2e8f0;
+}
+.data-table thead th{
+    background:#eef6ff;
+    color:#1e3a8a;
+    font-size:12px;
+    text-transform:none;
+}
+.data-table tbody tr:nth-child(even){
+    background:#fbfdff;
+}
+.table-link{
+    color:#1d4ed8;
+}
+.report-count-grid{
+    grid-template-columns:repeat(4,minmax(150px,1fr));
+    gap:12px;
+    margin-bottom:18px;
+}
+.summary-tile{
+    min-height:90px;
+    display:grid;
+    align-content:center;
+    gap:6px;
+    padding:16px;
+}
+.summary-tile span{
+    color:#64748b;
+    font-size:12px;
+    font-weight:900;
+}
+.summary-tile strong{
+    color:#071226;
+    font-size:28px;
+    line-height:1;
+}
+.report-accordion-list{
+    gap:14px;
+}
+.report-accordion-item summary{
+    min-height:64px;
+    padding:0 20px;
+    background:linear-gradient(180deg,#fff,#fbfdff);
+}
+.report-accordion-item[open] summary{
+    border-bottom:1px solid #e2e8f0;
+}
+.report-accordion-item summary::before{
+    background:#dbeafe;
+}
+.topology-link{
+    border-radius:18px;
+}
+.topology-node{
+    border-radius:15px;
+}
+.form-layout-grid{
+    gap:22px;
+}
+.form-card-main,
+.form-side-info{
+    background:rgba(255,255,255,.92);
+    border-color:rgba(203,213,225,.78);
+    box-shadow:var(--shadow-soft);
+}
+@media(max-width:1280px){
+    .app-frame{
+        grid-template-columns:1fr;
+    }
+    .app-sidebar{
+        position:sticky;
+        z-index:80;
+        height:auto;
+        min-height:0;
+        top:0;
+        padding:12px 16px;
+        display:grid;
+        grid-template-columns:auto 1fr;
+        align-items:center;
+        gap:12px;
+        overflow:visible;
+    }
+    .app-sidebar .app-brand{
+        padding:0;
+        border-bottom:0;
+    }
+    .app-frame .app-nav{
+        display:flex;
+        gap:6px;
+        overflow:auto;
+        justify-content:flex-start;
+    }
+    .app-frame .nav-link{
+        width:auto;
+        min-width:max-content;
+        min-height:42px;
+        padding:0 12px;
+    }
+    .sidebar-note{display:none;}
+    .page-shell{padding:22px 20px 38px;}
+    .dashboard-overview-grid{grid-template-columns:repeat(2,minmax(0,1fr));}
+}
+@media(max-width:980px){
+    .page-heading-card{
+        grid-template-columns:1fr;
+        align-items:stretch;
+    }
+    .page-heading-actions{
+        justify-content:stretch;
+    }
+    .refresh-command-card,
+    .dashboard-actions{
+        width:100%;
+    }
+    .search-form{
+        grid-template-columns:1fr;
+    }
+    .report-count-grid{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+}
+@media(max-width:640px){
+    .app-sidebar{
+        grid-template-columns:1fr;
+    }
+    .app-sidebar .app-brand{
+        justify-content:center;
+    }
+    .dashboard-overview-grid,
+    .report-count-grid{
+        grid-template-columns:1fr;
+    }
+    .page-shell{padding:16px 12px 28px;}
+    .page-title{font-size:24px;}
+    .refresh-command-card{
+        flex-direction:column;
+        align-items:stretch;
+    }
+}
+/* SWITCHMAP_23_UI_OVERHAUL_END */
+
+
+/* SWITCHMAP_23_1_CISCO_3850_VISUAL_FIX_START
+   Scope: only Cisco 3850 chassis/port-map visual. No layout/menu/report/refresh change. */
+.sm-map-scroll,
+.sm-dashboard-scroll{
+    direction:ltr;
+    overflow-x:auto;
+    overflow-y:hidden;
+    padding:22px 24px;
+    border-radius:22px;
+    background:
+        radial-gradient(circle at 18% 12%,rgba(59,130,246,.08),transparent 34%),
+        linear-gradient(180deg,#fbfdff 0%,#f3f7fc 100%);
+    border:1px solid #d7e3f4;
+}
+
+.sm-dashboard-scroll{
+    min-height:210px;
+    display:flex;
+    align-items:center;
+}
+
+.sm-chassis.sm-cisco-3850,
+.sm-chassis.sm-cisco-3850.is-dashboard{
+    --sm-left:156px;
+    --sm-copper:942px;
+    --sm-uplink:142px;
+    --sm-gap:16px;
+    --sm-port-w:30px;
+    --sm-port-h:28px;
+    --sm-port-gap:5px;
+    --sm-block-gap:14px;
+    direction:ltr;
+    position:relative;
+    width:1316px;
+    min-width:1316px;
+    height:154px;
+    min-height:154px;
+    display:grid;
+    grid-template-columns:var(--sm-left) var(--sm-copper) var(--sm-uplink);
+    gap:var(--sm-gap);
+    align-items:center;
+    padding:17px 23px;
+    margin:0 auto;
+    overflow:hidden;
+    border:1px solid #111827;
+    border-radius:10px;
+    background:
+        linear-gradient(180deg,rgba(255,255,255,.18) 0%,rgba(255,255,255,.04) 18%,rgba(0,0,0,.18) 100%),
+        linear-gradient(90deg,#151a20 0%,#414b55 4%,#242b33 12%,#20262d 78%,#11161c 100%);
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.34),
+        inset 0 -14px 24px rgba(0,0,0,.36),
+        0 18px 32px rgba(15,23,42,.18);
+    filter:drop-shadow(0 15px 24px rgba(15,23,42,.20));
+}
+
+.sm-chassis.sm-cisco-3850.is-full{
+    --sm-left:176px;
+    --sm-copper:1038px;
+    --sm-uplink:162px;
+    --sm-gap:18px;
+    --sm-port-w:34px;
+    --sm-port-h:31px;
+    --sm-port-gap:5px;
+    --sm-block-gap:16px;
+    width:1460px;
+    min-width:1460px;
+    height:174px;
+    min-height:174px;
+    padding:20px 26px;
+}
+
+.sm-chassis.sm-cisco-3850:before,
+.sm-chassis.sm-cisco-3850:after{
+    content:"";
+    position:absolute;
+    top:50%;
+    width:12px;
+    height:12px;
+    transform:translateY(-50%);
+    border-radius:50%;
+    background:radial-gradient(circle at 35% 35%,#8994a0 0,#46515c 46%,#111820 78%);
+    box-shadow:inset 0 1px 1px rgba(255,255,255,.28),0 0 0 1px rgba(0,0,0,.55);
+    opacity:.95;
+}
+
+.sm-chassis.sm-cisco-3850:before{left:13px;right:auto;}
+.sm-chassis.sm-cisco-3850:after{right:13px;left:auto;}
+
+.sm-chassis.sm-cisco-3850 .sm-chassis-module{
+    position:relative;
+    width:var(--sm-left);
+    height:108px;
+    min-height:108px;
+    padding:14px 15px 12px;
+    border:1px solid #0e141b;
+    border-radius:8px;
+    display:grid;
+    grid-template-columns:1fr;
+    grid-template-rows:auto auto 1fr auto;
+    align-content:start;
+    gap:6px;
+    overflow:hidden;
+    text-align:left;
+    background:
+        linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,0) 24%),
+        linear-gradient(180deg,#56616d 0%,#26303a 100%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.24),inset 0 -7px 14px rgba(0,0,0,.30);
+}
+
+.sm-chassis.sm-cisco-3850.is-full .sm-chassis-module{
+    height:122px;
+    min-height:122px;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-cisco-brand{
+    display:block;
+    color:#f8fafc;
+    font-family:Georgia,'Times New Roman',serif;
+    font-size:27px;
+    font-weight:950;
+    letter-spacing:.9px;
+    line-height:1;
+    text-shadow:0 1px 2px rgba(0,0,0,.8);
+}
+
+.sm-chassis.sm-cisco-3850.is-full .sm-cisco-brand{
+    font-size:31px;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-chassis-module strong{
+    display:block;
+    color:#ffffff;
+    font-size:11px;
+    font-weight:900;
+    line-height:1.1;
+    opacity:.96;
+}
+
+.sm-chassis.sm-cisco-3850.is-full .sm-chassis-module strong{
+    font-size:12px;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-chassis-module > span:not(.sm-mode-label){
+    display:none;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-mode-label{
+    position:absolute;
+    right:13px;
+    bottom:13px;
+    display:block;
+    width:auto;
+    height:auto;
+    padding:0;
+    color:#ffffff;
+    font-size:13px;
+    font-weight:950;
+    line-height:1;
+    text-align:right;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-mode-label:before{
+    content:"3850";
+}
+
+.sm-chassis.sm-cisco-3850 .status-leds{
+    position:absolute;
+    left:15px;
+    bottom:13px;
+    display:grid;
+    grid-template-columns:10px 10px;
+    gap:6px;
+    width:max-content;
+    height:auto;
+    direction:ltr;
+}
+
+.sm-chassis.sm-cisco-3850 .status-leds i{
+    display:block;
+    width:9px;
+    height:9px;
+    border-radius:50%;
+    background:#22c55e;
+    box-shadow:0 0 6px rgba(34,197,94,.80),inset 0 1px 0 rgba(255,255,255,.48);
+}
+
+.sm-chassis.sm-cisco-3850 .status-leds i.amber{
+    background:#f7c948;
+    box-shadow:0 0 6px rgba(247,201,72,.72),inset 0 1px 0 rgba(255,255,255,.48);
+}
+
+.sm-chassis.sm-cisco-3850 .status-leds b,
+.sm-chassis.sm-cisco-3850 .sm-chassis-topline,
+.sm-chassis.sm-cisco-3850 .sm-port-section-title{
+    display:none;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-chassis-main{
+    position:relative;
+    width:var(--sm-copper);
+    min-width:var(--sm-copper);
+    height:104px;
+    min-height:104px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:13px 15px;
+    border:1px solid rgba(11,18,26,.62);
+    border-radius:7px;
+    background:
+        linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,0) 34%),
+        linear-gradient(180deg,#46515c 0%,#242c35 100%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.16),inset 0 -5px 10px rgba(0,0,0,.26);
+}
+
+.sm-chassis.sm-cisco-3850.is-full .sm-chassis-main{
+    height:116px;
+    min-height:116px;
+    padding:15px 17px;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-port-bank{
+    width:max-content;
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    gap:7px;
+    padding:0;
+    border:0;
+    background:transparent;
+}
+
+.sm-chassis.sm-cisco-3850.is-full .sm-port-bank{
+    gap:8px;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-port-row{
+    display:flex;
+    align-items:center;
+    gap:var(--sm-port-gap);
+    width:max-content;
+    min-height:var(--sm-port-h);
+    direction:ltr;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-port-row .sm-port:nth-child(6n+7){
+    margin-left:var(--sm-block-gap);
+}
+
+.sm-chassis.sm-cisco-3850 .sm-port{
+    --port-led:#7f8790;
+    position:relative;
+    width:var(--sm-port-w);
+    min-width:var(--sm-port-w);
+    height:var(--sm-port-h);
+    min-height:var(--sm-port-h);
+    padding:0;
+    border:1px solid #5c6671;
+    border-radius:4px;
+    overflow:hidden;
+    cursor:pointer;
+    color:#1d2732 !important;
+    background:
+        linear-gradient(180deg,rgba(255,255,255,.52),rgba(255,255,255,0) 35%),
+        linear-gradient(180deg,#dde5ee 0%,#a8b3be 49%,#7d8894 100%) !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.78),
+        inset 0 -3px 0 rgba(0,0,0,.24),
+        0 1px 1px rgba(0,0,0,.34);
+    transform:none;
+    transition:.12s transform,.12s box-shadow,.12s border-color;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-port:after{
+    content:"";
+    position:absolute;
+    left:5px;
+    right:5px;
+    bottom:5px;
+    height:10px;
+    border-radius:2px;
+    background:linear-gradient(180deg,#4b5662 0%,#222b35 72%,#10161d 100%);
+    box-shadow:inset 0 1px 1px rgba(255,255,255,.13),0 -1px 0 rgba(255,255,255,.18);
+}
+
+.sm-chassis.sm-cisco-3850.is-full .sm-port:after{
+    left:6px;
+    right:6px;
+    bottom:6px;
+    height:11px;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-port:before{
+    content:"";
+    position:absolute;
+    left:4px;
+    top:4px;
+    width:6px;
+    height:6px;
+    border-radius:50%;
+    z-index:2;
+    background:var(--port-led);
+    box-shadow:0 0 5px rgba(34,197,94,.42),inset 0 1px 0 rgba(255,255,255,.50);
+}
+
+.sm-chassis.sm-cisco-3850.is-full .sm-port:before{
+    width:7px;
+    height:7px;
+    left:5px;
+    top:4px;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-port span{
+    position:absolute;
+    right:4px;
+    top:3px;
+    z-index:3;
+    display:block;
+    width:auto;
+    max-width:20px;
+    color:#1f2937 !important;
+    font-family:Tahoma,Arial,sans-serif;
+    font-size:8px;
+    font-weight:950;
+    line-height:1;
+    letter-spacing:-.45px;
+    text-align:right;
+    direction:ltr;
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:clip;
+}
+
+.sm-chassis.sm-cisco-3850.is-full .sm-port span{
+    font-size:8.5px;
+    max-width:24px;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-port small{
+    display:none;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-port:hover{
+    transform:translateY(-1px);
+    border-color:#dbeafe;
+    box-shadow:0 6px 12px rgba(15,23,42,.24),inset 0 1px 0 rgba(255,255,255,.78),inset 0 -3px 0 rgba(0,0,0,.21);
+}
+
+.sm-chassis.sm-cisco-3850 .sm-port.port-up,
+.sm-chassis.sm-cisco-3850 .sm-port.status-up{--port-led:#22c55e;}
+.sm-chassis.sm-cisco-3850 .sm-port.port-down,
+.sm-chassis.sm-cisco-3850 .sm-port.status-down{--port-led:#7f8790;}
+.sm-chassis.sm-cisco-3850 .sm-port.port-disabled,
+.sm-chassis.sm-cisco-3850 .sm-port.status-disabled{--port-led:#f59e0b;}
+.sm-chassis.sm-cisco-3850 .sm-port.port-error,
+.sm-chassis.sm-cisco-3850 .sm-port.status-error{--port-led:#ef4444;}
+
+.sm-chassis.sm-cisco-3850 .sm-port.port-trunk{
+    outline:2px solid rgba(37,99,235,.88);
+    outline-offset:1px;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-port.port-uplink,
+.sm-chassis.sm-cisco-3850 .sm-uplink-port{
+    outline:2px solid rgba(124,58,237,.88);
+    outline-offset:1px;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-port.selected-port{
+    outline:3px solid #60a5fa;
+    outline-offset:2px;
+    box-shadow:0 0 0 4px rgba(96,165,250,.22),inset 0 1px 0 rgba(255,255,255,.80);
+}
+
+.sm-chassis.sm-cisco-3850 .sm-uplink-module{
+    position:relative;
+    width:var(--sm-uplink);
+    height:104px;
+    min-height:104px;
+    padding:24px 12px 11px;
+    border:1px solid rgba(11,18,26,.65);
+    border-radius:7px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:
+        linear-gradient(180deg,rgba(255,255,255,.36),rgba(255,255,255,0) 32%),
+        linear-gradient(180deg,#d3dce6 0%,#8a97a4 100%);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.64),inset 0 -5px 10px rgba(0,0,0,.24);
+}
+
+.sm-chassis.sm-cisco-3850.is-full .sm-uplink-module{
+    height:116px;
+    min-height:116px;
+    padding:27px 14px 13px;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-uplink-module:before{
+    content:"C3850-NM";
+    position:absolute;
+    top:8px;
+    left:11px;
+    right:11px;
+    color:#263241;
+    font-size:9px;
+    font-weight:950;
+    line-height:1;
+    text-align:left;
+}
+
+.sm-chassis.sm-cisco-3850.is-full .sm-uplink-module:before{
+    top:9px;
+    font-size:10px;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-uplink-head{
+    display:none;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-uplink-bank{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    grid-auto-rows:min-content;
+    gap:7px;
+    width:100%;
+    direction:ltr;
+}
+
+.sm-chassis.sm-cisco-3850.is-full .sm-uplink-bank{
+    gap:8px;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-uplink-port{
+    width:55px;
+    min-width:55px;
+    height:29px;
+    min-height:29px;
+    border-color:#55616c;
+    border-radius:4px;
+    background:
+        linear-gradient(180deg,rgba(255,255,255,.50),rgba(255,255,255,0) 34%),
+        linear-gradient(180deg,#dce4ed 0%,#a7b3bf 52%,#7d8995 100%) !important;
+    color:#17202a !important;
+}
+
+.sm-chassis.sm-cisco-3850.is-full .sm-uplink-port{
+    width:62px;
+    min-width:62px;
+    height:32px;
+    min-height:32px;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-uplink-port:after{
+    left:10px;
+    right:10px;
+    bottom:6px;
+    height:9px;
+    background:linear-gradient(180deg,#43505c 0%,#202832 70%,#111820 100%);
+}
+
+.sm-chassis.sm-cisco-3850.is-full .sm-uplink-port:after{
+    left:11px;
+    right:11px;
+    bottom:7px;
+    height:10px;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-uplink-port span{
+    right:6px;
+    top:4px;
+    max-width:43px;
+    color:#253140 !important;
+    font-size:7px;
+    letter-spacing:-.45px;
+}
+
+.sm-chassis.sm-cisco-3850.is-full .sm-uplink-port span{
+    font-size:7.5px;
+    max-width:49px;
+}
+
+.sm-chassis.sm-cisco-3850 .module-empty{
+    grid-column:1/-1;
+    align-self:center;
+    color:#334155;
+    font-size:10px;
+    font-weight:900;
+    text-align:center;
+}
+
+@media(max-width:1280px){
+    .sm-chassis.sm-cisco-3850,
+    .sm-chassis.sm-cisco-3850.is-full{
+        margin:0;
+    }
+}
+/* SWITCHMAP_23_1_CISCO_3850_VISUAL_FIX_END */
+
+/* SWITCHMAP_24_RESPONSIVE_3850_FIT_START
+   Scope: responsive page fit + Cisco 3850 visual sizing only.
+   No JS, no templates, no SSH/Refresh/Reports/Topology changes. */
+html,
+body{
+    width:100%;
+    max-width:100%;
+    overflow-x:hidden;
+}
+
+.app-frame,
+.app-main,
+.page-shell,
+.page-heading-card,
+.surface-card,
+.sm-switch-card{
+    min-width:0;
+    max-width:100%;
+}
+
+.app-frame{
+    width:100%;
+    max-width:100vw;
+    overflow-x:hidden;
+}
+
+.page-shell{
+    width:100%;
+    max-width:none;
+    padding-left:clamp(12px,1.8vw,30px);
+    padding-right:clamp(12px,1.8vw,30px);
+}
+
+.page-heading-card{
+    grid-template-columns:minmax(0,1fr) minmax(260px,auto);
+}
+
+.page-heading-text,
+.page-heading-actions,
+.dashboard-actions,
+.refresh-command-card{
+    min-width:0;
+}
+
+.sm-switch-card{
+    overflow:hidden;
+}
+
+.sm-map-scroll,
+.sm-dashboard-scroll{
+    width:100%;
+    max-width:100%;
+    min-width:0;
+    overflow-x:auto;
+    overflow-y:hidden;
+    overscroll-behavior-inline:contain;
+    scrollbar-gutter:stable;
+}
+
+.sm-dashboard-scroll{
+    justify-content:center;
+    padding:clamp(12px,1.25vw,22px) clamp(12px,1.35vw,24px);
+}
+
+.sm-map-scroll:not(.sm-dashboard-scroll){
+    padding:clamp(14px,1.35vw,24px);
+}
+
+.sm-chassis.sm-cisco-3850,
+.sm-chassis.sm-cisco-3850.is-dashboard{
+    --sm-left:clamp(112px,8.8vw,146px);
+    --sm-uplink:clamp(106px,8.0vw,132px);
+    --sm-gap:clamp(10px,.85vw,15px);
+    --sm-port-w:clamp(20px,1.56vw,28px);
+    --sm-port-h:clamp(20px,1.50vw,26px);
+    --sm-port-gap:clamp(3px,.28vw,5px);
+    --sm-block-gap:clamp(8px,.62vw,13px);
+    width:100%;
+    max-width:1180px;
+    min-width:0;
+    height:clamp(122px,8.8vw,148px);
+    min-height:clamp(122px,8.8vw,148px);
+    grid-template-columns:var(--sm-left) minmax(0,1fr) var(--sm-uplink);
+    gap:var(--sm-gap);
+    padding:clamp(13px,1.05vw,18px) clamp(16px,1.25vw,23px);
+    margin-left:auto;
+    margin-right:auto;
+}
+
+.sm-chassis.sm-cisco-3850.is-full{
+    --sm-left:clamp(128px,10vw,176px);
+    --sm-uplink:clamp(118px,9vw,162px);
+    --sm-gap:clamp(12px,1vw,18px);
+    --sm-port-w:clamp(22px,1.72vw,34px);
+    --sm-port-h:clamp(22px,1.62vw,31px);
+    --sm-port-gap:clamp(3px,.32vw,5px);
+    --sm-block-gap:clamp(10px,.78vw,16px);
+    width:100%;
+    max-width:1320px;
+    min-width:1040px;
+    height:clamp(138px,10.2vw,174px);
+    min-height:clamp(138px,10.2vw,174px);
+    grid-template-columns:var(--sm-left) minmax(0,1fr) var(--sm-uplink);
+    gap:var(--sm-gap);
+    padding:clamp(15px,1.2vw,20px) clamp(18px,1.55vw,26px);
+}
+
+.sm-chassis.sm-cisco-3850 .sm-chassis-module{
+    width:var(--sm-left);
+    height:calc(100% - 32px);
+    min-height:92px;
+    padding:clamp(10px,.9vw,14px) clamp(10px,.95vw,15px);
+}
+
+.sm-chassis.sm-cisco-3850.is-full .sm-chassis-module{
+    height:calc(100% - 34px);
+    min-height:104px;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-cisco-brand{
+    font-size:clamp(22px,1.75vw,27px);
+}
+
+.sm-chassis.sm-cisco-3850.is-full .sm-cisco-brand{
+    font-size:clamp(25px,2vw,31px);
+}
+
+.sm-chassis.sm-cisco-3850 .sm-mode-label{
+    right:clamp(10px,.8vw,13px);
+    bottom:clamp(10px,.8vw,13px);
+    font-size:clamp(11px,.82vw,13px);
+}
+
+.sm-chassis.sm-cisco-3850 .status-leds{
+    left:clamp(10px,.9vw,15px);
+    bottom:clamp(10px,.8vw,13px);
+    gap:clamp(4px,.38vw,6px);
+}
+
+.sm-chassis.sm-cisco-3850 .sm-chassis-main,
+.sm-chassis.sm-cisco-3850.is-full .sm-chassis-main{
+    width:100%;
+    min-width:0;
+    height:calc(100% - 32px);
+    min-height:88px;
+    padding:clamp(10px,.9vw,15px) clamp(10px,1vw,17px);
+}
+
+.sm-chassis.sm-cisco-3850.is-full .sm-chassis-main{
+    min-height:100px;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-port-bank{
+    width:100%;
+    max-width:100%;
+    align-items:center;
+    gap:clamp(5px,.45vw,8px);
+}
+
+.sm-chassis.sm-cisco-3850 .sm-port-row{
+    max-width:100%;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-port{
+    width:var(--sm-port-w);
+    min-width:var(--sm-port-w);
+    height:var(--sm-port-h);
+    min-height:var(--sm-port-h);
+}
+
+.sm-chassis.sm-cisco-3850 .sm-port span{
+    font-size:clamp(7px,.58vw,8.5px);
+    max-width:calc(var(--sm-port-w) - 7px);
+}
+
+.sm-chassis.sm-cisco-3850.is-full .sm-port span{
+    font-size:clamp(7.5px,.62vw,9px);
+    max-width:calc(var(--sm-port-w) - 8px);
+}
+
+.sm-chassis.sm-cisco-3850 .sm-uplink-module,
+.sm-chassis.sm-cisco-3850.is-full .sm-uplink-module{
+    width:var(--sm-uplink);
+    height:calc(100% - 32px);
+    min-height:88px;
+    padding:clamp(22px,1.7vw,27px) clamp(8px,.9vw,14px) clamp(9px,.8vw,13px);
+}
+
+.sm-chassis.sm-cisco-3850.is-full .sm-uplink-module{
+    min-height:100px;
+}
+
+.sm-chassis.sm-cisco-3850 .sm-uplink-bank{
+    gap:clamp(5px,.45vw,8px);
+}
+
+.sm-chassis.sm-cisco-3850 .sm-uplink-port{
+    width:100%;
+    min-width:0;
+    height:clamp(26px,1.9vw,32px);
+    min-height:clamp(26px,1.9vw,32px);
+}
+
+.sm-chassis.sm-cisco-3850 .sm-uplink-port span{
+    font-size:clamp(6.4px,.52vw,7.5px);
+    max-width:calc(100% - 12px);
+}
+
+@media(max-width:1440px){
+    .page-heading-card{
+        grid-template-columns:1fr;
+        align-items:stretch;
+    }
+    .page-heading-actions,
+    .dashboard-actions{
+        justify-content:flex-start;
+    }
+    .dashboard-overview-grid{
+        grid-template-columns:repeat(2,minmax(0,1fr));
+    }
+}
+
+@media(max-width:1180px){
+    .sm-chassis.sm-cisco-3850,
+    .sm-chassis.sm-cisco-3850.is-dashboard{
+        max-width:1080px;
+    }
+    .sm-chassis.sm-cisco-3850.is-full{
+        min-width:980px;
+    }
+}
+
+@media(max-width:900px){
+    .sm-dashboard-scroll{
+        justify-content:flex-start;
+        overflow-x:auto;
+    }
+    .sm-chassis.sm-cisco-3850,
+    .sm-chassis.sm-cisco-3850.is-dashboard{
+        min-width:820px;
+        max-width:none;
+    }
+    .sm-chassis.sm-cisco-3850.is-full{
+        min-width:920px;
+        max-width:none;
+    }
+}
+
+@media(max-width:640px){
+    .page-heading-card,
+    .sm-switch-card{
+        border-radius:16px;
+    }
+    .sm-dashboard-scroll,
+    .sm-map-scroll:not(.sm-dashboard-scroll){
+        padding:10px;
+    }
+    .sm-chassis.sm-cisco-3850,
+    .sm-chassis.sm-cisco-3850.is-dashboard{
+        min-width:760px;
+    }
+    .sm-chassis.sm-cisco-3850.is-full{
+        min-width:860px;
+    }
+}
+/* SWITCHMAP_24_RESPONSIVE_3850_FIT_END */
+
+/* --------------------------------------------------------------------------
+   SwitchMap Phase 24.1 - Cisco 3850 coordinate visual
+   Scope: only the chassis visual marked with .sm-3850-v2.
+   -------------------------------------------------------------------------- */
+.sm-map-scroll:has(.sm-3850-v2),
+.sm-dashboard-scroll:has(.sm-3850-v2){
+    width:100% !important;
+    max-width:100% !important;
+    overflow-x:hidden !important;
+    overflow-y:visible !important;
+    padding:18px 14px !important;
+    box-sizing:border-box !important;
+}
+
+.sm-3850-v2,
+.sm-3850-v2.is-dashboard,
+.sm-3850-v2.is-full{
+    container-type:inline-size;
+    direction:ltr !important;
+    position:relative !important;
+    display:block !important;
+    width:min(100%,1180px) !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    min-height:118px !important;
+    height:auto !important;
+    aspect-ratio:1180 / 148;
+    margin:0 auto !important;
+    padding:0 !important;
+    overflow:hidden !important;
+    border:1px solid rgba(255,255,255,.16) !important;
+    border-radius:10px !important;
+    background:
+        linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,0) 18%),
+        linear-gradient(90deg,#080d12 0%,#18222c 10%,#202b36 44%,#151d26 72%,#080d12 100%) !important;
+    box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.24),
+        inset 0 -18px 38px rgba(0,0,0,.52),
+        0 18px 34px rgba(15,23,42,.22) !important;
+}
+
+.sm-3850-v2.is-full{
+    width:min(100%,1260px) !important;
+    min-height:138px !important;
+    aspect-ratio:1260 / 166;
+}
+
+.sm-3850-v2::before,
+.sm-3850-v2::after{
+    content:"" !important;
+    position:absolute !important;
+    top:48% !important;
+    width:10px !important;
+    height:10px !important;
+    border-radius:50% !important;
+    z-index:6 !important;
+    background:radial-gradient(circle at 35% 35%,#8a98a7 0%,#4b5664 48%,#1e2935 100%) !important;
+    box-shadow:inset 0 1px 2px rgba(255,255,255,.38),0 0 0 1px rgba(0,0,0,.45) !important;
+}
+
+.sm-3850-v2::before{left:1.15% !important;right:auto !important;}
+.sm-3850-v2::after{right:1.15% !important;left:auto !important;}
+
+.sm-3850-v2 .sm-chassis-module,
+.sm-3850-v2.is-full .sm-chassis-module{
+    position:absolute !important;
+    left:2.1% !important;
+    top:19% !important;
+    width:12.9% !important;
+    height:62% !important;
+    min-width:0 !important;
+    min-height:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:hidden !important;
+    border:1px solid rgba(255,255,255,.22) !important;
+    border-radius:7px !important;
+    background:
+        linear-gradient(180deg,rgba(255,255,255,.13),rgba(255,255,255,0) 34%),
+        linear-gradient(120deg,#303b46 0%,#121922 72%,#0b1017 100%) !important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.18),inset -18px 0 32px rgba(0,0,0,.24) !important;
+}
+
+.sm-3850-v2 .sm-chassis-module::before,
+.sm-3850-v2 .sm-chassis-module::after{
+    display:none !important;
+}
+
+.sm-3850-v2 .sm-cisco-brand,
+.sm-3850-v2.is-full .sm-cisco-brand{
+    position:absolute !important;
+    left:10% !important;
+    top:18% !important;
+    width:76% !important;
+    margin:0 !important;
+    padding:0 !important;
+    color:#ffffff !important;
+    font-family:Georgia,"Times New Roman",serif !important;
+    font-weight:800 !important;
+    font-size:clamp(18px,2.35cqw,30px) !important;
+    line-height:.86 !important;
+    letter-spacing:-.05em !important;
+    white-space:nowrap !important;
+    text-shadow:0 1px 2px rgba(0,0,0,.55) !important;
+}
+
+.sm-3850-v2 .sm-chassis-module strong,
+.sm-3850-v2.is-full .sm-chassis-module strong{
+    position:absolute !important;
+    left:11% !important;
+    top:44% !important;
+    margin:0 !important;
+    color:#f8fafc !important;
+    font-size:clamp(7px,.86cqw,12px) !important;
+    line-height:1 !important;
+    font-weight:800 !important;
+    white-space:nowrap !important;
+}
+
+.sm-3850-v2 .sm-chassis-module > span:not(.sm-mode-label),
+.sm-3850-v2.is-full .sm-chassis-module > span:not(.sm-mode-label){
+    position:absolute !important;
+    right:9% !important;
+    bottom:14% !important;
+    max-width:45% !important;
+    overflow:hidden !important;
+    color:#ffffff !important;
+    font-size:clamp(7px,.88cqw,12px) !important;
+    line-height:1 !important;
+    font-weight:800 !important;
+    text-align:right !important;
+    text-overflow:ellipsis !important;
+    white-space:nowrap !important;
+}
+
+.sm-3850-v2 .sm-mode-label,
+.sm-3850-v2.is-full .sm-mode-label{
+    display:none !important;
+}
+
+.sm-3850-v2 .status-leds,
+.sm-3850-v2.is-full .status-leds{
+    position:absolute !important;
+    left:10% !important;
+    bottom:12% !important;
+    width:38% !important;
+    height:25% !important;
+    display:grid !important;
+    grid-template-columns:min-content min-content min-content min-content !important;
+    grid-auto-rows:min-content !important;
+    align-items:center !important;
+    gap:5% 7% !important;
+    margin:0 !important;
+    padding:0 !important;
+    background:transparent !important;
+    border:0 !important;
+}
+
+.sm-3850-v2 .status-leds i,
+.sm-3850-v2.is-full .status-leds i{
+    display:block !important;
+    width:clamp(6px,.78cqw,10px) !important;
+    height:clamp(6px,.78cqw,10px) !important;
+    min-width:0 !important;
+    min-height:0 !important;
+    margin:0 !important;
+    border-radius:50% !important;
+    background:#22c55e !important;
+    box-shadow:0 0 8px rgba(34,197,94,.58),inset 0 1px 1px rgba(255,255,255,.45) !important;
+}
+
+.sm-3850-v2 .status-leds i.amber,
+.sm-3850-v2.is-full .status-leds i.amber{
+    background:#f5c542 !important;
+    box-shadow:0 0 8px rgba(245,197,66,.58),inset 0 1px 1px rgba(255,255,255,.45) !important;
+}
+
+.sm-3850-v2 .status-leds b,
+.sm-3850-v2.is-full .status-leds b{
+    display:block !important;
+    margin:0 !important;
+    color:#d9e2ed !important;
+    font-size:clamp(5px,.55cqw,7px) !important;
+    line-height:1 !important;
+    font-weight:700 !important;
+    letter-spacing:0 !important;
+    white-space:nowrap !important;
+}
+
+.sm-3850-v2 .sm-chassis-main,
+.sm-3850-v2.is-full .sm-chassis-main{
+    position:absolute !important;
+    left:16.7% !important;
+    top:21% !important;
+    width:69.8% !important;
+    height:58% !important;
+    min-width:0 !important;
+    min-height:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:hidden !important;
+    border:1px solid rgba(255,255,255,.07) !important;
+    border-radius:4px !important;
+    background:
+        linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,0) 32%),
+        linear-gradient(180deg,#29343f 0%,#141c25 100%) !important;
+    box-shadow:inset 0 1px 1px rgba(255,255,255,.09),inset 0 -10px 24px rgba(0,0,0,.35) !important;
+}
+
+.sm-3850-v2 .sm-chassis-topline,
+.sm-3850-v2 .sm-port-section-title,
+.sm-3850-v2.is-full .sm-chassis-topline,
+.sm-3850-v2.is-full .sm-port-section-title{
+    display:none !important;
+}
+
+.sm-3850-v2 .sm-port-bank,
+.sm-3850-v2.is-full .sm-port-bank{
+    position:absolute !important;
+    left:2.3% !important;
+    right:2.3% !important;
+    top:15% !important;
+    bottom:14% !important;
+    width:auto !important;
+    height:auto !important;
+    min-width:0 !important;
+    min-height:0 !important;
+    display:grid !important;
+    grid-template-rows:1fr 1fr !important;
+    gap:15% !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:visible !important;
+    background:transparent !important;
+    border:0 !important;
+    box-shadow:none !important;
+}
+
+.sm-3850-v2 .sm-port-row,
+.sm-3850-v2.is-full .sm-port-row{
+    direction:ltr !important;
+    display:grid !important;
+    grid-template-columns:repeat(24,minmax(0,1fr)) !important;
+    align-items:stretch !important;
+    gap:.75% !important;
+    width:100% !important;
+    height:100% !important;
+    min-width:0 !important;
+    min-height:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:visible !important;
+}
+
+.sm-3850-v2 .sm-port-row .sm-port:nth-child(6n+7),
+.sm-3850-v2.is-full .sm-port-row .sm-port:nth-child(6n+7){
+    margin-left:10% !important;
+}
+
+.sm-3850-v2 .sm-port,
+.sm-3850-v2.is-full .sm-port,
+.sm-3850-v2 .sm-uplink-port,
+.sm-3850-v2.is-full .sm-uplink-port{
+    --port-led:#8b95a1;
+    position:relative !important;
+    display:block !important;
+    width:100% !important;
+    min-width:0 !important;
+    max-width:none !important;
+    height:100% !important;
+    min-height:0 !important;
+    max-height:none !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:hidden !important;
+    border:1px solid rgba(17,24,39,.62) !important;
+    border-radius:3px !important;
+    background:
+        linear-gradient(180deg,rgba(255,255,255,.42),rgba(255,255,255,0) 27%),
+        linear-gradient(180deg,#cfd8e1 0%,#9ca8b4 54%,#697681 100%) !important;
+    box-shadow:
+        inset 0 1px 1px rgba(255,255,255,.52),
+        inset 0 -2px 3px rgba(0,0,0,.32),
+        0 1px 2px rgba(0,0,0,.28) !important;
+    color:#111827 !important;
+    cursor:pointer !important;
+    transform:none !important;
+}
+
+.sm-3850-v2 .sm-port::before,
+.sm-3850-v2.is-full .sm-port::before,
+.sm-3850-v2 .sm-uplink-port::before,
+.sm-3850-v2.is-full .sm-uplink-port::before{
+    content:"" !important;
+    position:absolute !important;
+    top:12% !important;
+    left:10% !important;
+    width:clamp(3px,.43cqw,6px) !important;
+    height:clamp(3px,.43cqw,6px) !important;
+    border-radius:50% !important;
+    background:var(--port-led) !important;
+    box-shadow:0 0 5px color-mix(in srgb,var(--port-led) 58%,transparent),inset 0 1px 0 rgba(255,255,255,.55) !important;
+    z-index:3 !important;
+}
+
+.sm-3850-v2 .sm-port::after,
+.sm-3850-v2.is-full .sm-port::after,
+.sm-3850-v2 .sm-uplink-port::after,
+.sm-3850-v2.is-full .sm-uplink-port::after{
+    content:"" !important;
+    position:absolute !important;
+    left:22% !important;
+    right:16% !important;
+    bottom:12% !important;
+    height:32% !important;
+    border-radius:2px !important;
+    background:linear-gradient(180deg,#111827,#020617) !important;
+    box-shadow:inset 0 1px 1px rgba(255,255,255,.13),0 -1px 0 rgba(255,255,255,.24) !important;
+    z-index:1 !important;
+}
+
+.sm-3850-v2 .sm-port span,
+.sm-3850-v2.is-full .sm-port span,
+.sm-3850-v2 .sm-uplink-port span,
+.sm-3850-v2.is-full .sm-uplink-port span{
+    position:absolute !important;
+    top:7% !important;
+    right:8% !important;
+    left:auto !important;
+    z-index:4 !important;
+    display:block !important;
+    width:auto !important;
+    min-width:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+    color:#1f2937 !important;
+    font-size:clamp(6px,.72cqw,9px) !important;
+    line-height:1 !important;
+    font-weight:800 !important;
+    text-align:right !important;
+    white-space:nowrap !important;
+    text-shadow:0 1px 0 rgba(255,255,255,.38) !important;
+}
+
+.sm-3850-v2 .sm-port small,
+.sm-3850-v2.is-full .sm-port small,
+.sm-3850-v2 .sm-uplink-port small,
+.sm-3850-v2.is-full .sm-uplink-port small{
+    display:none !important;
+}
+
+.sm-3850-v2 .sm-port.port-up,
+.sm-3850-v2 .sm-port.status-up,
+.sm-3850-v2.is-full .sm-port.port-up,
+.sm-3850-v2.is-full .sm-port.status-up{--port-led:#22c55e;}
+
+.sm-3850-v2 .sm-port.port-down,
+.sm-3850-v2 .sm-port.status-down,
+.sm-3850-v2.is-full .sm-port.port-down,
+.sm-3850-v2.is-full .sm-port.status-down{--port-led:#7b8794;}
+
+.sm-3850-v2 .sm-port.port-disabled,
+.sm-3850-v2 .sm-port.status-disabled,
+.sm-3850-v2.is-full .sm-port.port-disabled,
+.sm-3850-v2.is-full .sm-port.status-disabled{--port-led:#f59e0b;}
+
+.sm-3850-v2 .sm-port.port-error,
+.sm-3850-v2 .sm-port.status-error,
+.sm-3850-v2.is-full .sm-port.port-error,
+.sm-3850-v2.is-full .sm-port.status-error{--port-led:#ef4444;}
+
+.sm-3850-v2 .sm-port.port-trunk,
+.sm-3850-v2.is-full .sm-port.port-trunk{
+    outline:1px solid rgba(37,99,235,.75) !important;
+    outline-offset:0 !important;
+}
+
+.sm-3850-v2 .sm-port.port-uplink,
+.sm-3850-v2 .sm-uplink-port,
+.sm-3850-v2.is-full .sm-port.port-uplink,
+.sm-3850-v2.is-full .sm-uplink-port{
+    outline:1px solid rgba(124,58,237,.65) !important;
+    outline-offset:0 !important;
+}
+
+.sm-3850-v2 .sm-port:hover,
+.sm-3850-v2.is-full .sm-port:hover{
+    z-index:20 !important;
+    filter:brightness(1.1) !important;
+    transform:translateY(-1px) !important;
+}
+
+.sm-3850-v2 .sm-port.selected-port,
+.sm-3850-v2.is-full .sm-port.selected-port{
+    outline:2px solid #0ea5e9 !important;
+    outline-offset:1px !important;
+    z-index:25 !important;
+}
+
+.sm-3850-v2 .sm-uplink-module,
+.sm-3850-v2.is-full .sm-uplink-module{
+    position:absolute !important;
+    right:2.5% !important;
+    top:17% !important;
+    width:10.8% !important;
+    height:66% !important;
+    min-width:0 !important;
+    min-height:0 !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:hidden !important;
+    border:1px solid rgba(109,40,217,.75) !important;
+    border-radius:6px !important;
+    background:
+        linear-gradient(180deg,rgba(255,255,255,.18),rgba(255,255,255,0) 24%),
+        linear-gradient(135deg,#dde7f1 0%,#aab8c7 49%,#6b7b8d 100%) !important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 0 0 1px rgba(109,40,217,.25) !important;
+}
+
+.sm-3850-v2 .sm-uplink-module::before,
+.sm-3850-v2.is-full .sm-uplink-module::before{
+    display:none !important;
+}
+
+.sm-3850-v2 .sm-uplink-head,
+.sm-3850-v2.is-full .sm-uplink-head{
+    position:absolute !important;
+    top:5% !important;
+    left:7% !important;
+    right:7% !important;
+    display:block !important;
+    margin:0 !important;
+    padding:0 !important;
+    color:#1f2937 !important;
+    text-align:left !important;
+    line-height:1 !important;
+    background:transparent !important;
+    border:0 !important;
+}
+
+.sm-3850-v2 .sm-uplink-head span,
+.sm-3850-v2.is-full .sm-uplink-head span{
+    display:none !important;
+}
+
+.sm-3850-v2 .sm-uplink-head::before,
+.sm-3850-v2.is-full .sm-uplink-head::before{
+    content:"C3850-NM" !important;
+    display:block !important;
+    font-size:clamp(6px,.68cqw,9px) !important;
+    font-weight:900 !important;
+    color:#1f2937 !important;
+    white-space:nowrap !important;
+}
+
+.sm-3850-v2 .sm-uplink-bank,
+.sm-3850-v2.is-full .sm-uplink-bank{
+    direction:ltr !important;
+    position:absolute !important;
+    left:8% !important;
+    right:8% !important;
+    top:23% !important;
+    bottom:9% !important;
+    width:auto !important;
+    height:auto !important;
+    display:grid !important;
+    grid-template-columns:1fr 1fr !important;
+    grid-template-rows:1fr 1fr !important;
+    gap:8% 7% !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:visible !important;
+    background:transparent !important;
+    border:0 !important;
+    box-shadow:none !important;
+}
+
+.sm-3850-v2 .sm-uplink-port span,
+.sm-3850-v2.is-full .sm-uplink-port span{
+    top:8% !important;
+    right:8% !important;
+    max-width:82% !important;
+    overflow:hidden !important;
+    font-size:clamp(5px,.58cqw,8px) !important;
+    text-overflow:ellipsis !important;
+}
+
+.sm-3850-v2 .module-empty,
+.sm-3850-v2.is-full .module-empty{
+    grid-column:1 / -1 !important;
+    align-self:center !important;
+    justify-self:center !important;
+    color:#334155 !important;
+    font-size:clamp(7px,.72cqw,10px) !important;
+    font-weight:700 !important;
+}
+
+@media (max-width:900px){
+    .sm-map-scroll:has(.sm-3850-v2),
+    .sm-dashboard-scroll:has(.sm-3850-v2){
+        padding:14px 8px !important;
+    }
+    .sm-3850-v2,
+    .sm-3850-v2.is-dashboard,
+    .sm-3850-v2.is-full{
+        min-height:108px !important;
+    }
+    .sm-3850-v2 .status-leds b,
+    .sm-3850-v2.is-full .status-leds b{
+        display:none !important;
+    }
+    .sm-3850-v2 .status-leds,
+    .sm-3850-v2.is-full .status-leds{
+        grid-template-columns:repeat(4,min-content) !important;
+        gap:8% !important;
+    }
+}
+
+@media (max-width:640px){
+    .sm-3850-v2,
+    .sm-3850-v2.is-dashboard,
+    .sm-3850-v2.is-full{
+        min-height:96px !important;
+    }
+    .sm-3850-v2 .sm-cisco-brand,
+    .sm-3850-v2.is-full .sm-cisco-brand{
+        font-size:clamp(13px,2.7cqw,18px) !important;
+    }
+    .sm-3850-v2 .sm-chassis-module strong,
+    .sm-3850-v2 .sm-chassis-module > span:not(.sm-mode-label),
+    .sm-3850-v2.is-full .sm-chassis-module strong,
+    .sm-3850-v2.is-full .sm-chassis-module > span:not(.sm-mode-label){
+        display:none !important;
+    }
+    .sm-3850-v2 .sm-port span,
+    .sm-3850-v2.is-full .sm-port span{
+        font-size:clamp(5px,1.15cqw,7px) !important;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   SwitchMap Phase 24.2 - Cisco 3850 SVG chassis
+   Scope: only SVG switch visual. No SSH/Refresh/Reports/Topology change.
+   -------------------------------------------------------------------------- */
+.sm-3850-svg-scroll{
+    width:100% !important;
+    max-width:100% !important;
+    overflow-x:hidden !important;
+    overflow-y:visible !important;
+    padding:18px 12px !important;
+    box-sizing:border-box !important;
+    display:block !important;
+}
+
+.sm-3850-svg-shell{
+    direction:ltr !important;
+    width:100% !important;
+    max-width:1180px !important;
+    margin:0 auto !important;
+    min-width:0 !important;
+}
+
+.sm-3850-svg-shell.is-full{
+    max-width:1240px !important;
+}
+
+.sm-3850-svg{
+    display:block !important;
+    width:100% !important;
+    max-width:100% !important;
+    height:auto !important;
+    min-height:122px !important;
+    overflow:visible !important;
+    font-family:Inter,Arial,sans-serif !important;
+}
+
+.sm-3850-svg .svg-body-line{
+    stroke:rgba(255,255,255,.22);
+    stroke-width:1;
+}
+
+.sm-3850-svg .svg-screw{
+    fill:#485565;
+    stroke:#111827;
+    stroke-width:1;
+}
+
+.sm-3850-svg .svg-left-module rect{
+    fill:#1b2430;
+    stroke:rgba(255,255,255,.26);
+    stroke-width:1;
+}
+
+.sm-3850-svg .brand{
+    fill:#ffffff;
+    font-family:Georgia,"Times New Roman",serif;
+    font-weight:900;
+    font-size:30px;
+    letter-spacing:-1.4px;
+}
+
+.sm-3850-svg .model{
+    fill:#eef5ff;
+    font-weight:800;
+    font-size:10px;
+}
+
+.sm-3850-svg .badge{
+    fill:#ffffff;
+    font-weight:900;
+    font-size:12px;
+}
+
+.sm-3850-svg .sys-led.green{fill:#22c55e;filter:drop-shadow(0 0 3px rgba(34,197,94,.8));}
+.sm-3850-svg .sys-led.amber{fill:#facc15;filter:drop-shadow(0 0 3px rgba(250,204,21,.75));}
+.sm-3850-svg .led-text{
+    fill:#dbeafe;
+    font-weight:800;
+    font-size:5.5px;
+}
+
+.sm-3850-svg .svg-main-panel rect:first-child{
+    fill:url(#sm3850Panel);
+    stroke:rgba(255,255,255,.08);
+    stroke-width:1;
+}
+
+.sm-3850-svg .svg-panel-shine{
+    fill:rgba(255,255,255,.06);
+}
+
+.sm-svg-port{
+    cursor:pointer;
+    pointer-events:auto;
+    outline:none;
+}
+
+.sm-svg-port .port-frame{
+    fill:url(#sm3850Port);
+    stroke:#1f2937;
+    stroke-width:1;
+    filter:drop-shadow(0 1px 1px rgba(0,0,0,.45));
+}
+
+.sm-svg-port .port-jack{
+    fill:url(#sm3850Jack);
+}
+
+.sm-svg-port .port-led{
+    fill:#8b95a1;
+    stroke:rgba(255,255,255,.55);
+    stroke-width:.5;
+}
+
+.sm-svg-port.port-up .port-led,
+.sm-svg-port.status-up .port-led{
+    fill:#22c55e;
+    filter:drop-shadow(0 0 3px rgba(34,197,94,.8));
+}
+
+.sm-svg-port.port-down .port-led,
+.sm-svg-port.status-down .port-led{
+    fill:#94a3b8;
+}
+
+.sm-svg-port.port-disabled .port-led,
+.sm-svg-port.status-disabled .port-led{
+    fill:#f59e0b;
+    filter:drop-shadow(0 0 3px rgba(245,158,11,.75));
+}
+
+.sm-svg-port.port-error .port-led,
+.sm-svg-port.status-error .port-led{
+    fill:#ef4444;
+    filter:drop-shadow(0 0 3px rgba(239,68,68,.85));
+}
+
+.sm-svg-port.port-trunk .port-frame{
+    stroke:#2563eb;
+    stroke-width:1.8;
+}
+
+.sm-svg-port.port-uplink .port-frame,
+.sm-svg-port.sm-svg-uplink .port-frame{
+    stroke:#7c3aed;
+    stroke-width:1.8;
+}
+
+.sm-svg-port.selected-port .port-frame,
+.sm-svg-port:focus .port-frame{
+    stroke:#0ea5e9;
+    stroke-width:2.4;
+}
+
+.sm-svg-port:hover .port-frame{
+    filter:brightness(1.08) drop-shadow(0 2px 3px rgba(0,0,0,.5));
+}
+
+.sm-3850-svg .port-number{
+    fill:#172033;
+    font-size:8.2px;
+    font-weight:900;
+    paint-order:stroke;
+    stroke:rgba(255,255,255,.32);
+    stroke-width:.8px;
+    pointer-events:none;
+    dominant-baseline:middle;
+}
+
+.sm-3850-svg .te-label{
+    font-size:5.8px;
+}
+
+.sm-3850-svg .svg-uplink-module > rect{
+    fill:url(#sm3850Nm);
+    stroke:#7c3aed;
+    stroke-width:1.4;
+    filter:drop-shadow(0 1px 2px rgba(0,0,0,.35));
+}
+
+.sm-3850-svg .nm-title{
+    fill:#1f2937;
+    font-weight:900;
+    font-size:7.5px;
+}
+
+.sm-3850-svg .nm-empty{
+    fill:#334155;
+    font-size:9px;
+    font-weight:800;
+}
+
+@media(max-width:900px){
+    .sm-3850-svg-scroll{
+        padding:14px 6px !important;
+    }
+    .sm-3850-svg{
+        min-height:105px !important;
+    }
+    .sm-3850-svg .brand{
+        font-size:26px;
+    }
+    .sm-3850-svg .led-text{
+        display:none;
+    }
+}
+
+@media(max-width:640px){
+    .sm-3850-svg-scroll{
+        padding:10px 2px !important;
+    }
+    .sm-3850-svg{
+        min-height:92px !important;
+    }
+    .sm-3850-svg .brand{
+        font-size:20px;
+    }
+    .sm-3850-svg .model,
+    .sm-3850-svg .badge{
+        display:none;
+    }
+    .sm-3850-svg .port-number{
+        font-size:6px;
+    }
+}
+
+@media(max-width:1500px){
+    .sm-fullmap-layout{
+        grid-template-columns:1fr !important;
+    }
+    .detail-side-panel{
+        position:static !important;
+    }
+}
+
+/* Phase 25 - Port popup/detail cleanup */
+.port-modal-grid{
+    display:grid;
+    grid-template-columns:minmax(0,1.15fr) minmax(340px,.85fr);
+    gap:18px;
+    align-items:start;
+}
+
+.port-modal-info,
+.port-action-panel{
+    min-width:0;
+}
+
+.port-modal-section-title{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin:0 0 12px;
+    color:#0f172a;
+    font-weight:950;
+}
+
+.port-modal-section-title span{
+    font-size:15px;
+}
+
+.port-modal-section-title strong{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:74px;
+    padding:6px 10px;
+    border-radius:999px;
+    background:#eaf3ff;
+    color:#1d4ed8;
+    font-size:13px;
+}
+
+.port-modal-section-title small{
+    color:#64748b;
+    font-size:12px;
+    font-weight:800;
+}
+
+.compact-title{
+    margin-top:16px;
+    padding-top:14px;
+    border-top:1px solid #e2e8f0;
+}
+
+.port-main-grid .key-item{
+    padding:10px;
+    min-width:0;
+}
+
+.port-main-grid .key-item strong{
+    display:block;
+    font-size:15px;
+    line-height:1.45;
+    overflow-wrap:anywhere;
+}
+
+.port-main-grid .key-item span{
+    font-size:11px;
+}
+
+.port-refresh-box{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:8px;
+    margin-top:14px;
+    padding:10px;
+    border:1px solid #dbeafe;
+    border-radius:14px;
+    background:#eff6ff;
+}
+
+.port-refresh-box div{
+    min-width:0;
+}
+
+.port-refresh-box span{
+    display:block;
+    color:#475569;
+    font-size:11px;
+    font-weight:900;
+    margin-bottom:4px;
+}
+
+.port-refresh-box strong{
+    display:block;
+    color:#0f172a;
+    font-size:12px;
+    font-weight:950;
+    overflow-wrap:anywhere;
+}
+
+.compact-result{
+    min-height:20px;
+    padding:8px 10px;
+    border-radius:10px;
+    background:#f8fafc;
+    border:1px solid transparent;
+}
+
+.compact-result.ok{
+    background:#ecfdf5;
+    border-color:#bbf7d0;
+}
+
+.compact-result.fail{
+    background:#fef2f2;
+    border-color:#fecaca;
+}
+
+.detail-refresh-box{
+    grid-template-columns:1fr;
+}
+
+@media(max-width:980px){
+    .port-modal-grid{
+        grid-template-columns:1fr;
+    }
+
+    .port-refresh-box{
+        grid-template-columns:1fr;
+    }
+}
+
+/* Phase 25.1 - fit dashboard popup and full map inside common desktop viewports */
+html,
+body{
+    overflow-x:hidden !important;
+}
+
+@media(min-width:981px){
+    .modal-backdrop{
+        padding:10px !important;
+        overflow:hidden !important;
+        align-items:center !important;
+    }
+
+    .modal-card.modal-large{
+        width:min(1120px,calc(100vw - 20px)) !important;
+        max-height:calc(100dvh - 20px) !important;
+        overflow:hidden !important;
+        display:flex !important;
+        flex-direction:column !important;
+    }
+
+    .modal-header{
+        flex:0 0 auto !important;
+        min-height:56px !important;
+        padding:10px 16px !important;
+    }
+
+    .modal-header h3{
+        font-size:20px !important;
+        line-height:1.2 !important;
+    }
+
+    .modal-subtitle{
+        margin-top:2px !important;
+        font-size:12px !important;
+        line-height:1.35 !important;
+    }
+
+    .icon-button{
+        width:36px !important;
+        height:36px !important;
+        font-size:24px !important;
+    }
+
+    .modal-body.port-modal-grid{
+        flex:1 1 auto !important;
+        min-height:0 !important;
+        overflow:hidden !important;
+        padding:12px 14px !important;
+        gap:12px !important;
+        grid-template-columns:minmax(0,1fr) minmax(300px,390px) !important;
+        align-items:stretch !important;
+    }
+
+    .modal-body.port-modal-grid > .surface-soft{
+        min-height:0 !important;
+        overflow:hidden !important;
+        padding:12px !important;
+        border-radius:16px !important;
+    }
+
+    .modal-body.port-modal-grid .port-modal-info{
+        display:flex !important;
+        flex-direction:column !important;
+    }
+
+    .port-modal-section-title{
+        margin:0 0 7px !important;
+        gap:8px !important;
+    }
+
+    .port-modal-section-title span{
+        font-size:14px !important;
+    }
+
+    .port-modal-section-title strong{
+        min-width:60px !important;
+        padding:4px 9px !important;
+        font-size:12px !important;
+    }
+
+    .port-modal-section-title small{
+        font-size:11px !important;
+        line-height:1.4 !important;
+    }
+
+    .compact-title{
+        margin-top:9px !important;
+        padding-top:8px !important;
+    }
+
+    .key-grid{
+        gap:7px !important;
+    }
+
+    .port-main-grid .key-item{
+        min-height:48px !important;
+        padding:7px 9px !important;
+        border-radius:12px !important;
+    }
+
+    .port-main-grid .key-item span{
+        font-size:10px !important;
+        margin-bottom:2px !important;
+    }
+
+    .port-main-grid .key-item strong{
+        font-size:13px !important;
+        line-height:1.25 !important;
+    }
+
+    .port-refresh-box{
+        margin-top:8px !important;
+        padding:7px !important;
+        gap:6px !important;
+        border-radius:12px !important;
+    }
+
+    .port-refresh-box span{
+        font-size:10px !important;
+        margin-bottom:2px !important;
+    }
+
+    .port-refresh-box strong{
+        font-size:10.5px !important;
+        line-height:1.25 !important;
+    }
+
+    .modal-links-row{
+        margin-top:8px !important;
+        gap:8px !important;
+    }
+
+    .modal-links-row .btn{
+        min-height:34px !important;
+        padding:0 10px !important;
+        font-size:12px !important;
+    }
+
+    .port-action-panel .stack-form{
+        gap:7px !important;
+    }
+
+    .port-action-panel .field-row{
+        gap:3px !important;
+    }
+
+    .port-action-panel .field-row label{
+        font-size:12px !important;
+    }
+
+    .port-action-panel .input,
+    .port-action-panel input[type=text],
+    .port-action-panel input[type=password],
+    .port-action-panel input[type=number],
+    .port-action-panel select,
+    .port-action-panel textarea{
+        min-height:34px !important;
+        padding:6px 10px !important;
+        border-radius:10px !important;
+        font-size:12px !important;
+    }
+
+    .port-action-panel .field-help{
+        font-size:10.5px !important;
+        line-height:1.3 !important;
+    }
+
+    .port-action-panel .check-row{
+        min-height:24px !important;
+        margin:0 !important;
+        font-size:12px !important;
+        line-height:1.35 !important;
+    }
+
+    .port-action-panel .command-preview-box{
+        padding:8px 10px !important;
+        border-radius:10px !important;
+    }
+
+    .port-action-panel .command-preview-title{
+        margin-bottom:4px !important;
+        font-size:11px !important;
+    }
+
+    .port-action-panel .command-preview-box pre{
+        max-height:74px !important;
+        overflow:hidden !important;
+        margin:0 !important;
+        font-size:10.5px !important;
+        line-height:1.45 !important;
+    }
+
+    .port-action-panel .btn-block{
+        min-height:36px !important;
+        font-size:13px !important;
+    }
+
+    .compact-result{
+        min-height:24px !important;
+        padding:5px 8px !important;
+        font-size:12px !important;
+    }
+}
+
+@media(min-width:1200px){
+    .summary-bar-grid.compact-summary{
+        grid-template-columns:repeat(6,minmax(0,1fr)) !important;
+        gap:10px !important;
+        margin-bottom:10px !important;
+    }
+
+    .compact-summary .summary-tile{
+        min-height:76px !important;
+        padding:12px !important;
+    }
+
+    .compact-summary .summary-tile strong{
+        font-size:26px !important;
+    }
+
+    .control-toolbar-card{
+        padding:14px 16px !important;
+        margin-bottom:14px !important;
+    }
+
+    .sm-fullmap-layout{
+        grid-template-columns:minmax(0,1fr) minmax(360px,400px) !important;
+        gap:14px !important;
+        align-items:start !important;
+    }
+
+    .sm-map-card{
+        padding:14px !important;
+    }
+
+    .sm-map-card-head{
+        padding-bottom:10px !important;
+        margin-bottom:10px !important;
+    }
+
+    .sm-map-card .sm-3850-svg-scroll{
+        padding:14px 12px !important;
+    }
+
+    .detail-side-panel{
+        position:sticky !important;
+        top:78px !important;
+        padding:12px !important;
+        max-height:calc(100dvh - 94px) !important;
+        overflow:hidden !important;
+    }
+
+    .detail-side-panel .panel-section + .panel-section{
+        margin-top:8px !important;
+    }
+
+    .detail-side-panel h3[data-detail-title]{
+        margin:0 0 8px !important;
+        font-size:22px !important;
+        line-height:1.25 !important;
+    }
+
+    .detail-side-panel .port-main-grid .key-item{
+        min-height:46px !important;
+    }
+
+    .detail-side-panel .detail-refresh-box{
+        margin-top:8px !important;
+        grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    }
+
+    .detail-side-panel .modal-links-row{
+        margin-top:8px !important;
+    }
+
+    .detail-ssh-collapsible{
+        padding:0 !important;
+        overflow:hidden !important;
+    }
+
+    .detail-ssh-collapsible summary{
+        min-height:42px !important;
+        padding:0 12px !important;
+        display:flex !important;
+        align-items:center !important;
+        justify-content:space-between !important;
+        gap:8px !important;
+        cursor:pointer !important;
+        list-style:none !important;
+        font-weight:950 !important;
+        color:#0f172a !important;
+    }
+
+    .detail-ssh-collapsible summary::-webkit-details-marker{
+        display:none !important;
+    }
+
+    .detail-ssh-collapsible summary:before{
+        content:"+";
+        width:26px;
+        height:26px;
+        display:grid;
+        place-items:center;
+        border-radius:10px;
+        background:#e0edff;
+        color:#2563eb;
+        order:3;
+    }
+
+    .detail-ssh-collapsible[open] summary:before{
+        content:"−";
+    }
+
+    .detail-ssh-collapsible summary small{
+        color:#64748b;
+        font-size:11px;
+        font-weight:800;
+    }
+
+    .detail-ssh-body{
+        padding:0 10px 10px !important;
+    }
+
+    .detail-ssh-collapsible .stack-form{
+        display:grid !important;
+        grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+        gap:6px !important;
+    }
+
+    .detail-ssh-collapsible .command-preview-box,
+    .detail-ssh-collapsible .btn-block{
+        grid-column:1/-1 !important;
+    }
+
+    .detail-ssh-collapsible .command-preview-box pre{
+        max-height:58px !important;
+    }
+
+    .detail-ssh-collapsible .compact-result{
+        margin-top:6px !important;
+    }
+
+    .detail-side-panel .sm-log-details{
+        display:none !important;
+    }
+}
+
+@media(max-width:1199px){
+    .detail-ssh-collapsible{
+        padding:12px !important;
+    }
+
+    .detail-ssh-collapsible summary{
+        cursor:pointer !important;
+        font-weight:950 !important;
+        list-style:none !important;
+    }
+
+    .detail-ssh-collapsible summary::-webkit-details-marker{
+        display:none !important;
+    }
+
+    .detail-ssh-body{
+        margin-top:10px !important;
+    }
+}
+
+/* --------------------------------------------------------------------------
+   SwitchMap Phase 25.2 - Full map page row layout
+   Scope: switch_detail full map layout only. Dashboard popup and SVG internals unchanged.
+   -------------------------------------------------------------------------- */
+.sm-fullmap-layout{
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) !important;
+    gap:16px !important;
+    align-items:start !important;
+    width:100% !important;
+    max-width:100% !important;
+}
+
+.sm-fullmap-layout .sm-map-card{
+    order:1 !important;
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    padding:18px !important;
+}
+
+.sm-fullmap-layout .detail-side-panel{
+    order:2 !important;
+    width:100% !important;
+    max-width:100% !important;
+    min-width:0 !important;
+    position:static !important;
+    top:auto !important;
+    max-height:none !important;
+    overflow:visible !important;
+    padding:16px !important;
+}
+
+.sm-fullmap-layout .sm-map-card-head{
+    display:grid !important;
+    grid-template-columns:minmax(0,1fr) auto !important;
+    gap:12px !important;
+    align-items:center !important;
+    padding-bottom:12px !important;
+    margin-bottom:12px !important;
+}
+
+.sm-fullmap-layout .sm-map-card .sm-3850-svg-scroll{
+    width:100% !important;
+    max-width:100% !important;
+    padding:18px 24px !important;
+    overflow:hidden !important;
+}
+
+.sm-fullmap-layout .sm-map-card .sm-3850-svg-shell.is-full{
+    width:100% !important;
+    max-width:none !important;
+    margin:0 auto !important;
+}
+
+.sm-fullmap-layout .sm-map-card .sm-3850-svg-shell.is-full .sm-3850-svg{
+    width:100% !important;
+    min-height:150px !important;
+}
+
+.sm-fullmap-layout .detail-side-panel .port-modal-info{
+    display:block !important;
+}
+
+@media(min-width:1200px){
+    .sm-fullmap-layout{
+        grid-template-columns:minmax(0,1fr) !important;
+        gap:16px !important;
+    }
+
+    .sm-fullmap-layout .sm-map-card{
+        padding:18px !important;
+    }
+
+    .sm-fullmap-layout .detail-side-panel{
+        position:static !important;
+        max-height:none !important;
+        overflow:visible !important;
+        padding:16px !important;
+    }
+
+    .sm-fullmap-layout .detail-side-panel .port-main-grid{
+        grid-template-columns:repeat(4,minmax(0,1fr)) !important;
+    }
+
+    .sm-fullmap-layout .detail-side-panel .key-item-wide{
+        grid-column:span 2 !important;
+    }
+
+    .sm-fullmap-layout .detail-side-panel .detail-refresh-box{
+        grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    }
+}
+
+@media(max-width:900px){
+    .sm-fullmap-layout .sm-map-card{
+        padding:12px !important;
+    }
+
+    .sm-fullmap-layout .sm-map-card-head{
+        grid-template-columns:1fr !important;
+    }
+
+    .sm-fullmap-layout .sm-map-card .sm-3850-svg-scroll{
+        padding:12px 8px !important;
+    }
+
+    .sm-fullmap-layout .sm-map-card .sm-3850-svg-shell.is-full .sm-3850-svg{
+        min-height:112px !important;
+    }
+
+    .sm-fullmap-layout .detail-side-panel{
+        padding:12px !important;
+    }
+}
+/* SWITCHMAP_PHASE_25_2_FULLMAP_ROWS_END */
+
+/* --------------------------------------------------------------------------
+   SwitchMap Phase 26 - Audit log filters and CSV view
+   Scope: action_logs page only. Dashboard, popup, SVG and full map unchanged.
+   -------------------------------------------------------------------------- */
+.audit-filter-card{
+    margin-bottom:14px;
+}
+
+.audit-filter-form{
+    display:grid;
+    grid-template-columns:minmax(260px,1.7fr) repeat(5,minmax(130px,1fr)) auto auto;
+    gap:10px;
+    align-items:center;
+}
+
+.audit-filter-form .input{
+    min-width:0;
+}
+
+.audit-summary-grid{
+    margin-bottom:14px;
+}
+
+.audit-table-panel .table-wrap{
+    max-height:calc(100dvh - 350px);
+    overflow:auto;
+}
+
+.audit-table{
+    min-width:1420px;
+}
+
+.audit-table th,
+.audit-table td{
+    padding:10px 9px;
+}
+
+.audit-time{
+    white-space:nowrap;
+}
+
+.audit-message{
+    min-width:220px;
+    max-width:360px;
+    word-break:break-word;
+}
+
+.audit-command-pre{
+    max-height:88px;
+    overflow:auto;
+    min-width:260px;
+}
+
+.muted-mini{
+    margin-top:4px;
+    color:#64748b;
+    font-size:11px;
+    font-weight:700;
+}
+
+@media(max-width:1400px){
+    .audit-filter-form{
+        grid-template-columns:repeat(4,minmax(0,1fr));
+    }
+
+    .audit-search{
+        grid-column:span 2;
+    }
+}
+
+@media(max-width:900px){
+    .audit-filter-form{
+        grid-template-columns:1fr;
+    }
+
+    .audit-search{
+        grid-column:auto;
+    }
+
+    .audit-table-panel .table-wrap{
+        max-height:none;
+    }
+}
+/* SWITCHMAP_PHASE_26_AUDIT_END */
+
+/* Feature-specific CSS is loaded from inventory/css/*.css in base.html. */
+
+/* Phase 40 - MikroTik device cards */
+.mikrotik-device-card{
+    margin:14px 0 8px;
+    padding:16px;
+    border:1px solid #bae6fd;
+    border-radius:20px;
+    background:linear-gradient(135deg,#f8fafc 0%,#ecfeff 52%,#eff6ff 100%);
+    box-shadow:0 14px 30px rgba(15,23,42,.08);
+}
+.mikrotik-device-card.is-full{min-height:340px;display:grid;align-content:start;gap:18px;}
+.mikrotik-device-top{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;}
+.mikrotik-device-icon{width:46px;height:46px;border-radius:16px;display:grid;place-items:center;background:#0f172a;color:#fff;font-size:14px;font-weight:1000;letter-spacing:.08em;}
+.mikrotik-device-top strong{display:block;font-size:18px;font-weight:1000;color:#0f172a;}
+.mikrotik-device-top span{display:block;margin-top:2px;font-size:12px;color:#475569;}
+.mikrotik-device-top em{font-style:normal;border:1px solid #bae6fd;background:#f0f9ff;color:#0369a1;border-radius:999px;padding:5px 10px;font-size:11px;font-weight:1000;white-space:nowrap;}
+.mikrotik-device-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-top:14px;}
+.mikrotik-device-grid div{padding:10px;border:1px solid #dbeafe;border-radius:14px;background:rgba(255,255,255,.82);}
+.mikrotik-device-grid span{display:block;font-size:11px;color:#64748b;margin-bottom:4px;}
+.mikrotik-device-grid strong{font-size:13px;color:#0f172a;font-weight:950;}
+.mikrotik-review-chip{display:inline-flex;margin-top:12px;padding:5px 10px;border-radius:999px;border:1px solid #fed7aa;background:#fff7ed;color:#c2410c;font-size:11px;font-weight:1000;}
+
+/* Phase 41 - Dynamic device visual layouts */
+.dynamic-device-panel{direction:ltr;width:100%;overflow-x:auto;padding:10px 2px 4px;box-sizing:border-box;}
+.dynamic-device-panel.is-dashboard{min-height:132px;}
+.dynamic-device-panel.is-full{min-height:230px;}
+.dynamic-device-face{min-width:680px;background:linear-gradient(180deg,#111827 0%,#020617 100%);border:1px solid rgba(148,163,184,.32);border-radius:18px;padding:14px;box-shadow:0 18px 45px rgba(15,23,42,.18),inset 0 1px 0 rgba(255,255,255,.08);box-sizing:border-box;}
+.dynamic-device-panel.is-full .dynamic-device-face{min-width:960px;padding:18px;}
+.dynamic-device-brand{display:flex;align-items:center;gap:10px;color:#e5e7eb;margin-bottom:12px;}
+.dynamic-device-brand strong{font-size:15px;font-weight:900;letter-spacing:.2px;}
+.dynamic-device-brand small{color:#93c5fd;font-size:12px;}
+.dynamic-device-brand em{margin-left:auto;font-style:normal;color:#94a3b8;font-size:12px;}
+.brand-chip{display:inline-flex;align-items:center;justify-content:center;padding:5px 9px;border-radius:999px;background:rgba(59,130,246,.16);color:#bfdbfe;border:1px solid rgba(96,165,250,.28);font-size:11px;font-weight:800;}
+.dynamic-device-body{display:grid;grid-template-columns:120px minmax(0,1fr) 86px;gap:12px;align-items:stretch;}
+.dynamic-device-panel.is-dashboard .dynamic-device-body{grid-template-columns:96px minmax(0,1fr) 70px;gap:8px;}
+.dynamic-device-left,.dynamic-device-right{border:1px solid rgba(148,163,184,.22);background:rgba(15,23,42,.72);border-radius:13px;color:#cbd5e1;padding:10px;display:flex;flex-direction:column;justify-content:center;gap:7px;min-height:72px;box-sizing:border-box;}
+.dynamic-device-panel.is-dashboard .dynamic-device-left,.dynamic-device-panel.is-dashboard .dynamic-device-right{min-height:58px;padding:7px;border-radius:10px;}
+.dynamic-device-left span{font-size:12px;font-weight:800;color:#f8fafc;}
+.dynamic-device-left small{font-size:10px;color:#94a3b8;}
+.dynamic-device-right span,.dynamic-device-right b{display:block;text-align:center;border-radius:999px;padding:4px 6px;background:rgba(30,41,59,.86);font-size:10px;color:#dbeafe;border:1px solid rgba(148,163,184,.2);}
+.device-leds{display:flex;gap:5px;}
+.device-leds i{width:8px;height:8px;border-radius:50%;background:#22c55e;box-shadow:0 0 10px rgba(34,197,94,.7);}
+.device-leds i:nth-child(2){background:#38bdf8;box-shadow:0 0 10px rgba(56,189,248,.65);}
+.device-leds i:nth-child(3){background:#f59e0b;box-shadow:0 0 10px rgba(245,158,11,.55);}
+.dynamic-device-ports{background:linear-gradient(180deg,rgba(15,23,42,.96),rgba(2,6,23,.96));border:1px solid rgba(148,163,184,.25);border-radius:14px;padding:11px;display:flex;flex-direction:column;gap:8px;align-items:center;justify-content:center;min-width:0;box-sizing:border-box;}
+.dynamic-device-panel.is-dashboard .dynamic-device-ports{padding:8px;gap:6px;border-radius:10px;}
+.dynamic-port-row,.dynamic-uplink-row{display:flex;flex-wrap:nowrap;gap:5px;justify-content:center;align-items:center;max-width:100%;}
+.dynamic-uplink-row{margin-top:2px;padding-top:8px;border-top:1px solid rgba(148,163,184,.22);}
+.dynamic-port{appearance:none;border:1px solid #64748b;background:linear-gradient(180deg,#e2e8f0 0%,#94a3b8 100%);border-radius:5px;min-width:28px;height:28px;padding:2px 3px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;color:#0f172a;font-family:Arial,Helvetica,sans-serif;box-shadow:inset 0 0 0 1px rgba(255,255,255,.36);line-height:1;}
+.dynamic-device-panel.is-full .dynamic-port{min-width:36px;height:34px;border-radius:6px;}
+.dynamic-port:hover{outline:2px solid #38bdf8;outline-offset:1px;}
+.dynamic-port-label{font-size:9px;font-weight:900;white-space:nowrap;letter-spacing:-.35px;}
+.dynamic-port-subtitle{font-size:8px;font-weight:800;opacity:.75;}
+.dynamic-device-panel.is-dashboard .dynamic-port-label{font-size:7px;}
+.dynamic-device-panel.is-dashboard .dynamic-port-subtitle{display:none;}
+.dynamic-port.is-fiber{min-width:42px;height:34px;border-radius:7px;background:linear-gradient(180deg,#dbeafe 0%,#60a5fa 100%);border-color:#2563eb;}
+.dynamic-device-panel.is-full .dynamic-port.is-fiber{min-width:58px;height:42px;}
+.dynamic-port.port-up{background:linear-gradient(180deg,#86efac 0%,#22c55e 100%);border-color:#15803d;}
+.dynamic-port.port-down{background:linear-gradient(180deg,#fca5a5 0%,#ef4444 100%);border-color:#991b1b;}
+.dynamic-port.port-disabled{background:linear-gradient(180deg,#cbd5e1 0%,#64748b 100%);border-color:#475569;color:#e2e8f0;}
+.dynamic-port.port-error{background:linear-gradient(180deg,#fde68a 0%,#f97316 100%);border-color:#c2410c;}
+.dynamic-port.port-trunk{box-shadow:inset 0 -4px 0 rgba(37,99,235,.82),inset 0 0 0 1px rgba(255,255,255,.36);}
+.dynamic-port.port-uplink{outline:1px solid rgba(96,165,250,.65);}
+.dynamic-device-meta{direction:rtl;display:flex;flex-wrap:wrap;gap:8px;margin-top:11px;color:#cbd5e1;font-size:11px;}
+.dynamic-device-meta span{padding:5px 8px;border-radius:999px;background:rgba(15,23,42,.72);border:1px solid rgba(148,163,184,.22);}
+.dynamic-no-ports{direction:rtl;color:#94a3b8;font-size:12px;padding:18px;text-align:center;}
+.mikrotik-crs354 .dynamic-device-face{min-width:1040px;}
+.mikrotik-crs354.is-dashboard .dynamic-device-face{min-width:760px;}
+.mikrotik-crs354.is-dashboard .dynamic-port{min-width:21px;height:22px;padding:1px;}
+.mikrotik-crs354.is-dashboard .dynamic-port.is-fiber{min-width:32px;height:26px;}
+.mikrotik-rb5009 .dynamic-device-face,.mikrotik-rb2011 .dynamic-device-face,.mikrotik-hex .dynamic-device-face,.mikrotik-ax3 .dynamic-device-face,.mikrotik-cap .dynamic-device-face,.mikrotik-chr .dynamic-device-face{min-width:620px;}
+.mikrotik-cap .dynamic-device-body{grid-template-columns:140px minmax(180px,1fr) 110px;}
+.mikrotik-cap .dynamic-device-left:after,.mikrotik-ax3 .dynamic-device-left:after{content:"WiFi";display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;border-radius:50%;border:1px solid rgba(125,211,252,.35);background:radial-gradient(circle,rgba(14,165,233,.25),rgba(15,23,42,.5));color:#bae6fd;font-size:10px;font-weight:900;}
+@media(max-width:980px){.dynamic-device-face{min-width:620px}.dynamic-device-body{grid-template-columns:82px minmax(0,1fr) 58px}.dynamic-device-brand em{display:none}.dynamic-port{min-width:22px;height:24px}.dynamic-port-label{font-size:7px}.dynamic-device-left,.dynamic-device-right{padding:6px}.mikrotik-crs354.is-dashboard .dynamic-device-face{min-width:690px}.mikrotik-crs354.is-dashboard .dynamic-port{min-width:18px;height:20px}}
+
+/* Phase 41.2 - Dynamic visual and switch edit save fix */
+.switch-edit-card{max-width:1180px;margin:0 auto;}
+.switch-edit-form select,.switch-edit-form input,.switch-edit-form textarea{width:100%;}
+.form-section-title{margin:18px 0 10px;font-weight:800;color:#0f172a;}
+.form-grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;}
+.form-grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;}
+.form-error-box{padding:12px;border:1px solid #fecaca;background:#fff1f2;color:#991b1b;border-radius:12px;margin-bottom:12px;}
+.form-actions-row{display:flex;gap:10px;margin-top:18px;align-items:center;}
+@media(max-width:900px){.form-grid-3,.form-grid-2{grid-template-columns:1fr;}}
+
+/* Phase 41.6 - MikroTik visual tuning: port scale, brand, frame */
+.dynamic-device-panel.mikrotik-device-card{
+    padding:12px 2px 6px;
+    background:linear-gradient(135deg,#f8fbff 0%,#eff6ff 58%,#f8fafc 100%);
+    border-color:#bfdbfe;
+}
+.dynamic-device-panel .mikrotik-face{
+    background:linear-gradient(180deg,#182335 0%,#0b1220 58%,#050914 100%);
+    border:2px solid rgba(125,211,252,.38);
+    border-radius:18px;
+    padding:16px 18px;
+    box-shadow:0 18px 42px rgba(15,23,42,.20),inset 0 1px 0 rgba(255,255,255,.10);
+}
+.dynamic-device-panel.is-dashboard .mikrotik-face{
+    min-height:156px;
+}
+.mikrotik-brand-bar{
+    display:grid;
+    grid-template-columns:auto minmax(160px,1fr) auto;
+    gap:12px;
+    align-items:center;
+    margin-bottom:14px;
+    padding-bottom:10px;
+    border-bottom:1px solid rgba(148,163,184,.22);
+}
+.mikrotik-brand-chip{
+    min-width:74px;
+    height:28px;
+    padding:0 12px;
+    border-radius:999px;
+    background:linear-gradient(180deg,#2563eb 0%,#1e40af 100%);
+    color:#eff6ff;
+    border:1px solid rgba(147,197,253,.52);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.22);
+    font-size:12px;
+    font-weight:950;
+    letter-spacing:0;
+}
+.mikrotik-brand-title strong{
+    display:block;
+    font-size:17px;
+    line-height:1.1;
+    color:#f8fafc;
+    letter-spacing:.1px;
+}
+.mikrotik-brand-title small{
+    display:block;
+    margin-top:3px;
+    color:#bfdbfe;
+    font-size:12px;
+    font-weight:800;
+}
+.mikrotik-brand-bar em{
+    max-width:260px;
+    text-align:right;
+    color:#cbd5e1;
+    font-size:12px;
+    font-weight:800;
+    white-space:nowrap;
+}
+.mikrotik-device-body{
+    grid-template-columns:118px minmax(360px,1fr) 118px;
+    gap:10px;
+}
+.dynamic-device-panel.is-dashboard .mikrotik-device-body{
+    grid-template-columns:106px minmax(320px,1fr) 106px;
+    gap:8px;
+}
+.mikrotik-identity-panel,
+.mikrotik-role-panel{
+    min-height:92px;
+    border-radius:12px;
+    background:linear-gradient(180deg,rgba(15,23,42,.88),rgba(2,6,23,.84));
+    border:1px solid rgba(125,211,252,.26);
+}
+.dynamic-device-panel.is-dashboard .mikrotik-identity-panel,
+.dynamic-device-panel.is-dashboard .mikrotik-role-panel{
+    min-height:78px;
+}
+.mikrotik-identity-panel span,
+.mikrotik-role-panel span{
+    font-size:11px;
+    line-height:1.1;
+}
+.mikrotik-port-bay{
+    min-height:92px;
+    padding:12px 14px;
+    justify-content:center;
+    align-items:center;
+    background:linear-gradient(180deg,rgba(11,18,32,.92),rgba(2,6,23,.94));
+    border:1px solid rgba(148,163,184,.30);
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.03);
+}
+.dynamic-device-panel.is-dashboard .mikrotik-port-bay{
+    min-height:78px;
+    padding:10px 12px;
+}
+.mikrotik-device-card .dynamic-port-row,
+.mikrotik-device-card .dynamic-uplink-row{
+    gap:7px;
+}
+.mikrotik-device-card .dynamic-port{
+    min-width:34px;
+    height:32px;
+    border-radius:7px;
+    padding:3px 4px;
+    border-width:2px;
+    font-weight:950;
+}
+.mikrotik-device-card .dynamic-port-label{
+    font-size:9px;
+    letter-spacing:-.25px;
+}
+.dynamic-device-panel.is-dashboard.mikrotik-device-card .dynamic-port{
+    min-width:31px;
+    height:30px;
+}
+.dynamic-device-panel.is-dashboard.mikrotik-device-card .dynamic-port-label{
+    font-size:8px;
+}
+.dynamic-device-panel.is-dashboard.mikrotik-device-card .dynamic-port-subtitle{
+    display:none;
+}
+.mikrotik-device-card .dynamic-port.is-fiber{
+    min-width:54px;
+    height:34px;
+    border-radius:8px;
+}
+.dynamic-device-panel.is-dashboard.mikrotik-device-card .dynamic-port.is-fiber{
+    min-width:48px;
+    height:32px;
+}
+.mikrotik-rb5009 .dynamic-device-face,
+.mikrotik-rb2011 .dynamic-device-face,
+.mikrotik-hex .dynamic-device-face,
+.mikrotik-ax3 .dynamic-device-face,
+.mikrotik-cap .dynamic-device-face,
+.mikrotik-chr .dynamic-device-face{
+    min-width:760px;
+}
+.mikrotik-rb5009.is-dashboard .dynamic-device-face,
+.mikrotik-rb2011.is-dashboard .dynamic-device-face,
+.mikrotik-hex.is-dashboard .dynamic-device-face,
+.mikrotik-ax3.is-dashboard .dynamic-device-face,
+.mikrotik-cap.is-dashboard .dynamic-device-face,
+.mikrotik-chr.is-dashboard .dynamic-device-face{
+    min-width:720px;
+}
+.mikrotik-rb5009 .mikrotik-port-bay,
+.mikrotik-rb2011 .mikrotik-port-bay,
+.mikrotik-hex .mikrotik-port-bay,
+.mikrotik-ax3 .mikrotik-port-bay,
+.mikrotik-cap .mikrotik-port-bay,
+.mikrotik-chr .mikrotik-port-bay{
+    justify-content:center;
+}
+.mikrotik-rb5009 .dynamic-port,
+.mikrotik-rb2011 .dynamic-port,
+.mikrotik-hex .dynamic-port,
+.mikrotik-ax3 .dynamic-port,
+.mikrotik-cap .dynamic-port,
+.mikrotik-chr .dynamic-port{
+    min-width:42px;
+    height:36px;
+}
+.mikrotik-rb5009.is-dashboard .dynamic-port,
+.mikrotik-rb2011.is-dashboard .dynamic-port,
+.mikrotik-hex.is-dashboard .dynamic-port,
+.mikrotik-ax3.is-dashboard .dynamic-port,
+.mikrotik-cap.is-dashboard .dynamic-port,
+.mikrotik-chr.is-dashboard .dynamic-port{
+    min-width:38px;
+    height:34px;
+}
+.mikrotik-crs354 .dynamic-device-face{
+    min-width:1160px;
+}
+.mikrotik-crs354.is-dashboard .dynamic-device-face{
+    min-width:1060px;
+}
+.mikrotik-crs354 .mikrotik-device-body{
+    grid-template-columns:120px minmax(840px,1fr) 120px;
+}
+.mikrotik-crs354.is-dashboard .mikrotik-device-body{
+    grid-template-columns:108px minmax(780px,1fr) 108px;
+}
+.mikrotik-crs354 .dynamic-port{
+    min-width:29px;
+    height:28px;
+}
+.mikrotik-crs354.is-dashboard .dynamic-port{
+    min-width:27px;
+    height:26px;
+}
+.mikrotik-crs354 .dynamic-port.is-fiber{
+    min-width:56px;
+    height:32px;
+}
+.mikrotik-crs354.is-dashboard .dynamic-port.is-fiber{
+    min-width:50px;
+    height:30px;
+}
+.mikrotik-crs354 .dynamic-port-row{
+    gap:6px;
+}
+.mikrotik-crs354 .dynamic-uplink-row{
+    gap:8px;
+    margin-top:4px;
+    padding-top:10px;
+}
+.mikrotik-cap .dynamic-device-body{
+    grid-template-columns:118px minmax(320px,1fr) 118px;
+}
+.mikrotik-device-meta{
+    justify-content:flex-end;
+    gap:7px;
+}
+.mikrotik-device-meta span{
+    color:#dbeafe;
+    border-color:rgba(125,211,252,.28);
+    background:rgba(15,23,42,.82);
+}
+@media(max-width:980px){
+    .mikrotik-brand-bar{grid-template-columns:auto minmax(120px,1fr);}
+    .mikrotik-brand-bar em{grid-column:1/-1;text-align:left;max-width:none;}
+    .mikrotik-device-body,
+    .dynamic-device-panel.is-dashboard .mikrotik-device-body{grid-template-columns:96px minmax(360px,1fr) 96px;}
+    .mikrotik-crs354.is-dashboard .dynamic-device-face{min-width:1040px;}
+}
+
+/* Phase 41.7 - Dynamic MikroTik layout final: model-aware sizing and neutral placeholder ports */
+.switch-avatar{
+    width:74px !important;
+    height:74px !important;
+    border-radius:18px !important;
+    overflow:hidden;
+    padding:7px !important;
+    box-sizing:border-box;
+    text-align:center;
+}
+.switch-avatar span{
+    max-width:100%;
+    font-size:10px !important;
+    line-height:1.1;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+.switch-avatar strong{
+    max-width:100%;
+    font-size:18px !important;
+    line-height:1.05 !important;
+    margin-top:3px !important;
+    white-space:normal;
+    overflow:hidden;
+    text-overflow:clip;
+    word-break:keep-all;
+}
+.sm-switch-title h2{
+    font-size:24px !important;
+    line-height:1.15 !important;
+    max-width:100%;
+}
+.sm-switch-title p{
+    font-size:14px !important;
+}
+.dynamic-device-panel.mikrotik-device-card{
+    overflow-x:auto;
+    padding:10px 0 4px;
+}
+.dynamic-device-panel .mikrotik-face{
+    width:max-content;
+    min-width:var(--mk-face-min, 640px) !important;
+    max-width:none;
+    padding:14px 16px !important;
+    border-radius:18px !important;
+    box-sizing:border-box;
+}
+.mikrotik-brand-bar{
+    display:grid !important;
+    grid-template-columns:auto minmax(160px,1fr) auto !important;
+    gap:10px !important;
+    align-items:center !important;
+    margin-bottom:12px !important;
+    padding-bottom:10px !important;
+}
+.mikrotik-brand-chip{
+    min-width:64px !important;
+    height:26px !important;
+    padding:0 10px !important;
+    font-size:11px !important;
+}
+.mikrotik-brand-title strong{
+    font-size:16px !important;
+    max-width:260px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+.mikrotik-brand-title small{
+    font-size:11px !important;
+}
+.mikrotik-model-stack{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    gap:3px;
+    min-width:90px;
+    max-width:190px;
+}
+.mikrotik-model-stack span{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:58px;
+    max-width:120px;
+    height:24px;
+    padding:0 9px;
+    border-radius:999px;
+    background:rgba(59,130,246,.14);
+    border:1px solid rgba(147,197,253,.38);
+    color:#dbeafe;
+    font-size:11px;
+    font-weight:950;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+.mikrotik-model-stack em{
+    display:block;
+    max-width:190px;
+    font-style:normal;
+    color:#cbd5e1;
+    font-size:11px;
+    font-weight:850;
+    text-align:right;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+.mikrotik-device-body,
+.dynamic-device-panel.is-dashboard .mikrotik-device-body{
+    display:grid !important;
+    grid-template-columns:var(--mk-side-w,104px) minmax(var(--mk-bay-min,280px),auto) var(--mk-side-w,104px) !important;
+    gap:10px !important;
+    align-items:stretch !important;
+}
+.mikrotik-identity-panel,
+.mikrotik-role-panel,
+.dynamic-device-panel.is-dashboard .mikrotik-identity-panel,
+.dynamic-device-panel.is-dashboard .mikrotik-role-panel{
+    min-height:86px !important;
+    padding:8px !important;
+    border-radius:12px !important;
+}
+.mikrotik-identity-panel span,
+.mikrotik-role-panel span,
+.mikrotik-role-panel b{
+    font-size:10px !important;
+    line-height:1.15 !important;
+    max-width:100%;
+    white-space:normal;
+}
+.mikrotik-wifi-mark{
+    display:inline-grid;
+    place-items:center;
+    width:42px;
+    height:32px;
+    border-radius:999px;
+    color:#bae6fd;
+    background:rgba(14,165,233,.18);
+    border:1px solid rgba(125,211,252,.25);
+    font-size:10px;
+    font-weight:950;
+}
+.mikrotik-ax3 .dynamic-device-left:after,
+.mikrotik-cap .dynamic-device-left:after{
+    display:none !important;
+    content:none !important;
+}
+.mikrotik-port-bay,
+.dynamic-device-panel.is-dashboard .mikrotik-port-bay{
+    width:max-content;
+    min-width:var(--mk-bay-min,280px) !important;
+    min-height:84px !important;
+    padding:11px 14px !important;
+    gap:8px !important;
+    align-items:center !important;
+    justify-content:center !important;
+}
+.mikrotik-device-card .dynamic-port-row,
+.mikrotik-device-card .dynamic-uplink-row,
+.mikrotik-device-card .dynamic-wireless-row{
+    display:flex;
+    flex-wrap:nowrap;
+    align-items:center;
+    justify-content:center;
+    gap:6px !important;
+}
+.mikrotik-device-card .dynamic-uplink-row,
+.mikrotik-device-card .dynamic-wireless-row{
+    padding-top:8px;
+    margin-top:2px;
+    border-top:1px solid rgba(148,163,184,.16);
+}
+.mikrotik-device-card .dynamic-port,
+.dynamic-device-panel.is-dashboard.mikrotik-device-card .dynamic-port{
+    width:var(--mk-port-w,34px) !important;
+    min-width:var(--mk-port-w,34px) !important;
+    height:var(--mk-port-h,30px) !important;
+    min-height:var(--mk-port-h,30px) !important;
+    padding:2px 3px !important;
+    border-radius:7px !important;
+    box-sizing:border-box;
+}
+.mikrotik-device-card .dynamic-port.is-fiber,
+.dynamic-device-panel.is-dashboard.mikrotik-device-card .dynamic-port.is-fiber{
+    width:var(--mk-fiber-w,56px) !important;
+    min-width:var(--mk-fiber-w,56px) !important;
+    height:calc(var(--mk-port-h,30px) + 4px) !important;
+}
+.mikrotik-device-card .dynamic-port-label,
+.dynamic-device-panel.is-dashboard.mikrotik-device-card .dynamic-port-label{
+    font-size:9px !important;
+    line-height:1 !important;
+    letter-spacing:-.15px !important;
+    white-space:nowrap;
+}
+.mikrotik-device-card .dynamic-port-subtitle{
+    display:none !important;
+}
+.dynamic-port.port-unknown,
+.dynamic-port.status-unknown,
+.mikrotik-device-card .dynamic-port.port-unknown{
+    color:#dbeafe !important;
+    background:linear-gradient(180deg,#64748b 0%,#334155 100%) !important;
+    border-color:#94a3b8 !important;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 0 0 1px rgba(148,163,184,.18) !important;
+}
+.dynamic-port.port-unknown:before,
+.dynamic-port.status-unknown:before{
+    background:#cbd5e1 !important;
+}
+.mikrotik-crs354 .dynamic-device-face{
+    min-width:var(--mk-face-min,1030px) !important;
+}
+.mikrotik-rb5009 .dynamic-device-face,
+.mikrotik-rb2011 .dynamic-device-face,
+.mikrotik-hex .dynamic-device-face,
+.mikrotik-ax3 .dynamic-device-face,
+.mikrotik-cap .dynamic-device-face,
+.mikrotik-chr .dynamic-device-face{
+    min-width:var(--mk-face-min,640px) !important;
+}
+.mikrotik-cap .dynamic-device-body{
+    grid-template-columns:var(--mk-side-w,96px) minmax(var(--mk-bay-min,200px),auto) var(--mk-side-w,96px) !important;
+}
+.mikrotik-device-meta{
+    justify-content:flex-start !important;
+    max-width:100%;
+    overflow:hidden;
+}
+.mikrotik-device-meta span{
+    font-size:10px !important;
+    max-width:180px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+@media(max-width:980px){
+    .dynamic-device-panel .mikrotik-face{min-width:var(--mk-face-min,640px) !important;}
+    .mikrotik-brand-bar{grid-template-columns:auto minmax(130px,1fr) auto !important;}
+    .mikrotik-model-stack em{display:none;}
+}
+
+
+/* PHASE79_8_MULTI_SSH_ACTION */
+.phase79-multi-ssh-box{border:1px solid rgba(148,163,184,.35);border-radius:14px;background:rgba(248,250,252,.9);padding:10px;margin:10px 0;direction:ltr;text-align:left}
+.phase79-multi-head{display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:12px;color:#1e293b;margin-bottom:8px}
+.phase79-multi-head span{font-size:11px;color:#64748b;background:#eef6ff;border-radius:999px;padding:2px 8px}
+.phase79-multi-list{display:grid;grid-template-columns:1fr;gap:6px;max-height:210px;overflow:auto;padding-right:2px}
+.phase79-multi-row{display:grid;grid-template-columns:minmax(150px,1fr) minmax(0,150px);gap:8px;align-items:center;border:1px solid rgba(203,213,225,.8);border-radius:10px;padding:6px 8px;background:#fff;font-size:12px;color:#0f172a}
+.phase79-multi-row input[type="checkbox"]{vertical-align:middle;margin-right:6px}
+.phase79-multi-value{height:30px;min-height:30px;font-size:12px;padding:4px 8px}
+.phase79-multi-no-value{color:#94a3b8;text-align:center;font-size:12px}
+@media (max-width:900px){.phase79-multi-row{grid-template-columns:1fr}.phase79-multi-value{width:100%}}
+
+
+/* PHASE79_8_1_MULTI_SSH_UI_RESULT_ORDER */
+.phase79-8-1-multi-box{direction:ltr;text-align:left;background:#f8fafc;border:1px solid #cbd5e1;border-radius:14px;padding:8px;margin:8px 0 10px;max-height:none;overflow:visible}
+.phase79-8-1-multi-box .phase79-multi-head{margin-bottom:4px}
+.phase79-multi-hint{font-size:11px;color:#64748b;margin:0 0 6px;direction:rtl;text-align:right}
+.phase79-8-1-multi-box .phase79-multi-list{max-height:154px;overflow:auto;display:grid;gap:5px;padding:2px 3px 2px 0}
+.phase79-8-1-multi-box .phase79-multi-row{display:grid;grid-template-columns:24px minmax(92px,1fr) minmax(0,112px) 50px;align-items:center;gap:6px;border:1px solid #dbe4ef;border-radius:10px;background:#fff;padding:5px 6px;font-size:12px}
+.phase79-8-1-multi-box .phase79-multi-row.is-selected{border-color:#93c5fd;background:#eff6ff}
+.phase79-order-num{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:999px;background:#e2e8f0;color:#334155;font-size:11px;font-weight:900}
+.phase79-multi-check{display:flex;align-items:center;gap:6px;margin:0;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#0f172a}
+.phase79-multi-check input{width:auto;min-height:auto;margin:0}
+.phase79-8-1-multi-box .phase79-multi-value{height:28px;min-height:28px;padding:3px 7px;font-size:12px;border-radius:9px}
+.phase79-order-controls{display:flex;gap:3px;justify-content:flex-end}
+.phase79-order-controls button{width:22px;height:22px;border-radius:7px;border:1px solid #cbd5e1;background:#fff;color:#1e293b;font-weight:900;cursor:pointer;padding:0;line-height:18px}
+.phase79-order-controls button:hover{background:#e0f2fe;border-color:#93c5fd}
+.phase79-multi-result{display:block;margin:8px 0;padding:8px 10px;border-radius:12px;border:1px solid #cbd5e1;background:#f8fafc;color:#0f172a;font-size:12px;line-height:1.65;white-space:normal;direction:rtl;text-align:right;min-height:0}
+.phase79-multi-result:empty{display:none}
+.phase79-multi-result.ok{border-color:#86efac;background:#f0fdf4;color:#166534}
+.phase79-multi-result.fail{border-color:#fecaca;background:#fef2f2;color:#991b1b}
+.phase79-multi-result ol{margin:4px 18px 0 0;padding:0;font-weight:700}
+.phase79-multi-result li{margin:0}
+.command-preview-box .phase79-multi-ssh-box{display:none!important}
+@media (max-width:900px){.phase79-8-1-multi-box .phase79-multi-row{grid-template-columns:24px 1fr 1fr 50px}.phase79-8-1-multi-box .phase79-multi-list{max-height:180px}}
+
+
+/* PHASE79_8_2_PLATFORM_ACTION_GUARD */
+.phase79-multi-row.is-platform-disabled{
+    opacity:.55;
+    background:rgba(148,163,184,.14);
+}
+.phase79-multi-row.is-platform-disabled .phase79-multi-check{
+    text-decoration:line-through;
+}
+.phase79-platform-note{
+    color:#b91c1c;
+    font-size:11px;
+    white-space:nowrap;
+}

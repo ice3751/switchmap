@@ -1,0 +1,41 @@
+{% extends "inventory/base.html" %}
+{% block title %}Automation Templates | SwitchMap{% endblock %}
+{% block body_class %}phase77-body{% endblock %}
+{% block content %}
+<section class="phase77-shell">
+    <header class="phase77-page-head">
+        <div><p class="phase77-eyebrow">Phase 77</p><h1>Automation Templates</h1><p>الگوی امن برای عملیات SSH؛ اجرای واقعی هنوز از همان مکانیزم پایدار قبلی انجام می‌شود.</p></div>
+        <div class="phase77-head-actions">
+            <form method="post" action="{% url 'inventory:automation_template_seed_defaults' %}">{% csrf_token %}<button class="phase77-btn secondary" type="submit">ساخت Templateهای پیش‌فرض</button></form>
+            <a class="phase77-btn" href="{% url 'inventory:automation_template_create' %}">Template جدید</a>
+        </div>
+    </header>
+
+    <form class="phase77-filterbar" method="get">
+        <select name="action"><option value="">همه Actionها</option>{% for value,label in action_choices %}<option value="{{ value }}" {% if action_filter == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select>
+        <select name="risk"><option value="">همه ریسک‌ها</option>{% for value,label in risk_choices %}<option value="{{ value }}" {% if risk_filter == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select>
+        <button class="phase77-btn secondary" type="submit">فیلتر</button>
+    </form>
+
+    <section class="phase77-panel">
+        <table class="phase77-table">
+            <thead><tr><th>نام</th><th>Action</th><th>Value</th><th>Risk</th><th>Approval</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+                {% for item in templates %}
+                    <tr>
+                        <td><b>{{ item.name }}</b><small>{{ item.description|default:"" }}</small></td>
+                        <td class="ltr">{{ item.action }}</td>
+                        <td class="ltr">{{ item.value_template|default:"-" }}</td>
+                        <td><span class="phase77-pill risk-{{ item.risk_level }}">{{ item.get_risk_level_display }}</span></td>
+                        <td>{% if item.requires_approval %}لازم{% else %}ندارد{% endif %}</td>
+                        <td>{% if item.is_active %}Active{% else %}Disabled{% endif %}</td>
+                        <td><a href="{% url 'inventory:automation_template_preview' item.id %}">Preview</a> · <a href="{% url 'inventory:automation_template_edit' item.id %}">Edit</a></td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="7">Template ثبت نشده است.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+</section>
+{% endblock %}

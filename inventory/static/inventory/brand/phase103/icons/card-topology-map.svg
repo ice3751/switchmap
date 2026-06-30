@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="520" height="150" viewBox="0 0 520 150" fill="none">
+  <defs>
+    <filter id="s" x="-20%" y="-30%" width="140%" height="170%">
+      <feDropShadow dx="0" dy="5" stdDeviation="4" flood-color="#64748b" flood-opacity=".16"/>
+    </filter>
+    <linearGradient id="node" x1="0" y1="0" x2="0" y2="1">
+      <stop stop-color="#fff"/>
+      <stop offset="1" stop-color="#e8eef6"/>
+    </linearGradient>
+  </defs>
+  <path d="M74 78 188 112 316 43 443 92" stroke="#9fb1c7" stroke-width="2" stroke-dasharray="6 6"/>
+  <path d="M188 112 314 130 443 92M316 43l-2 87" stroke="#aabbd0" stroke-width="2" stroke-dasharray="6 6"/>
+  <path d="M188 112 316 43" stroke="#f59e0b" stroke-width="2.4"/>
+  <g filter="url(#s)" stroke="#bcc9d8">
+    <g transform="translate(39 52)">
+      <path d="M0 13 35 0l35 13-35 14L0 13Z" fill="#f6f9fc"/>
+      <path d="M0 13v19l35 14 35-14V13L35 27 0 13Z" fill="url(#node)"/>
+      <path d="M8 27h21M42 27h19" stroke-width="2"/>
+    </g>
+    <g transform="translate(153 85)">
+      <path d="M0 13 35 0l35 13-35 14L0 13Z" fill="#f6f9fc"/>
+      <path d="M0 13v19l35 14 35-14V13L35 27 0 13Z" fill="url(#node)"/>
+      <path d="M8 27h21M42 27h19" stroke-width="2"/>
+    </g>
+    <g transform="translate(281 16)">
+      <path d="M0 13 35 0l35 13-35 14L0 13Z" fill="#f6f9fc"/>
+      <path d="M0 13v19l35 14 35-14V13L35 27 0 13Z" fill="url(#node)"/>
+      <path d="M8 27h21M42 27h19" stroke-width="2"/>
+    </g>
+    <g transform="translate(408 65)">
+      <path d="M0 13 35 0l35 13-35 14L0 13Z" fill="#f6f9fc"/>
+      <path d="M0 13v19l35 14 35-14V13L35 27 0 13Z" fill="url(#node)"/>
+      <path d="M8 27h21M42 27h19" stroke-width="2"/>
+    </g>
+  </g>
+</svg>

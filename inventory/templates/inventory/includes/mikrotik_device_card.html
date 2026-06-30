@@ -1,0 +1,21 @@
+<div class="mikrotik-device-card {% if map_mode == 'full' %}is-full{% endif %}">
+    <div class="mikrotik-device-top">
+        <div class="mikrotik-device-icon">MT</div>
+        <div>
+            <strong>{{ switch_name }}</strong>
+            <span class="ltr">{{ switch_ip }}{% if switch_obj.winbox_port %}:{{ switch_obj.winbox_port }}{% endif %}</span>
+        </div>
+        <em>{{ switch_obj.get_device_role_display }}</em>
+    </div>
+    <div class="mikrotik-device-grid">
+        <div><span>Vendor</span><strong>{{ switch_obj.get_vendor_display }}</strong></div>
+        <div><span>Family</span><strong>{{ switch_obj.get_device_family_display }}</strong></div>
+        <div><span>Role</span><strong>{{ switch_obj.get_device_role_display }}</strong></div>
+        <div><span>Site</span><strong>{{ switch_obj.site|default:"-" }}</strong></div>
+        <div><span>Location</span><strong>{{ switch_obj.location|default:"-" }}</strong></div>
+        <div><span>Topology</span><strong>{{ switch_obj.topology_position }}</strong></div>
+    </div>
+    {% if switch_obj.needs_review %}
+        <div class="mikrotik-review-chip">Needs Review</div>
+    {% endif %}
+</div>

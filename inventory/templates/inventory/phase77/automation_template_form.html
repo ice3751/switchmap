@@ -1,0 +1,13 @@
+{% extends "inventory/base.html" %}
+{% block title %}Automation Template | SwitchMap{% endblock %}
+{% block body_class %}phase77-body{% endblock %}
+{% block content %}
+<section class="phase77-shell narrow">
+    <header class="phase77-page-head"><div><p class="phase77-eyebrow">Phase 77</p><h1>{% if mode == 'edit' %}ویرایش{% else %}Template جدید{% endif %}</h1></div><a class="phase77-btn secondary" href="{% url 'inventory:automation_templates' %}">بازگشت</a></header>
+    <form class="phase77-form" method="post">{% csrf_token %}
+        {{ form.non_field_errors }}
+        {% for field in form %}<label><span>{{ field.label }}</span>{{ field }}{{ field.errors }}</label>{% endfor %}
+        <button class="phase77-btn" type="submit">ذخیره</button>
+    </form>
+</section>
+{% endblock %}
