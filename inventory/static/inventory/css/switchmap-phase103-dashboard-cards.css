@@ -479,7 +479,9 @@
   position: relative !important;
   min-width: 106px !important;
   min-height: 64px !important;
-  padding: 10px 34px 10px 12px !important;
+  padding: 10px !important;
+  padding-inline-start: 12px !important;
+  padding-inline-end: 34px !important;
   flex-direction: column !important;
   gap: 4px !important;
   border-color: #d7e0eb !important;
