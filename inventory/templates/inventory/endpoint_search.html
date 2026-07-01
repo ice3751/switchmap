@@ -1,0 +1,81 @@
+{% extends "inventory/base.html" %}
+{% block title %}Endpoint Search | SwitchMap{% endblock %}
+{% block page_title %}جستجوی کاربران و Endpoint ها{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">جستجو بر اساس IP، MAC، VLAN، سوییچ، پورت، AP/Router واسط، Hostname و Source.</p>{% endblock %}
+{% block page_actions %}
+<div class="toolbar-group">
+    <a class="btn btn-secondary" href="{% url 'inventory:endpoint_export_csv' %}?{{ request.GET.urlencode }}">Export CSV</a>
+</div>
+{% endblock %}
+
+{% block extra_head %}
+<style>
+.endpoint-search-panel{display:grid;gap:14px}.endpoint-search-form{display:grid;grid-template-columns:minmax(260px,1.6fr) repeat(4,minmax(130px,.7fr)) auto;gap:10px;align-items:end}.endpoint-search-form label{display:grid;gap:5px;font-size:12px;color:#64748b;font-weight:800}.endpoint-search-form input,.endpoint-search-form select{width:100%;border:1px solid rgba(148,163,184,.35);border-radius:12px;padding:10px 12px;background:#fff;color:#0f172a}.endpoint-summary-grid{display:grid;grid-template-columns:repeat(5,minmax(120px,1fr));gap:10px}.endpoint-summary-tile{border:1px solid rgba(148,163,184,.24);border-radius:16px;padding:12px 14px;background:linear-gradient(180deg,#fff,#f8fafc)}.endpoint-summary-tile span{display:block;color:#64748b;font-size:12px;font-weight:800}.endpoint-summary-tile strong{display:block;margin-top:4px;font-size:24px;color:#0f172a}.endpoint-table td,.endpoint-table th{white-space:nowrap}.endpoint-evidence{max-width:360px;overflow:hidden;text-overflow:ellipsis}.endpoint-badge{display:inline-flex;align-items:center;border-radius:999px;padding:4px 9px;background:#eef2ff;color:#3730a3;font-size:11px;font-weight:900}.endpoint-badge.direct_port{background:#dcfce7;color:#166534}.endpoint-badge.behind_ap{background:#e0f2fe;color:#075985}.endpoint-badge.behind_router{background:#fef3c7;color:#92400e}.endpoint-badge.behind_trunk,.endpoint-badge.behind_network_device{background:#f1f5f9;color:#334155}@media(max-width:1100px){.endpoint-search-form{grid-template-columns:1fr 1fr}.endpoint-summary-grid{grid-template-columns:1fr 1fr}.endpoint-table-wrap{overflow-x:auto}}
+</style>
+{% endblock %}
+
+{% block content %}
+<section class="surface-card endpoint-search-panel" data-phase112r8-3-endpoint-search>
+    <form class="endpoint-search-form" method="get">
+        <label>جستجو
+            <input type="search" name="q" value="{{ query }}" placeholder="IP / MAC / Port / Switch / AP / Hostname">
+        </label>
+        <label>VLAN
+            <input type="text" name="vlan" value="{{ selected_vlan }}" placeholder="1 یا 101">
+        </label>
+        <label>نوع اتصال
+            <select name="connection_type">
+                <option value="">همه</option>
+                {% for value,label in connection_type_choices %}<option value="{{ value }}" {% if selected_connection_type == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+            </select>
+        </label>
+        <label>وضعیت
+            <select name="status">
+                <option value="">همه</option>
+                {% for value,label in status_choices %}<option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+            </select>
+        </label>
+        <label>Limit
+            <input type="number" name="limit" value="{{ limit }}" min="1" max="1000">
+        </label>
+        <button class="btn btn-primary" type="submit">جستجو</button>
+    </form>
+</section>
+
+<section class="endpoint-summary-grid">
+    <div class="endpoint-summary-tile"><span>کل Endpoint</span><strong>{{ total_count }}</strong></div>
+    <div class="endpoint-summary-tile"><span>Active</span><strong>{{ active_count }}</strong></div>
+    <div class="endpoint-summary-tile"><span>نتیجه فیلتر</span><strong>{{ result_count }}</strong></div>
+    <div class="endpoint-summary-tile"><span>VLAN 1</span><strong>{{ vlan_counts.1|default:"0" }}</strong></div>
+    <div class="endpoint-summary-tile"><span>VLAN 101</span><strong>{{ vlan_counts.101|default:"0" }}</strong></div>
+</section>
+
+<section class="surface-card endpoint-table-wrap">
+    <table class="data-table compact-table endpoint-table">
+        <thead>
+            <tr>
+                <th>MAC</th><th>IP</th><th>VLAN</th><th>Type</th><th>Switch</th><th>Port</th><th>Via</th><th>SSID</th><th>Confidence</th><th>Last Seen</th><th>Evidence</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for ep in endpoints %}
+            <tr>
+                <td class="ltr">{{ ep.mac_address }}</td>
+                <td class="ltr">{{ ep.ip_address|default:"-" }}</td>
+                <td>{{ ep.vlan|default:"-" }}</td>
+                <td><span class="endpoint-badge {{ ep.connection_type }}">{{ ep.connection_type }}</span></td>
+                <td>{% if ep.last_seen_switch %}<a class="table-link" href="{% url 'inventory:switch_detail' ep.last_seen_switch.id %}">{{ ep.last_seen_switch.name }}</a>{% else %}-{% endif %}</td>
+                <td class="ltr">{% if ep.last_seen_port %}<a class="table-link" href="{% url 'inventory:switch_detail' ep.last_seen_switch.id %}?port={{ ep.last_seen_port.id }}">{{ ep.last_seen_port.interface_name }}</a>{% else %}-{% endif %}</td>
+                <td>{% if ep.via_device %}{{ ep.via_device.name }}{% else %}{{ ep.via_device_name|default:"-" }}{% endif %}</td>
+                <td>{{ ep.ssid|default:"-" }}</td>
+                <td>{{ ep.confidence }}</td>
+                <td class="ltr">{{ ep.last_seen|date:"Y-m-d H:i:s" }}</td>
+                <td class="endpoint-evidence" title="{{ ep.evidence_summary }}">{{ ep.evidence_summary|default:"-" }}</td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="11">موردی پیدا نشد.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

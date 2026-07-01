@@ -1,0 +1,67 @@
+{% extends "inventory/base.html" %}
+{% block title %}Alarm Detail | SwitchMap{% endblock %}
+{% block page_title %}Alarm Drill-down{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">جزئیات Evidence، Rule و لینک‌های مستقیم مرتبط با آلارم.</p>{% endblock %}
+{% block page_actions %}<a class="btn btn-secondary" href="{% url 'inventory:alarm_center' %}">Back to Alarms</a>{% endblock %}
+{% block content %}
+<section class="summary-bar-grid">
+    <div class="summary-tile"><span>Severity</span><strong>{{ alarm.get_severity_display }}</strong></div>
+    <div class="summary-tile"><span>Status</span><strong>{{ alarm.get_status_display }}</strong></div>
+    <div class="summary-tile"><span>Type</span><strong>{{ alarm.get_category_display }}</strong></div>
+    <div class="summary-tile"><span>Occurrences</span><strong>{{ alarm.occurrences }}</strong></div>
+</section>
+
+<section class="surface-card table-panel">
+    <div class="section-title-row compact-title-row">
+        <div>
+            <h3>{{ alarm.title }}</h3>
+            <p>{{ alarm.message|default:"-" }}</p>
+        </div>
+        <span class="alarm-pill alarm-pill-{{ alarm.severity }}">{{ alarm.get_severity_display }}</span>
+    </div>
+    <div class="table-wrap">
+        <table class="data-table">
+            <tbody>
+                <tr><th>Fingerprint</th><td class="ltr">{{ alarm.fingerprint }}</td></tr>
+                <tr><th>Source</th><td>{{ alarm.source|default:"-" }}</td></tr>
+                <tr><th>Switch</th><td>{% if switch %}<a class="table-link" href="{{ device_url }}">{{ switch.name }}</a>{% else %}-{% endif %}</td></tr>
+                <tr><th>Port</th><td>{% if port %}<a class="table-link ltr" href="{{ port_url }}">{{ port.interface_name }}</a>{% else %}-{% endif %}</td></tr>
+                <tr><th>Port State</th><td class="ltr">{{ port_state_label }}</td></tr>
+                <tr><th>First Seen</th><td class="ltr">{{ alarm_first_seen_text }}</td></tr>
+                <tr><th>Last Seen</th><td class="ltr">{{ alarm_last_seen_text }}</td></tr>
+                <tr><th>Ack</th><td class="ltr">{{ alarm_acknowledged_at_text|default:"-" }}{% if alarm.acknowledged_by %} / {{ alarm.acknowledged_by }}{% endif %}</td></tr>
+                <tr><th>Resolved</th><td class="ltr">{{ alarm_resolved_at_text|default:"-" }}</td></tr>
+                <tr><th>Details</th><td class="ltr">{{ alarm.details|default:"-" }}</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="surface-card table-panel">
+    <div class="section-title-row compact-title-row">
+        <div><h3>Evidence</h3><p>هیچ Warning بدون Evidence نباید نمایش داده شود.</p></div>
+    </div>
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead><tr><th>Source</th><th>Value</th></tr></thead>
+            <tbody>
+                {% for item in evidence %}
+                    <tr><td>{{ item.source }}</td><td class="ltr">{{ item.value }}</td></tr>
+                {% empty %}
+                    <tr><td colspan="2">Evidence ثبت نشده است؛ این آلارم باید در Rule Engine بررسی شود.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="surface-card table-panel">
+    <div class="section-title-row compact-title-row"><div><h3>Drill-down Links</h3></div></div>
+    <div class="alarm-action-stack">
+        {% if device_url %}<a class="btn btn-secondary" href="{{ device_url }}">Device</a>{% endif %}
+        {% if port_url %}<a class="btn btn-secondary" href="{{ port_url }}">Port</a>{% endif %}
+        {% if topology_url %}<a class="btn btn-secondary" href="{{ topology_url }}">Topology Edge</a>{% endif %}
+        {% if sfp_url %}<a class="btn btn-secondary" href="{{ sfp_url }}">SFP Detail</a>{% endif %}
+    </div>
+</section>
+{% endblock %}

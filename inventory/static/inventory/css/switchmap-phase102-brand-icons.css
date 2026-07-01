@@ -1,0 +1,137 @@
+/* Phase102 - SwitchMap Brand + Navigation Icon System */
+:root {
+  --phase102-blue: #27a8ff;
+  --phase102-cyan: #39d5ff;
+  --phase102-navy: #07172f;
+  --phase102-icon-size: 20px;
+}
+
+.brand-link.phase102-brand-link {
+  gap: 10px;
+  min-width: 0;
+  text-decoration: none;
+}
+
+.phase102-brand-mark {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: transparent;
+  box-shadow: 0 0 0 1px rgba(39,168,255,.28), 0 10px 26px rgba(39,168,255,.20);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+
+.phase102-brand-mark img {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.phase102-brand-word {
+  line-height: 1;
+  letter-spacing: -.02em;
+}
+
+.phase102-brand-word .phase102-brand-switch {
+  color: #f4f8ff;
+}
+
+.phase102-brand-word .phase102-brand-map {
+  color: var(--phase102-blue);
+}
+
+.phase102-brand-subtitle {
+  letter-spacing: .04em;
+  opacity: .82;
+}
+
+.command-dropdown-panel .command-dropdown-item,
+.topbar-nav > a.topbar-link,
+.topbar-dropdown > summary.topbar-link,
+.user-panel a.command-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.command-dropdown-panel .command-dropdown-item::before,
+.topbar-nav > a.topbar-link::before,
+.topbar-dropdown > summary.topbar-link::before {
+  content: "";
+  width: var(--phase102-icon-size);
+  height: var(--phase102-icon-size);
+  flex: 0 0 var(--phase102-icon-size);
+  display: inline-block;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  opacity: .98;
+  filter: drop-shadow(0 0 5px rgba(39,168,255,.28));
+}
+
+.command-dropdown-panel .command-dropdown-item:hover::before,
+.command-dropdown-panel .command-dropdown-item.active::before,
+.topbar-nav > a.topbar-link:hover::before,
+.topbar-nav > a.topbar-link.active::before,
+.topbar-dropdown > summary.topbar-link:hover::before {
+  filter: drop-shadow(0 0 8px rgba(57,213,255,.45));
+}
+
+.command-dropdown-section-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.command-dropdown-section-label::before {
+  content: "";
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  display: inline-block;
+  background: url("../brand/phase102/icons/backup-restore.svg") center/contain no-repeat;
+  filter: drop-shadow(0 0 5px rgba(39,168,255,.22));
+}
+.command-dropdown-section-label:nth-of-type(2)::before {
+  background-image: url("../brand/phase102/icons/ssh-automation.svg");
+}
+
+
+/* Top-level dropdown summary icons */
+.monitoring-dropdown > summary.topbar-link::before { background-image: url("../brand/phase102/icons/monitoring.svg"); }
+.inventory-dropdown > summary.topbar-link::before,
+.switches-dropdown > summary.topbar-link::before { background-image: url("../brand/phase102/icons/devices.svg"); }
+.automation-dropdown > summary.topbar-link::before { background-image: url("../brand/phase102/icons/operations.svg"); }
+.admin-dropdown > summary.topbar-link::before { background-image: url("../brand/phase102/icons/management.svg"); }
+
+/* Top-level and dropdown exact menu mapping */
+.topbar-nav > a.topbar-link[href="/"]::before,
+.topbar-nav > a.topbar-link[href$="/"]::before { background-image: url("../brand/phase102/icons/dashboard.svg"); }
+.command-dropdown-item[href$="/noc/"]::before,
+.command-dropdown-item[href$="/phase77/noc/"]::before { background-image: url("../brand/phase102/icons/noc-dashboard.svg"); }
+.command-dropdown-item[href$="/alarms/"]::before { background-image: url("../brand/phase102/icons/alerts.svg"); }
+.command-dropdown-item[href$="/sfp-monitor/"]::before { background-image: url("../brand/phase102/icons/sfp-live.svg"); }
+.command-dropdown-item[href$="/mikrotik/"]::before { background-image: url("../brand/phase102/icons/mikrotik.svg"); }
+.command-dropdown-item[href$="/topology/"]::before { background-image: url("../brand/phase102/icons/topology.svg"); }
+.command-dropdown-item[href$="/assets/"]::before { background-image: url("../brand/phase102/icons/assets.svg"); }
+.command-dropdown-item[href$="/assets/completion/"]::before { background-image: url("../brand/phase102/icons/documentation.svg"); }
+.command-dropdown-item[href*="export"]::before,
+.command-dropdown-item[href$="/ports/export/"]::before { background-image: url("../brand/phase102/icons/csv.svg"); }
+.command-dropdown-item[href$="/backups/"]::before { background-image: url("../brand/phase102/icons/restore-guard.svg"); }
+.command-dropdown-item[href$="/cisco-backups/"]::before { background-image: url("../brand/phase102/icons/cisco-backup.svg"); }
+.command-dropdown-item[href$="/mikrotik-backups/"]::before { background-image: url("../brand/phase102/icons/mikrotik.svg"); }
+.command-dropdown-item[href$="/backup-storage/"]::before { background-image: url("../brand/phase102/icons/secure-backup-storage.svg"); }
+.command-dropdown-item[href$="/config-backups/"]::before { background-image: url("../brand/phase102/icons/config-diff.svg"); }
+.command-dropdown-item[href$="/automation/templates/"]::before { background-image: url("../brand/phase102/icons/automation-templates.svg"); }
+.command-dropdown-item[href$="/logs/"]::before { background-image: url("../brand/phase102/icons/logs.svg"); }
+.command-dropdown-item[href$="/reports/"]::before { background-image: url("../brand/phase102/icons/reports.svg"); }
+.command-dropdown-item[href$="/users/"]::before { background-image: url("../brand/phase102/icons/users.svg"); }
+.command-dropdown-item[href="/admin/"]::before { background-image: url("../brand/phase102/icons/admin.svg"); }
+
+@media (max-width: 920px) {
+  .phase102-brand-subtitle { display: none; }
+  .phase102-brand-mark { width: 34px; height: 34px; }
+}

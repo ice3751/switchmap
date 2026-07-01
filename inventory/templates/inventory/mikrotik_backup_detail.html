@@ -1,0 +1,38 @@
+{% extends 'inventory/base.html' %}
+{% block title %}MikroTik Backup Detail{% endblock %}
+{% block body_class %}phase86-mikrotik-backup-detail{% endblock %}
+{% block extra_head %}
+<style>
+  .phase85-detail{direction:rtl;--b:#d8e3f1;--m:#64748b;--blue:#2563eb;--red:#dc2626;--green:#16a34a;color:#0f172a}.phase85-hero,.phase85-panel{background:rgba(255,255,255,.96);border:1px solid var(--b);border-radius:22px;box-shadow:0 18px 42px rgba(15,23,42,.06);padding:18px;margin-bottom:16px}.phase85-hero{display:flex;align-items:center;justify-content:space-between;gap:16px;border-top:4px solid var(--blue)}.phase85-hero h1{margin:0 0 8px}.muted{color:var(--m)}.small{font-size:12px}.ltr{direction:ltr;unicode-bidi:plaintext;text-align:left}.phase85-btn{border:1px solid #bfdbfe;background:#fff;color:#1d4ed8;border-radius:12px;padding:9px 13px;font-weight:900;text-decoration:none;cursor:pointer}.phase85-btn.primary{background:var(--blue);color:#fff;border-color:var(--blue)}.phase85-btn.danger{background:var(--red);color:#fff;border-color:var(--red)}.phase85-grid{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:16px;align-items:start}.phase85-code{white-space:pre-wrap;direction:ltr;text-align:left;unicode-bidi:plaintext;padding:12px;border:1px dashed #bfdbfe;border-radius:12px;background:#f8fafc;max-height:620px;overflow:auto;font-size:12px;line-height:1.45}.phase85-meta{display:grid;gap:0;border:1px solid #eef2f7;border-radius:14px;overflow:hidden}.phase85-meta div{display:grid;grid-template-columns:105px minmax(0,1fr);gap:10px;border-bottom:1px solid #e2e8f0;padding:9px 10px;background:#fff}.phase85-meta div:last-child{border-bottom:0}.phase85-meta span{color:#64748b;font-size:12px}.phase85-meta strong{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.phase85-meta strong.ltr{direction:ltr;text-align:left}.phase85-warn{border:1px solid #fed7aa;background:#fff7ed;color:#9a3412;padding:10px;border-radius:12px}.phase85-ok{border:1px solid #bbf7d0;background:#f0fdf4;color:#166534;padding:10px;border-radius:12px}.phase85-side-actions{display:flex;gap:8px;flex-wrap:wrap}.phase85-preview-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}.phase85-preview-head h2{margin:0}@media(max-width:1100px){.phase85-grid{grid-template-columns:1fr}.phase85-hero{display:block}.phase85-meta div{grid-template-columns:1fr}.phase85-meta strong{white-space:normal}}
+</style>
+{% endblock %}
+{% block content %}
+<div class="page-shell phase85-detail" data-phase86-mikrotik-detail-cleanup="true">
+  <section class="phase85-hero">
+    <div><h1>MikroTik Backup Detail</h1><p class="muted">{{ backup.device }} / {{ backup.backup_type_label }} / {{ backup.jalali_date }}</p></div>
+    <div class="phase85-side-actions"><a class="phase85-btn" href="{% url 'inventory:mikrotik_backup_center' %}">Back</a>{% if download_allowed and backup.success %}<a class="phase85-btn primary" href="{% url 'inventory:mikrotik_backup_download' backup.backup_id %}">Download Full File (Admin)</a>{% endif %}</div>
+  </section>
+  <section class="phase85-grid">
+    <main>
+      {% if is_export %}<div class="phase85-panel"><div class="phase85-preview-head"><h2>Preview</h2><span class="muted small">masked / UI only</span></div><pre class="phase85-code">{{ content_preview }}</pre></div>{% endif %}
+      {% if diff_text %}<div class="phase85-panel"><div class="phase85-preview-head"><h2>Diff با Backup قبلی</h2><span class="muted small">masked</span></div><pre class="phase85-code">{{ diff_text }}</pre></div>{% endif %}
+      {% if is_full_backup %}<div class="phase85-panel"><h2>Full Binary Backup</h2><p class="muted">Preview برای فایل باینری نمایش داده نمی‌شود. Download فقط برای Admin است.</p></div>{% endif %}
+    </main>
+    <aside>
+      <div class="phase85-panel"><h2>Metadata</h2><div class="phase85-meta">
+        <div><span>Device</span><strong>{{ backup.device }}</strong></div>
+        <div><span>IP</span><strong class="ltr">{{ backup.management_ip }}</strong></div>
+        <div><span>Model</span><strong>{{ backup.model|default:'-' }}</strong></div>
+        <div><span>Type</span><strong>{{ backup.backup_type_label }}</strong></div>
+        <div><span>Status</span><strong>{% if backup.success %}OK{% else %}FAIL{% endif %}</strong></div>
+        <div><span>Hash</span><strong class="ltr" title="{{ backup.file_hash|default:'-' }}">{{ backup.file_hash|default:'-' }}</strong></div>
+        <div><span>Size</span><strong class="ltr">{{ backup.size }}</strong></div>
+        <div><span>Storage</span><strong title="{{ backup.file_path }}">{{ backup.file_path }}</strong></div>
+        <div><span>UI Preview</span><strong>{{ backup.ui_preview|default:'masked' }}</strong></div>
+        <div><span>Sensitive</span><strong>{{ backup.sensitive_line_count }}</strong></div>
+      </div>{% if backup.error %}<p class="phase85-warn">{{ backup.error }}</p>{% endif %}</div>
+      <div class="phase85-panel"><h2>Restore Prepare / Dry-run</h2>{% if validation.ok %}<p class="phase85-ok">Status: Validatable</p>{% else %}<p class="phase85-warn">Status: Blocked</p>{% endif %}<p class="muted small">{{ validation.message }}</p>{% if validation.blockers %}<h3>Blockers</h3><ul>{% for item in validation.blockers %}<li>{{ item }}</li>{% endfor %}</ul>{% endif %}{% if validation.warnings %}<h3>Warnings</h3><ul>{% for item in validation.warnings %}<li>{{ item }}</li>{% endfor %}</ul>{% endif %}{% if backup.success %}<form method="post" action="{% url 'inventory:mikrotik_backup_validate_restore' backup.backup_id %}">{% csrf_token %}<button class="phase85-btn danger" type="submit">Validate Restore Candidate</button></form>{% endif %}</div>
+    </aside>
+  </section>
+</div>
+{% endblock %}

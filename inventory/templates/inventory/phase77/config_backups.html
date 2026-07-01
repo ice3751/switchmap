@@ -1,0 +1,25 @@
+{% extends "inventory/base.html" %}
+{% block title %}Config Backup / Diff | SwitchMap{% endblock %}
+{% block body_class %}phase77-body{% endblock %}
+{% block content %}
+<section class="phase77-shell">
+    <header class="phase77-page-head"><div><p class="phase77-eyebrow">Phase 77</p><h1>Config Backup / Diff</h1><p>ثبت دستی Config و Diff بدون اجرای SSH خودکار.</p></div><a class="phase77-btn secondary" href="{% url 'inventory:backup_center' %}">Backup Center</a></header>
+    <section class="phase77-two-col wide-left">
+        <article class="phase77-panel">
+            <header><h2>Snapshot جدید</h2></header>
+            <form class="phase77-form" method="post">{% csrf_token %}
+                {{ form.non_field_errors }}
+                {% for field in form %}<label><span>{{ field.label }}</span>{{ field }}{{ field.errors }}</label>{% endfor %}
+                <button class="phase77-btn" type="submit">ذخیره Snapshot</button>
+            </form>
+        </article>
+        <article class="phase77-panel">
+            <header><h2>آخرین Snapshotها</h2></header>
+            <form class="phase77-filterbar compact" method="get"><select name="switch"><option value="">همه سوییچ‌ها</option>{% for sw in switches %}<option value="{{ sw.id }}" {% if switch_filter == sw.id|stringformat:'s' %}selected{% endif %}>{{ sw.name }}</option>{% endfor %}</select><button class="phase77-btn secondary" type="submit">فیلتر</button></form>
+            <div class="phase77-list">
+                {% for item in snapshots %}<a class="phase77-row" href="{% url 'inventory:config_backup_detail' item.id %}"><span><b>{{ item.switch.name }} · {{ item.get_config_type_display }}</b><small class="ltr">{{ item.created_at|date:'Y-m-d H:i:s' }} · {{ item.content_hash|slice:':12' }}</small></span><em>{{ item.get_command_source_display }}</em></a>{% empty %}<div class="phase77-empty">Snapshot ثبت نشده است.</div>{% endfor %}
+            </div>
+        </article>
+    </section>
+</section>
+{% endblock %}

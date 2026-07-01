@@ -5,5 +5,6 @@ from .views import (
     ssh_action_preview,
     switch_bulk_ssh_action,
     switchmap_ajax_ssh_port_action,
+    switchmap_ajax_multi_ssh_port_action,
 )
 

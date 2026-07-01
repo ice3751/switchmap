@@ -1,0 +1,51 @@
+این چت ادامه پروژه SwitchMap است. قبل از هر کاری وضعیت فعلی پروژه را از فایل زیر بخوان:
+
+C:\SwitchMap\docs\SWITCHMAP_PHASE109_R16_STATUS.md
+
+قواعد اجرای کار:
+- فارسی، کوتاه و مرحله‌ای پاسخ بده.
+- حدس نزن.
+- PowerShell نده.
+- دستورها را یک‌جا در CMD block بده.
+- هیچ رمز یا Community را ذخیره یا تکرار نکن.
+- قبل از هر تغییر DB، بکاپ بگیر.
+- Search / Dashboard UI / Static / Cache را دست نزن مگر ایراد واقعی جدید دیده شود.
+- Discovery کلی اجرا نکن؛ فقط Targeted.
+- از آدرس http://it-tools.winac-co.com:8000/ استفاده کن، نه localhost.
+- سرویس پروژه Scheduled Task با نام "SwitchMap Waitress" است.
+
+وضعیت سالم فعلی:
+- Search سالم است.
+- NEXUS / Edari / Salon topology سالم است.
+- reciprocal_missing_count=0 شده است.
+- bad_lldp_0_ports=0 است.
+- switch_count=24، port_count=684، neighbor_port_count=88، network_neighbor_matched_count=33.
+- پنج سوییچ Salon به Inventory اضافه و Poll/Discovery شدند:
+  Salon-Gharbi، Salon-jonobi، Salon-Sharghi-PATROL، Salon-Shomali، Salon-Edari-Fiber.
+
+هدف چت جدید:
+Phase109-R17 Safe Classification Patch را آماده کن.
+
+Scope دقیق R17:
+1) AliHome ether2 -> 192.168.2.250
+   باید Client / DHCP Endpoint حساب شود، نه Network Neighbor.
+
+2) RB2011-Iranmall ether1 -> 7o8-Iranmall-EDGE / 172.16.1.1
+   فعلاً Pending Review بماند و Apply نشود.
+
+3) Salon-Gharbi Te1/1/1 -> Salon-tolid.winac-co.com
+   Production Fiber Switch / Pending Config است.
+   نباید خطای توپولوژی حساب شود.
+   فعلاً Pending Network Device بماند.
+
+4) Salon-Sharghi-PATROL Gi1/0/37 -> RB-CAP-Patrol
+   Access Point واحد نگهبانی است.
+   باید Unmanaged AP / Endpoint حساب شود، نه Switch.
+
+خواسته R17:
+- اول Read-only Probe بساز.
+- بعد Safe Classification Patch بساز.
+- Patch فقط Match/Classification Helper و Audit را اصلاح کند.
+- اگر DB لازم شد، فقط با Backup و Preview قبل از Apply.
+- خروجی نهایی باید نشان دهد Unresolved واقعی فقط Pending 7o8 و Salon-tolid است، نه خطای توپولوژی.
+- هیچ تغییر UI، Search، CSS، JS، Poller اصلی یا Discovery کلی انجام نده.

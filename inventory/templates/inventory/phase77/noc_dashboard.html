@@ -1,0 +1,87 @@
+{% extends "inventory/base.html" %}
+{% load static %}
+{% block title %}NOC Dashboard | SwitchMap{% endblock %}
+{% block body_class %}phase77-body{% endblock %}
+{% block content %}
+<section class="phase77-shell">
+    <header class="phase77-page-head">
+        <div>
+            <p class="phase77-eyebrow">Phase 77</p>
+            <h1>NOC Dashboard</h1>
+            <p>نمای یکپارچه برای وضعیت فعلی شبکه، بدون تغییر در Dashboard اصلی.</p>
+        </div>
+        <div class="phase77-head-actions">
+            <span>آخرین تولید: <b class="ltr">{{ now_text }}</b></span>
+            <a class="phase77-btn" href="{% url 'inventory:switch_list' %}">Dashboard اصلی</a>
+        </div>
+    </header>
+
+    <section class="phase77-kpi-grid">
+        <article class="phase77-kpi"><small>Devices</small><strong>{{ switch_count }}</strong><span>فعال</span></article>
+        <article class="phase77-kpi"><small>Ports</small><strong>{{ visible_port_count }}</strong><span>نمایشی از {{ port_count }}</span></article>
+        <article class="phase77-kpi {% if alarm_critical_count %}is-danger{% elif alarm_active_count %}is-warning{% endif %}"><small>Active Alarms</small><strong>{{ alarm_active_count }}</strong><span>{{ alarm_critical_count }} Critical / {{ alarm_warning_count }} Warning</span></article>
+        <article class="phase77-kpi {% if snmp_failed %}is-danger{% elif snmp_stale %}is-warning{% endif %}"><small>SNMP</small><strong>{{ snmp_failed }}</strong><span>{{ snmp_stale }} Stale</span></article>
+        <article class="phase77-kpi {% if sfp_problem_count %}is-warning{% endif %}"><small>SFP Issues</small><strong>{{ sfp_problem_count }}</strong><span>Warning/Critical</span></article>
+        <article class="phase77-kpi"><small>Documentation</small><strong>{{ documentation_percent }}%</strong><span>{{ undocumented_count }} بدون مستندات</span></article>
+    </section>
+
+    <section class="phase77-two-col">
+        <article class="phase77-panel">
+            <header><h2>اقدام‌های فوری</h2><a href="{% url 'inventory:alarm_center' %}">همه آلارم‌ها</a></header>
+            <div class="phase77-list">
+                {% for alarm in alarm_items %}
+                    <a class="phase77-row severity-{{ alarm.severity }}" href="{% url 'inventory:alarm_center' %}?status=active#alarm-{{ alarm.id }}">
+                        <span><b>{{ alarm.title }}</b><small>{% if alarm.switch %}{{ alarm.switch.name }}{% endif %}{% if alarm.port %} · {{ alarm.port.interface_name }}{% endif %}</small></span>
+                        <em>{{ alarm.get_severity_display }}</em>
+                    </a>
+                {% empty %}
+                    <div class="phase77-empty">آلارم فعالی وجود ندارد.</div>
+                {% endfor %}
+            </div>
+        </article>
+
+        <article class="phase77-panel">
+            <header><h2>SFP / Link Issues</h2><a href="{% url 'inventory:sfp_monitor' %}">SFP Live</a></header>
+            <div class="phase77-list">
+                {% for item in sfp_problem_items %}
+                    <a class="phase77-row {% if item.health_state == 'critical' or item.err_disabled %}severity-critical{% else %}severity-warning{% endif %}" href="{% url 'inventory:sfp_monitor' %}?switch={{ item.switch_id }}">
+                        <span><b>{{ item.switch.name }} · {{ item.interface_name }}</b><small>{{ item.link_status|default:"-" }} · {{ item.health_state }}</small></span>
+                        <em>{% if item.err_disabled %}Err-disabled{% else %}{{ item.health_state }}{% endif %}</em>
+                    </a>
+                {% empty %}
+                    <div class="phase77-empty">مشکل SFP فعالی ثبت نشده است.</div>
+                {% endfor %}
+            </div>
+        </article>
+    </section>
+
+    <section class="phase77-three-col">
+        <article class="phase77-panel">
+            <header><h2>Documentation</h2><a href="{% url 'inventory:asset_completion' %}">جزئیات</a></header>
+            <div class="phase77-stat-list">
+                <span><b>{{ documented_count }}</b> کامل</span>
+                <span><b>{{ partial_count }}</b> نیمه‌کامل</span>
+                <span><b>{{ undocumented_count }}</b> بدون مستندات</span>
+            </div>
+        </article>
+
+        <article class="phase77-panel">
+            <header><h2>Router Health</h2><a href="{% url 'inventory:mikrotik_center' %}">MikroTik</a></header>
+            <div class="phase77-list compact">
+                {% for item in router_health|slice:":8" %}
+                    <div class="phase77-row severity-{{ item.status }}"><span><b>{{ item.switch.name }}</b><small>{{ item.collected_at_text }}</small></span><em>{{ item.status }}</em></div>
+                {% empty %}<div class="phase77-empty">دیتای Router Health ثبت نشده است.</div>{% endfor %}
+            </div>
+        </article>
+
+        <article class="phase77-panel">
+            <header><h2>Recent Actions</h2><a href="{% url 'inventory:action_logs' %}">لاگ‌ها</a></header>
+            <div class="phase77-list compact">
+                {% for item in recent_actions|slice:":8" %}
+                    <div class="phase77-row"><span><b>{{ item.action_label|default:item.action }}</b><small>{{ item.switch.name }} · {{ item.port.interface_name }} · {{ item.created_at_text }}</small></span><em>{% if item.success %}OK{% else %}Fail{% endif %}</em></div>
+                {% empty %}<div class="phase77-empty">عملیات اخیر ثبت نشده است.</div>{% endfor %}
+            </div>
+        </article>
+    </section>
+</section>
+{% endblock %}

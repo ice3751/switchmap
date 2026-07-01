@@ -1,81 +1,44 @@
-import json
+from __future__ import annotations
+
+import argparse
 import os
-import subprocess
 import sys
+from datetime import datetime
 from pathlib import Path
 
 
-ROOT = Path(__file__).resolve().parents[1]
-MANIFEST = Path(__file__).with_name("manifest.json")
+def main() -> int:
+    parser = argparse.ArgumentParser(description="SwitchMap Phase94 read-only smoke runner")
+    parser.add_argument("--strict", action="store_true")
+    parser.add_argument("--output", default="")
+    args = parser.parse_args()
 
+    root = Path(__file__).resolve().parents[1]
+    os.chdir(str(root))
+    root_str = str(root)
+    if root_str not in sys.path:
+        sys.path.insert(0, root_str)
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
+    os.environ["PYTHONDONTWRITEBYTECODE"] = "1"
 
-PRODUCTION_ENV = {
-    "SWITCHMAP_DEBUG": "False",
-    "SWITCHMAP_SECRET_KEY": "switchmap-production-smoke-secret-key-with-more-than-fifty-characters",
-    "SWITCHMAP_ALLOWED_HOSTS": "127.0.0.1,localhost,testserver",
-    "SWITCHMAP_SECURE_SSL_REDIRECT": "True",
-    "SWITCHMAP_SESSION_COOKIE_SECURE": "True",
-    "SWITCHMAP_CSRF_COOKIE_SECURE": "True",
-    "SWITCHMAP_SECURE_HSTS_SECONDS": "31536000",
-    "SWITCHMAP_SECURE_HSTS_INCLUDE_SUBDOMAINS": "True",
-    "SWITCHMAP_SECURE_HSTS_PRELOAD": "True",
-}
+    import django
+    django.setup()
+    from django.core.management import call_command
 
+    stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    output = args.output or str(root / "logs" / f"phase94_smoke_runner_{stamp}.json")
+    cmd_args = ["--output", output]
+    if args.strict:
+        cmd_args.insert(0, "--strict")
 
-def load_manifest():
-    return json.loads(MANIFEST.read_text(encoding="utf-8"))
-
-
-def files_for_category(manifest, category):
-    if category == "all":
-        files = []
-        for key in ("current", "production", "legacy"):
-            files.extend(manifest[key])
-        return files
-    if category not in manifest:
-        raise SystemExit(f"Unknown smoke category: {category}")
-    return manifest[category]
-
-
-def env_for_category(category):
-    env = os.environ.copy()
-    if category == "production":
-        env.update(PRODUCTION_ENV)
-    return env
-
-
-def run(category):
-    manifest = load_manifest()
-    files = files_for_category(manifest, category)
-    env = env_for_category(category)
-    results = []
-
-    for rel_path in files:
-        path = ROOT / rel_path
-        if not path.exists():
-            results.append(("FAIL", rel_path, "missing file"))
-            continue
-
-        proc = subprocess.run(
-            [sys.executable, str(path)],
-            cwd=ROOT,
-            env=env,
-            text=True,
-            capture_output=True,
-            timeout=120,
-        )
-        output_lines = (proc.stdout.strip().splitlines() or proc.stderr.strip().splitlines() or [""])
-        status = "PASS" if proc.returncode == 0 else "FAIL"
-        results.append((status, rel_path, output_lines[-1]))
-
-    for status, rel_path, detail in results:
-        print(f"{status} {rel_path} | {detail}")
-
-    failed = [item for item in results if item[0] != "PASS"]
-    print(f"SUMMARY {len(results) - len(failed)} pass {len(failed)} fail")
-    return 1 if failed else 0
+    print("PHASE94_SMOKE_RUNNER_START")
+    print("MODE=read_only_no_visible_test_data_no_network_no_ssh_no_backup_no_restore_no_service")
+    print(f"ROOT={root}")
+    print(f"REPORT_JSON={output}")
+    call_command("phase94_verification_baseline_check", *cmd_args)
+    print("PHASE94_SMOKE_RUNNER_OK")
+    return 0
 
 
 if __name__ == "__main__":
-    category = sys.argv[1] if len(sys.argv) > 1 else "current"
-    raise SystemExit(run(category))
+    raise SystemExit(main())

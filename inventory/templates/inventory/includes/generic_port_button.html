@@ -10,6 +10,9 @@
         data-switch-ip="{{ switch_ip|default:'' }}"
         data-switch-user="{{ switch_user|default:'admin' }}"
         data-interface="{{ port|port_label }}"
+        data-port-label="{{ port.description|default_if_none:'' }}"
+        data-port-description="{{ port|port_description }}"
+        data-search-code="{{ port.description|default_if_none:'' }} {{ port.cable_label|default_if_none:'' }} {{ port.outlet|default_if_none:'' }} {{ port.interface_name|default_if_none:'' }} {{ port.snmp_raw_name|default_if_none:'' }} {{ port.snmp_alias|default_if_none:'' }} {{ port.neighbor_device|default_if_none:'' }} {{ port.neighbor_ip|default_if_none:'' }} {{ port.neighbor_port|default_if_none:'' }}"
         data-interface-name="{{ port|port_label }}"
         data-status="{{ port|port_state_label }}"
         data-port-mode="{{ port|port_mode }}"
@@ -35,3 +38,5 @@
     <span class="dynamic-port-label">{{ port|port_short_label }}</span>
     <span class="dynamic-port-subtitle">{% if port.port_mode == 'trunk' %}T{% elif port.access_vlan %}{{ port.access_vlan }}{% elif port.vlan %}{{ port.vlan }}{% else %}-{% endif %}</span>
 </button>
+{# PHASE70_LIMITED_QUICK_SEARCH_FIX: data attributes only; no layout/render change #}
+{# PHASE70_1_SEARCH_EXACT_UI_FIX: data attributes verified only; no layout/render change #}

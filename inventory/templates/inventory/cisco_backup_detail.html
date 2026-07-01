@@ -1,0 +1,65 @@
+{% extends "inventory/base.html" %}
+{% block title %}Cisco Backup Detail | SwitchMap{% endblock %}
+{% block content %}
+<div class="page-shell phase77-shell" data-phase84-cisco-backup-detail="1">
+  <section class="hero-panel">
+    <div>
+      <h1>Cisco Backup Detail</h1>
+      <p>{{ backup.device }} / {{ backup.backup_type_label }} / {{ backup.jalali_date }}</p>
+    </div>
+    <div class="hero-actions">
+      <a class="btn btn-secondary" href="{% url 'inventory:cisco_backup_center' %}">Back</a>
+      {% if backup.success and download_allowed %}<a class="btn btn-primary" href="{% url 'inventory:cisco_backup_download' backup.backup_id %}">Download Full File (Admin)</a>{% endif %}
+    </div>
+  </section>
+
+  <section class="grid two-col">
+    <div class="card-panel">
+      <h2>Metadata</h2>
+      <dl class="detail-list">
+        <dt>Device</dt><dd>{{ backup.device }}</dd>
+        <dt>IP</dt><dd class="ltr">{{ backup.management_ip }}</dd>
+        <dt>Model</dt><dd>{{ backup.model }}</dd>
+        <dt>Type</dt><dd>{{ backup.backup_type_label }}</dd>
+        <dt>Command</dt><dd class="ltr">{{ backup.command }}</dd>
+        <dt>Status</dt><dd>{% if backup.success %}<span class="badge ok">OK</span>{% else %}<span class="badge critical">FAIL</span>{% endif %}</dd>
+        {% if backup.error %}<dt>Error</dt><dd>{{ backup.error }}</dd>{% endif %}
+        <dt>Hash</dt><dd class="ltr">{{ backup.file_hash|default:"-" }}</dd>
+        <dt>Storage</dt><dd class="ltr"><small>{{ backup.file_path|default:"-" }}</small></dd>
+        <dt>UI Preview</dt><dd>{{ backup.ui_preview|default:"masked" }}</dd>
+        <dt>Sensitive Lines</dt><dd>{{ backup.sensitive_line_count|default:"0" }}</dd>
+        <dt>Download Scope</dt><dd>{{ backup.download_scope|default:"admin-only" }}</dd>
+      </dl>
+    </div>
+    <div class="card-panel">
+      <h2>Restore Prepare / Dry-run</h2>
+      {% if validation %}
+        <p>Status: {% if validation.ok %}<span class="badge ok">Validatable</span>{% else %}<span class="badge critical">Blocked</span>{% endif %}</p>
+        <p>Lines: {{ validation.line_count }} / Non-empty: {{ validation.non_empty_count }} / Sensitive: {{ validation.dangerous_count }}</p>
+        {% if validation.blockers %}<h3>Blockers</h3><ul>{% for item in validation.blockers %}<li>{{ item }}</li>{% endfor %}</ul>{% endif %}
+        {% if validation.warnings %}<h3>Warnings</h3><ul>{% for item in validation.warnings %}<li>{{ item }}</li>{% endfor %}</ul>{% endif %}
+      {% else %}
+        <p>Restore Prepare فقط برای running-config / startup-config فعال است.</p>
+      {% endif %}
+      {% if backup.success %}
+      <form method="post" action="{% url 'inventory:cisco_backup_validate_restore' backup.backup_id %}">
+        {% csrf_token %}
+        <button class="btn btn-danger" type="submit">Validate Restore Candidate</button>
+      </form>
+      {% endif %}
+      <p class="muted small">Restore واقعی در Phase84 عمداً غیرفعال است.</p>
+    </div>
+  </section>
+
+  <section class="card-panel">
+    <h2>Diff با Backup قبلی</h2>
+    <p class="muted small">Preview و Diff برای جلوگیری از نمایش Secret ماسک می‌شوند. فایل اصلی فقط با Download و سطح Admin قابل دریافت است.</p>
+    <pre class="code-block ltr">{{ diff_text|default:"No previous diff." }}</pre>
+  </section>
+
+  <section class="card-panel">
+    <h2>Masked Content Preview</h2>
+    <pre class="code-block ltr">{{ content_preview|default:"No content."|truncatechars:80000 }}</pre>
+  </section>
+</div>
+{% endblock %}

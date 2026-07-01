@@ -1,44 +1,19 @@
 {
+  "schema_version": "phase94r3_verification_baseline_v1",
+  "mode": "read_only_no_visible_test_data_no_network_no_ssh_no_backup_no_restore_no_service",
+  "visible_test_data_created": "NO",
   "current": [
-    "switchmap_23_1_visual_smoke_test.py",
-    "switchmap_26_6_dashboard_sfp_ui_smoke_test.py",
-    "switchmap_26_7_nexus_dashboard_smoke_test.py",
-    "switchmap_26_10_nexus_dashboard_layout_smoke_test.py",
-    "switchmap_26_12_nexus_dashboard_port_size_smoke_test.py",
-    "switchmap_26_13_sfp_dashboard_true_live_smoke_test.py",
-    "switchmap_27_access_control_smoke_test.py",
-    "switchmap_28_sfp_alert_smoke_test.py",
-    "switchmap_30_topology_smoke_test.py",
-    "switchmap_31a_bulk_ssh_smoke_test.py",
-    "switchmap_31b_1_alarm_actions_smoke_test.py",
-    "switchmap_31c_ui_cleanup_smoke_test.py",
-    "switchmap_32_user_management_smoke_test.py",
-    "switchmap_33_topology_ui_smoke_test.py",
-    "switchmap_33b_topology_matching_smoke_test.py",
-    "switchmap_34_1_backup_ui_smoke_test.py",
-    "switchmap_34_backup_center_smoke_test.py",
-    "switchmap_35_1_notification_ui_smoke_test.py",
-    "switchmap_36_1_asset_ui_smoke_test.py",
-    "switchmap_36_asset_documentation_smoke_test.py",
-    "switchmap_40_mikrotik_inventory_topology_smoke_test.py",
-    "switchmap_41_dynamic_device_layout_smoke_test.py",
-    "switchmap_41_2_switch_edit_save_smoke_test.py"
+    "smoke_tests/run_smoke.py"
   ],
   "production": [
-    "switchmap_29_production_smoke_test.py"
+    "smoke_tests/run_smoke.py"
   ],
-  "legacy": [
-    "switchmap_23_ui_smoke_test.py",
-    "switchmap_26_1_cisco_logs_smoke_test.py",
-    "switchmap_26_2_cisco_log_ux_smoke_test.py",
-    "switchmap_26_3_cisco_log_pull_smoke_test.py",
-    "switchmap_26_4_sfp_monitor_smoke_test.py",
-    "switchmap_26_5_dashboard_sfp_smoke_test.py",
-    "switchmap_26_8_nexus_visual_smoke_test.py",
-    "switchmap_26_9_nexus_dashboard_tune_smoke_test.py",
-    "switchmap_26_11_nexus_dashboard_port_labels_smoke_test.py",
-    "switchmap_26_audit_smoke_test.py",
-    "switchmap_31b_alarm_center_smoke_test.py",
-    "switchmap_35_notification_dashboard_smoke_test.py"
-  ]
+  "phase94": [
+    "smoke_tests/run_smoke.py"
+  ],
+  "notes": {
+    "summary": "This manifest intentionally does not reference historical missing smoke files.",
+    "runner": "The runner invokes Phase94R3 read-only guards only.",
+    "safety": "No Switch, Port, Alarm, Backup, Credential, Scheduled Task, Service, SSH, SNMP, or Restore object is created or modified."
+  }
 }

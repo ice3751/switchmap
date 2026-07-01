@@ -1,0 +1,117 @@
+/* Phase 78 isolated UI. No dashboard/switch-map/search layout override. */
+.phase78-body .phase78-shell { max-width: 1540px; }
+.phase78-kpi-grid { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.phase78-note {
+    margin: 0 0 12px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    background: #eff6ff;
+    color: #1e3a8a;
+    font-weight: 800;
+}
+.phase78-rulebox {
+    display: grid;
+    grid-template-columns: 140px minmax(0, 1fr);
+    gap: 10px 12px;
+    align-items: start;
+}
+.phase78-rulebox b {
+    color: #0f172a;
+}
+.phase78-rulebox span {
+    color: #64748b;
+}
+.phase78-table-wrap {
+    overflow: auto;
+}
+.phase78-table td,
+.phase78-table th {
+    white-space: nowrap;
+}
+.phase78-table td:first-child,
+.phase78-table td:last-child {
+    white-space: normal;
+    min-width: 220px;
+}
+.phase77-pill.severity-critical { background: #fee2e2; color: #991b1b; }
+.phase77-pill.severity-warning { background: #fef3c7; color: #92400e; }
+.phase77-pill.severity-info { background: #dbeafe; color: #1e40af; }
+@media (max-width: 1200px) {
+    .phase78-kpi-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 760px) {
+    .phase78-kpi-grid { grid-template-columns: 1fr; }
+    .phase78-rulebox { grid-template-columns: 1fr; }
+}
+
+/* PHASE78_1_ALARM_BADGE_UI: isolate mixed English/number text in RTL cards. */
+.phase78-severity-split {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    direction: ltr;
+    unicode-bidi: isolate;
+    flex-wrap: wrap;
+}
+.phase78-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    direction: ltr;
+    unicode-bidi: isolate;
+    white-space: nowrap;
+    border-radius: 999px;
+    padding: 4px 9px;
+    font-size: 12px;
+    line-height: 1.2;
+    font-weight: 900;
+    border: 1px solid transparent;
+}
+.phase78-badge-critical {
+    background: #fee2e2;
+    color: #991b1b;
+    border-color: #fecaca;
+}
+.phase78-badge-warning {
+    background: #fef3c7;
+    color: #92400e;
+    border-color: #fde68a;
+}
+
+/* PHASE78_2_ALARM_BADGE_LAYOUT_FIX: override generic .phase77-kpi span display:block. */
+.phase77-kpi .phase78-severity-split {
+    display: flex !important;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 8px;
+    direction: ltr;
+    unicode-bidi: isolate;
+    flex-wrap: wrap;
+}
+.phase77-kpi .phase78-severity-split .phase78-badge {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    width: auto;
+    min-width: 0;
+    direction: ltr;
+    unicode-bidi: isolate;
+    white-space: nowrap;
+    text-align: center;
+    border-radius: 999px;
+    padding: 5px 10px;
+    font-size: 12px;
+    line-height: 1.1;
+    font-weight: 900;
+}
+.phase77-kpi .phase78-severity-split .phase78-badge .ltr {
+    display: inline !important;
+    margin: 0;
+    font-size: 12px;
+    color: inherit;
+    line-height: 1.1;
+}
+

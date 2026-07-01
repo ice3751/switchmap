@@ -6,20 +6,23 @@ import sqlite3
 import tempfile
 import zipfile
 from pathlib import Path
-from datetime import datetime, time
+from datetime import datetime, time, timedelta
 from decimal import Decimal, InvalidOperation
 from io import BytesIO, StringIO
 from zoneinfo import ZoneInfo
+from urllib.parse import urlencode
 
 from django.conf import settings
+from django.core.cache import cache
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.core.management import call_command
 from django.core.paginator import Paginator
 from django.db.models import Count, Prefetch, Q
-from django.http import Http404, HttpResponse, JsonResponse
+from django.http import FileResponse, Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.dateparse import parse_date
@@ -28,8 +31,13 @@ from django.views.decorators.http import require_POST
 IRAN_TZ = ZoneInfo("Asia/Tehran")
 
 from .forms import PortForm, SSHPortActionForm, SwitchBulkImportForm, SwitchForm, UserCreateForm, UserPasswordForm, UserUpdateForm
-from .access_control import ROLE_ADMIN, ROLE_OPERATOR, ROLE_VIEW_ONLY, can_run_ssh_action, user_role
+from .access_control import ROLE_ADMIN, ROLE_OPERATOR, ROLE_VIEW_ONLY, can_admin_panel, can_edit_port, can_refresh, can_run_ssh, can_run_ssh_action, user_role
 from .models import AlarmNotification, CiscoSyslogEntry, Port, PortActionLog, PortDocumentationHistory, SfpMonitorSnapshot, Switch, SystemAuditLog
+from .phase79_history import latest_port_connection, history_has_identity_data
+from .endpoint_display_policy import classify_port_connection_display
+from .alarm_rules import AlarmCandidate, evaluate_alarm_candidates, sfp_alarm_details, sfp_rule_key_for_tag, sfp_severity_for_tag
+from .alarm_policy import alarm_is_false_positive, is_actionable_interface_down, sfp_issue_labels_from_values as policy_sfp_issue_labels_from_values
+from .topology_engine import classify_edge, edge_warning_allowed, topology_alarm_should_exist
 from .ssh_tools import (
     SshActionError,
     action_label,
@@ -38,6 +46,7 @@ from .ssh_tools import (
     action_risk_text,
     build_port_commands,
     run_port_action,
+    run_port_multi_actions,
     run_bulk_port_actions,
     run_switch_show_commands,
 )
@@ -103,6 +112,128 @@ def _apply_dashboard_port_groups(switch):
     )
 
 
+
+def _phase79_empty_last_connection_payload():
+    return {
+        "available": False,
+        "identity": "سابقه‌ای ثبت نشده",
+        "event_type": "-",
+        "observed_at_text": "-",
+        "last_verified_at_text": "-",
+        "neighbor": "-",
+        "neighbor_source": "-",
+        "mac": "-",
+        "ip": "-",
+        "vlan": "-",
+        "status_after": "-",
+        "source": "-",
+        "classification": "no_current_evidence",
+        "display_label": "",
+        "display_source": "",
+        "direct": False,
+        "confidence": 0,
+        "reason": "No current connected-device evidence is available.",
+        "raw_evidence": {},
+    }
+
+
+def _phase79_clean_identity(value):
+    if value is None:
+        return ""
+    value = str(value).strip()
+    if value in ("", "-", "None", "none", "null", "Null", "NULL"):
+        return ""
+    if value.lower() in ("unknown", "نامشخص"):
+        return ""
+    return value
+
+
+def _phase79_first_mac(value):
+    value = _phase79_clean_identity(value)
+    if not value:
+        return ""
+    for part in re.split(r"[\s,;]+", value):
+        part = _phase79_clean_identity(part)
+        if part:
+            return part
+    return ""
+
+
+def _phase79_neighbor_label(device, port):
+    return " / ".join(filter(None, [
+        _phase79_clean_identity(device),
+        _phase79_clean_identity(port),
+    ]))
+
+
+def _phase79_current_connection_payload(port):
+    if not port:
+        return _phase79_empty_last_connection_payload()
+    display = classify_port_connection_display(port)
+    if not display.get("available"):
+        return _phase79_empty_last_connection_payload()
+    observed_at = getattr(port, "discovery_last_poll", None) or getattr(port, "snmp_last_poll", None) or getattr(port, "updated_at", None)
+    status_after = getattr(port, "status", "") or ""
+    event_type = "Current" if str(status_after).lower() == "up" else "Last known"
+    return {
+        "available": True,
+        "identity": display["display_label"],
+        "event_type": event_type,
+        "observed_at_text": _dt_text(observed_at),
+        "last_verified_at_text": _dt_text(observed_at),
+        "neighbor": display["raw_evidence"].get("neighbor") or "-",
+        "neighbor_source": _phase79_clean_identity(getattr(port, "neighbor_source", "")) or "-",
+        "mac": display["display_mac"] or "-",
+        "ip": display["display_ip"] or "-",
+        "vlan": display["display_vlan"] or "-",
+        "status_after": status_after or "-",
+        "source": display["display_source"] or "-",
+        "classification": display["classification"],
+        "display_label": display["display_label"],
+        "display_source": display["display_source"],
+        "direct": display["direct"],
+        "confidence": display["confidence"],
+        "reason": display["reason"],
+        "raw_evidence": display["raw_evidence"],
+    }
+
+
+def _phase79_history_payload(history):
+    if not history:
+        return _phase79_empty_last_connection_payload()
+    display = classify_port_connection_display(history)
+    if not display.get("available"):
+        return _phase79_empty_last_connection_payload()
+    return {
+        "available": True,
+        "identity": display["display_label"],
+        "event_type": history.get_event_type_display() if hasattr(history, "get_event_type_display") else _phase79_clean_identity(getattr(history, "event_type", "")) or "-",
+        "observed_at_text": _dt_text(getattr(history, "observed_at", None)),
+        "last_verified_at_text": _dt_text(getattr(history, "last_verified_at", None)),
+        "neighbor": display["raw_evidence"].get("neighbor") or "-",
+        "neighbor_source": _phase79_clean_identity(getattr(history, "neighbor_source", "")) or "-",
+        "mac": display["display_mac"] or "-",
+        "ip": display["display_ip"] or "-",
+        "vlan": display["display_vlan"] or "-",
+        "status_after": _phase79_clean_identity(getattr(history, "status_after", "")) or "-",
+        "source": display["display_source"] or _phase79_clean_identity(getattr(history, "source", "")) or "-",
+        "classification": display["classification"],
+        "display_label": display["display_label"],
+        "display_source": display["display_source"],
+        "direct": display["direct"],
+        "confidence": display["confidence"],
+        "reason": display["reason"],
+        "raw_evidence": display["raw_evidence"],
+    }
+
+
+def _phase79_effective_last_connection_payload(port):
+    current = _phase79_current_connection_payload(port)
+    if current.get("available"):
+        return current
+    return _phase79_history_payload(latest_port_connection(port))
+
+
 def _port_payload(port):
     if not port:
         return {}
@@ -135,6 +266,7 @@ def _port_payload(port):
         "snmp_last_poll_text": _dt_text(port.snmp_last_poll),
         "discovery_last_poll_text": _dt_text(port.discovery_last_poll),
         "neighbor_source": port.neighbor_source or "",
+        "last_connection": _phase79_effective_last_connection_payload(port),
         "edit_url": reverse("inventory:port_edit", args=[port.id]),
         "table_url": reverse("inventory:switch_ports_table", args=[port.switch.id]),
         "map_url": f"{reverse('inventory:switch_detail', args=[port.switch.id])}?port={port.id}",
@@ -223,7 +355,6 @@ def _refresh_step_payload(stage, result):
 
 def _alarm_dashboard_payload(limit=8):
     try:
-        _sync_alarm_notifications()
         active_qs = AlarmNotification.objects.select_related("switch", "port").filter(status=AlarmNotification.Status.ACTIVE)
         alarms = list(active_qs.order_by("severity", "-last_seen", "-id")[:limit])
         alarms.sort(key=lambda item: (_alarm_severity_rank(item.severity), item.switch.name if item.switch else "", item.title))
@@ -275,8 +406,554 @@ def _attach_switch_alarm_summaries(switches):
         switch.dashboard_alarm_titles = items[:3]
 
 
-def switch_list(request):
-    search_query = request.GET.get("q", "").strip()
+def _backup_dashboard_payload(force=False):
+    if not force and BACKUP_DASHBOARD_CACHE_SECONDS > 0:
+        cached = cache.get(BACKUP_DASHBOARD_CACHE_KEY)
+        if cached is not None:
+            return cached
+    try:
+        backup_files = _list_backup_files()
+        latest_backup = backup_files[0] if backup_files else None
+        total_size = sum(item.get("size", 0) for item in backup_files)
+        payload = {
+            "status": "ok" if backup_files else "unknown",
+            "count": len(backup_files),
+            "latest": latest_backup,
+            "latest_text": latest_backup.get("created_at_text", "") if latest_backup else "",
+            "latest_name": latest_backup.get("name", "") if latest_backup else "",
+            "total_size_text": _file_size_text(total_size),
+        }
+    except Exception as exc:
+        payload = {
+            "status": "unknown",
+            "count": 0,
+            "latest": None,
+            "latest_text": "",
+            "latest_name": "",
+            "total_size_text": "-",
+            "error": str(exc),
+        }
+    if not force and BACKUP_DASHBOARD_CACHE_SECONDS > 0:
+        cache.set(BACKUP_DASHBOARD_CACHE_KEY, payload, BACKUP_DASHBOARD_CACHE_SECONDS)
+    return payload
+
+# Phase 63: analytical live dashboard payload and background status
+DASHBOARD_INSIGHT_MARKER = "Phase 63 Live Insight Dashboard"
+DASHBOARD_FRESH_MINUTES = 20
+SWITCHMAP_TEST_DEVICE_TOKENS = (
+    "smoke",
+    "test",
+    "phase41",
+    "phase42",
+    "phase43",
+    "phase48",
+    "phase50",
+    "phase55",
+    "switchmap-phase",
+    "switchmap_phase",
+)
+
+
+# Phase104R1: dashboard performance stabilization.
+# Short TTL keeps the dashboard operational view fresh while avoiding repeated
+# topology/SFP/alarm/backup aggregation work on every browser refresh.
+def _phase104_int_env(name, default):
+    raw = os.environ.get(name, "")
+    try:
+        value = int(raw or default)
+    except (TypeError, ValueError):
+        value = int(default)
+    return max(0, value)
+
+
+DASHBOARD_INSIGHT_CACHE_KEY = "switchmap:phase104R1:dashboard_insight:v1"
+DASHBOARD_INSIGHT_CACHE_SECONDS = _phase104_int_env("SWITCHMAP_DASHBOARD_INSIGHT_CACHE_SECONDS", 20)
+BACKUP_DASHBOARD_CACHE_KEY = "switchmap:phase104R1:backup_dashboard:v1"
+BACKUP_DASHBOARD_CACHE_SECONDS = _phase104_int_env("SWITCHMAP_BACKUP_DASHBOARD_CACHE_SECONDS", 60)
+
+# Phase106: dashboard deep performance stabilization.
+# Cache the expensive rendered device-browser fragment separately from the live
+# four-card summary. This avoids rebuilding all switch-card SVG/port markup on
+# every dashboard refresh while keeping cards/data refreshable.
+DASHBOARD_DEVICE_BROWSER_CACHE_SECONDS = _phase104_int_env("SWITCHMAP_DASHBOARD_DEVICE_BROWSER_CACHE_SECONDS", 20)
+DASHBOARD_DEVICE_BROWSER_CACHE_VERSION = "phase106R1-v1"
+DASHBOARD_FAST_TOPOLOGY_CACHE_KEY = "switchmap-phase106R1-dashboard-fast-topology-v1"
+DASHBOARD_FAST_TOPOLOGY_CACHE_SECONDS = _phase104_int_env("SWITCHMAP_DASHBOARD_FAST_TOPOLOGY_CACHE_SECONDS", 20)
+
+
+def _dashboard_text_blob(switch):
+    return " ".join(
+        [
+            switch.name or "",
+            switch.model or "",
+            switch.location or "",
+            switch.site or "",
+            str(switch.management_ip or ""),
+            switch.notes or "",
+            getattr(switch, "vendor", "") or "",
+            getattr(switch, "device_family", "") or "",
+        ]
+    ).lower()
+
+
+def _is_dashboard_test_device(switch):
+    blob = _dashboard_text_blob(switch)
+    return any(token in blob for token in SWITCHMAP_TEST_DEVICE_TOKENS)
+
+
+def _dashboard_age_text(value, now=None):
+    if not value:
+        return "ثبت نشده"
+    now = now or timezone.now()
+    seconds = max(0, int((now - value).total_seconds()))
+    if seconds < 90:
+        return "کمتر از یک دقیقه قبل"
+    minutes = seconds // 60
+    if minutes < 60:
+        return f"{minutes} دقیقه قبل"
+    hours = minutes // 60
+    if hours < 24:
+        return f"{hours} ساعت قبل"
+    days = hours // 24
+    return f"{days} روز قبل"
+
+
+
+def _dashboard_detail_url(route_name, *args, query=None, fragment=""):
+    url = reverse(route_name, args=args)
+    if query:
+        url += "?" + urlencode({key: value for key, value in query.items() if value not in (None, "")})
+    if fragment:
+        url += "#" + str(fragment)
+    return url
+
+
+def _alarm_detail_url(alarm):
+    return reverse("inventory:alarm_detail", args=[alarm.id])
+
+
+def _switch_issue_url(switch_id, issue_id=""):
+    return _dashboard_detail_url("inventory:switch_detail", switch_id, query={"issue": issue_id} if issue_id else None)
+
+
+def _port_issue_url(switch_id, port_id, issue_id=""):
+    return _dashboard_detail_url("inventory:switch_detail", switch_id, query={"port": port_id, "issue": issue_id})
+
+def _dashboard_status_file():
+    return Path(settings.BASE_DIR) / "logs" / "dashboard-background-refresh-status.json"
+
+
+def _dashboard_background_status(now=None):
+    now = now or timezone.now()
+    path = _dashboard_status_file()
+    default = {
+        "configured": False,
+        "state": "unknown",
+        "label": "وضعیت سرویس مشخص نیست",
+        "last_run_text": "ثبت نشده",
+        "last_result": "unknown",
+        "summary": "فایل وضعیت Auto Refresh هنوز ساخته نشده است.",
+    }
+    if not path.exists():
+        return default
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except Exception as exc:
+        default.update({"configured": True, "state": "error", "label": "خطا در خواندن وضعیت", "summary": str(exc)})
+        return default
+
+    completed = data.get("completed_at") or data.get("started_at") or ""
+    completed_dt = None
+    if completed:
+        try:
+            completed_dt = datetime.fromisoformat(str(completed).replace("Z", "+00:00"))
+            if timezone.is_naive(completed_dt):
+                completed_dt = timezone.make_aware(completed_dt, timezone.get_current_timezone())
+        except Exception:
+            completed_dt = None
+
+    is_fresh = bool(completed_dt and completed_dt >= now - timedelta(minutes=DASHBOARD_FRESH_MINUTES))
+    has_error = bool(data.get("errors")) or str(data.get("status") or "").lower() not in {"ok", "success", "done", ""}
+    state = "ok" if is_fresh and not has_error else ("warning" if completed_dt else "unknown")
+    if has_error:
+        state = "warning"
+    return {
+        "configured": True,
+        "state": state,
+        "label": "Auto Refresh فعال" if state == "ok" else "Auto Refresh نیاز به بررسی دارد",
+        "last_run_text": _dashboard_age_text(completed_dt, now) if completed_dt else "ثبت نشده",
+        "last_run": completed_dt.isoformat() if completed_dt else "",
+        "last_result": data.get("status") or "ok",
+        "summary": data.get("summary") or "SNMP و Discovery در پس‌زمینه اجرا شده‌اند.",
+        "devices": data.get("devices", 0),
+        "ok": data.get("ok", 0),
+        "failed": data.get("failed", 0),
+    }
+
+
+def _device_insight_item(switch, now, fresh_cutoff):
+    last_poll = switch.snmp_last_poll
+    last_discovery = switch.discovery_last_poll
+    best_poll = max([item for item in [last_poll, last_discovery] if item], default=None)
+    snmp_error = (switch.snmp_last_error or "").strip()
+    discovery_error = (switch.discovery_last_error or "").strip()
+
+    if not switch.snmp_enabled:
+        status = "not_monitored"
+        severity = "info"
+        title = "خارج از پوشش"
+        compact_reason = "Not Monitored"
+        conclusion = "برای این دستگاه SNMP Read Only تعریف نشده است."
+        action = "اگر باید مانیتور شود، SNMP Read Only و Community را ثبت کن."
+    elif snmp_error:
+        status = "poll_failed"
+        severity = "critical"
+        title = "خطای مانیتورینگ"
+        compact_reason = "SNMP Failed"
+        conclusion = "SNMP پاسخ نمی‌دهد یا مسیر UDP 161 بسته است."
+        action = f"دسترسی SNMP از VM به {switch.management_ip}:161 و Community را بررسی کن."
+    elif discovery_error:
+        status = "discovery_warning"
+        severity = "warning"
+        title = "داده توپولوژی ناقص"
+        compact_reason = "Discovery Stale"
+        conclusion = "SNMP پایه سالم است، ولی CDP/LLDP/MAC کامل به‌روزرسانی نشده است."
+        action = "دسترسی Discovery و SNMP Table ها را بررسی کن."
+    elif not best_poll or best_poll < fresh_cutoff:
+        status = "stale"
+        severity = "warning"
+        title = "داده قدیمی"
+        compact_reason = "Poll Stale"
+        conclusion = "آخرین داده برای تصمیم‌گیری تازه نیست."
+        action = "وضعیت Scheduled Task و لاگ Auto Refresh را بررسی کن."
+    else:
+        status = "healthy"
+        severity = "ok"
+        title = "قابل اتکا"
+        compact_reason = "Healthy"
+        conclusion = "داده تازه و بدون خطا است."
+        action = "اقدام لازم ندارد."
+
+    issue_id = f"device-{switch.id}-{status}"
+    return {
+        "id": switch.id,
+        "issue_id": issue_id,
+        "object_type": "Device",
+        "object_name": switch.name,
+        "name": switch.name,
+        "ip": str(switch.management_ip or ""),
+        "status": status,
+        "severity": severity,
+        "title": title,
+        "conclusion": conclusion,
+        "short_reason": conclusion,
+        "compact_reason": compact_reason,
+        "recommended_action": action,
+        "last_check_time": timezone.localtime(best_poll, IRAN_TZ).strftime("%Y-%m-%d %H:%M:%S") if best_poll else "ثبت نشده",
+        "last_poll": timezone.localtime(best_poll, IRAN_TZ).strftime("%Y-%m-%d %H:%M:%S") if best_poll else "",
+        "last_poll_text": _dashboard_age_text(best_poll, now) if best_poll else "ثبت نشده",
+        "snmp_error": snmp_error[:180],
+        "discovery_error": discovery_error[:180],
+        "detail_url": _switch_issue_url(switch.id, issue_id),
+    }
+
+
+
+def _dashboard_topology_issues(sfp_dashboard, discovery_warning, limit=5):
+    """Build only the compact topology issues needed by the dashboard.
+
+    Phase106R1 intentionally avoids the full topology page builder here because
+    that function can trigger many per-edge history lookups. The dashboard only
+    needs a short actionable list/count.
+    """
+    cache_key = DASHBOARD_FAST_TOPOLOGY_CACHE_KEY
+    cached = cache.get(cache_key) if DASHBOARD_FAST_TOPOLOGY_CACHE_SECONDS > 0 else None
+    if cached is not None:
+        return cached
+
+    issues = []
+
+    for item in sfp_dashboard.get("items", [])[:8]:
+        if any(token in str(item.get("switch", "")).lower() for token in SWITCHMAP_TEST_DEVICE_TOKENS):
+            continue
+        switch_id = item.get("switch_id")
+        port_id = item.get("port_id")
+        issue_id = f"sfp-{switch_id}-{item.get('interface', '')}".replace(" ", "-").replace("/", "-")
+        detail_url = _port_issue_url(switch_id, port_id, issue_id) if switch_id and port_id else _dashboard_detail_url("inventory:sfp_monitor", query={"switch": switch_id}, fragment=issue_id)
+        issues.append({
+            "issue_id": issue_id,
+            "severity": "critical" if item.get("is_error") else "warning",
+            "title": f"SFP / Link: {item.get('switch', '-')} {item.get('interface', '-')}",
+            "summary": item.get("note") or item.get("health_text") or "SFP issue",
+            "compact_reason": "SFP Warning" if not item.get("is_error") else "SFP Critical",
+            "object_type": "SFP",
+            "object_name": f"{item.get('switch', '-')} {item.get('interface', '-')}",
+            "last_check_time": item.get("poll_time") or "ثبت نشده",
+            "short_reason": item.get("note") or "SFP abnormal",
+            "recommended_action": "پورت، ماژول SFP، Patch Cord و سمت مقابل لینک را بررسی کن.",
+            "detail_url": detail_url,
+        })
+
+    for item in discovery_warning[:5]:
+        issue_id = item.get("issue_id") or f"discovery-{item.get('id')}"
+        issues.append({
+            "issue_id": issue_id,
+            "severity": "warning",
+            "title": f"Discovery stale: {item.get('name', '-')}",
+            "summary": item.get("conclusion") or "Topology discovery issue",
+            "compact_reason": "Discovery Stale",
+            "object_type": "Discovery",
+            "object_name": item.get("name") or "Device",
+            "last_check_time": item.get("last_check_time") or item.get("last_poll_text") or "ثبت نشده",
+            "short_reason": item.get("discovery_error") or item.get("conclusion") or "Discovery ناقص است.",
+            "recommended_action": item.get("recommended_action") or "CDP / LLDP / SNMP Table را بررسی کن.",
+            "detail_url": item.get("detail_url") or _switch_issue_url(item.get("id"), issue_id),
+        })
+
+    try:
+        ports = (
+            Port.objects.select_related("switch")
+            .filter(switch__is_active=True)
+            .order_by("switch__name", "display_order", "interface_name")
+        )
+        for port in ports:
+            if len(issues) >= 20:
+                break
+            switch = getattr(port, "switch", None)
+            if not switch or _is_dashboard_test_device(switch):
+                continue
+            if not is_visible_switchmap_interface(port.interface_name):
+                continue
+            if _topology_role_for_port(port) == "uplink" and not port.neighbor_device and topology_alarm_should_exist(port):
+                issue_id = f"topology-uplink-{port.id}"
+                issues.append({
+                    "issue_id": issue_id,
+                    "severity": "warning",
+                    "title": f"Uplink بدون Neighbor: {switch.name} {port.interface_name}",
+                    "summary": "Uplink شناسایی شده ولی Neighbor ندارد.",
+                    "compact_reason": "Neighbor Missing",
+                    "object_type": "Topology Port",
+                    "object_name": f"{switch.name} {port.interface_name}",
+                    "last_check_time": _dashboard_age_text(getattr(port, "discovery_last_poll", None)),
+                    "short_reason": "CDP/LLDP برای این Uplink داده معتبر نداده است.",
+                    "recommended_action": "CDP/LLDP و پورت سمت مقابل را بررسی کن.",
+                    "detail_url": reverse("inventory:topology_edge_detail", args=[port.id]),
+                })
+    except Exception:
+        pass
+
+    ranked = sorted(
+        issues,
+        key=lambda item: (0 if item.get("severity") == "critical" else 1, item.get("title") or ""),
+    )
+    result = (ranked[:limit], len(ranked))
+    if DASHBOARD_FAST_TOPOLOGY_CACHE_SECONDS > 0:
+        cache.set(cache_key, result, DASHBOARD_FAST_TOPOLOGY_CACHE_SECONDS)
+    return result
+
+
+def _dashboard_insight_payload_uncached(force=False):
+    now = timezone.now()
+    fresh_cutoff = now - timedelta(minutes=DASHBOARD_FRESH_MINUTES)
+    queryset = (
+        Switch.objects.filter(is_active=True)
+        .prefetch_related("ports")
+        .order_by("topology_position", "name")
+    )
+    switches = [switch for switch in queryset if not _is_dashboard_test_device(switch)]
+    device_items = [_device_insight_item(switch, now, fresh_cutoff) for switch in switches]
+
+    healthy = [item for item in device_items if item["status"] == "healthy"]
+    failed = [item for item in device_items if item["status"] == "poll_failed"]
+    stale = [item for item in device_items if item["status"] == "stale"]
+    discovery_warning = [item for item in device_items if item["status"] == "discovery_warning"]
+    not_monitored = [item for item in device_items if item["status"] == "not_monitored"]
+    attention = failed + stale + discovery_warning
+    total = len(device_items)
+    reliable_percent = round((len(healthy) / total) * 100) if total else 0
+    coverage_percent = round(((total - len(not_monitored)) / total) * 100) if total else 0
+
+    alarm_dashboard = _alarm_dashboard_payload(limit=6)
+    sfp_dashboard = _sfp_dashboard_payload()
+    backup_dashboard = _backup_dashboard_payload(force=force)
+    background_status = _dashboard_background_status(now)
+    topology_issues, topology_issue_count = _dashboard_topology_issues(sfp_dashboard, discovery_warning, limit=5)
+
+    if alarm_dashboard.get("critical"):
+        state = "critical"
+        title = "آلارم Critical فعال است"
+        subtitle = "اول آلارم‌های Critical را بررسی کن؛ این موارد روی عملیات اثر مستقیم دارند."
+    elif failed:
+        state = "critical"
+        title = f"{len(failed)} دستگاه مانیتورینگ ناموفق دارد"
+        subtitle = "SNMP پاسخ نمی‌دهد؛ مسیر شبکه، Firewall یا Community را بررسی کن."
+    elif stale:
+        state = "warning"
+        title = f"{len(stale)} دستگاه داده تازه ندارد"
+        subtitle = "داده قدیمی برای تصمیم‌گیری قابل اتکا نیست؛ سرویس Auto Refresh یا لاگ آن را بررسی کن."
+    elif topology_issue_count:
+        state = "warning"
+        title = "چند هشدار قابل بررسی وجود دارد"
+        subtitle = "داده اصلی تازه است، ولی بعضی منابع تکمیلی نیاز به بررسی دارند."
+    else:
+        state = "ok"
+        title = "وضعیت شبکه قابل اتکا است"
+        subtitle = "داده‌های مانیتورینگ تازه‌اند و خطای مهمی دیده نمی‌شود."
+
+    actions = []
+    for item in failed[:4]:
+        actions.append({
+            "issue_id": item["issue_id"],
+            "object_type": item["object_type"],
+            "object_name": item["object_name"],
+            "severity": "critical",
+            "title": item["name"],
+            "summary": item["conclusion"],
+            "short_reason": item["short_reason"],
+            "compact_reason": item.get("compact_reason", item["short_reason"]),
+            "action": item["recommended_action"],
+            "recommended_action": item["recommended_action"],
+            "last_check_time": item["last_check_time"],
+            "last_poll_text": item["last_poll_text"],
+            "detail_url": item["detail_url"],
+        })
+    for item in stale[:3]:
+        actions.append({
+            "issue_id": item["issue_id"],
+            "object_type": item["object_type"],
+            "object_name": item["object_name"],
+            "severity": "warning",
+            "title": item["name"],
+            "summary": item["conclusion"],
+            "short_reason": item["short_reason"],
+            "compact_reason": item.get("compact_reason", item["short_reason"]),
+            "action": item["recommended_action"],
+            "recommended_action": item["recommended_action"],
+            "last_check_time": item["last_check_time"],
+            "last_poll_text": item["last_poll_text"],
+            "detail_url": item["detail_url"],
+        })
+    for alarm in alarm_dashboard.get("items", [])[:4]:
+        target_name = alarm.switch.name if alarm.switch else "SwitchMap"
+        if alarm.port:
+            target_name = f"{target_name} / {alarm.port.interface_name}"
+        actions.append({
+            "issue_id": f"alarm-{alarm.id}",
+            "object_type": "Alarm",
+            "object_name": target_name,
+            "severity": "critical" if alarm.severity == AlarmNotification.Severity.CRITICAL else "warning",
+            "title": alarm.title,
+            "summary": alarm.message or alarm.details or "آلارم فعال",
+            "short_reason": alarm.message or alarm.details or "آلارم فعال",
+            "compact_reason": "Alarm Active",
+            "action": "جزئیات را در Alarm Center بررسی و Ack/Resolve کن.",
+            "recommended_action": "جزئیات را در Alarm Center بررسی و Ack/Resolve کن.",
+            "last_check_time": timezone.localtime(alarm.last_seen, IRAN_TZ).strftime("%Y-%m-%d %H:%M:%S") if alarm.last_seen else "ثبت نشده",
+            "last_poll_text": _dashboard_age_text(alarm.last_seen, now),
+            "detail_url": _alarm_detail_url(alarm),
+        })
+    if not actions:
+        actions.append({
+            "issue_id": "dashboard-ok",
+            "object_type": "Dashboard",
+            "object_name": "SwitchMap",
+            "severity": "ok",
+            "title": "اقدام فوری لازم نیست",
+            "summary": "وضعیت فعلی قابل اتکا است.",
+            "short_reason": "Issue فعالی دیده نشد.",
+            "compact_reason": "OK",
+            "action": "داشبورد به‌صورت خودکار به‌روزرسانی می‌شود.",
+            "recommended_action": "اقدام لازم ندارد.",
+            "last_check_time": timezone.localtime(now, IRAN_TZ).strftime("%Y-%m-%d %H:%M:%S"),
+            "last_poll_text": _dashboard_age_text(now, now),
+            "detail_url": reverse("inventory:switch_list"),
+        })
+
+    alarm_items = []
+    for alarm in alarm_dashboard.get("items", [])[:6]:
+        target_name = alarm.switch.name if alarm.switch else "SwitchMap"
+        alarm_items.append({
+            "id": alarm.id,
+            "issue_id": f"alarm-{alarm.id}",
+            "object_type": "Alarm",
+            "object_name": target_name,
+            "title": alarm.title,
+            "severity": alarm.severity,
+            "target": target_name,
+            "port": alarm.port.interface_name if alarm.port else "",
+            "message": alarm.message or alarm.details or "",
+            "short_reason": alarm.message or alarm.details or "آلارم فعال",
+            "compact_reason": "Alarm Active",
+            "recommended_action": "Ack یا Resolve را از Alarm Center انجام بده.",
+            "last_check_time": timezone.localtime(alarm.last_seen, IRAN_TZ).strftime("%Y-%m-%d %H:%M:%S") if alarm.last_seen else "ثبت نشده",
+            "last_seen_text": _dashboard_age_text(alarm.last_seen, now),
+            "detail_url": _alarm_detail_url(alarm),
+        })
+
+    return {
+        "phase_marker": DASHBOARD_INSIGHT_MARKER,
+        "generated_at": timezone.localtime(now, IRAN_TZ).strftime("%Y-%m-%d %H:%M:%S"),
+        "overall": {"state": state, "title": title, "subtitle": subtitle},
+        "counters": {
+            "total_devices": total,
+            "healthy": len(healthy),
+            "attention": len(attention),
+            "snmp_failed": len(failed),
+            "stale": len(stale),
+            "not_monitored": len(not_monitored),
+            "coverage_percent": coverage_percent,
+            "reliable_percent": reliable_percent,
+            "active_alarms": alarm_dashboard.get("active", 0),
+            "critical_alarms": alarm_dashboard.get("critical", 0),
+            "warning_alarms": alarm_dashboard.get("warning", 0),
+            "sfp_issues": sfp_dashboard.get("summary", {}).get("active", 0),
+            "sfp_critical": sfp_dashboard.get("summary", {}).get("error", 0),
+            "topology_issues": topology_issue_count,
+            "topology_critical": sum(1 for item in topology_issues if item.get("severity") == "critical"),
+        },
+        "background": background_status,
+        "actions": actions[:8],
+        "alarms": alarm_items,
+        "topology_issues": topology_issues,
+        "device_items": device_items,
+        "sfp_dashboard": sfp_dashboard,
+        "backup_dashboard": backup_dashboard,
+        "alarm_categories": alarm_dashboard.get("categories", {}),
+    }
+
+
+def _dashboard_insight_payload(force=False):
+    if force or DASHBOARD_INSIGHT_CACHE_SECONDS <= 0:
+        return _dashboard_insight_payload_uncached(force=True)
+    cached = cache.get(DASHBOARD_INSIGHT_CACHE_KEY)
+    if cached is not None:
+        return cached
+    payload = _dashboard_insight_payload_uncached(force=False)
+    cache.set(DASHBOARD_INSIGHT_CACHE_KEY, payload, DASHBOARD_INSIGHT_CACHE_SECONDS)
+    return payload
+
+
+def switchmap_dashboard_data_view(request):
+    force = str(request.GET.get("force", "")).strip().lower() in {"1", "true", "yes", "refresh"}
+    return JsonResponse({"ok": True, "dashboard": _dashboard_insight_payload(force=force)})
+
+
+def _dashboard_device_browser_cache_key(request, search_query=""):
+    user = getattr(request, "user", None)
+    role = user_role(user)
+    flags = "".join([
+        "r1" if can_refresh(user) else "r0",
+        "a1" if can_admin_panel(user) else "a0",
+        "e1" if can_edit_port(user) else "e0",
+        "s1" if can_run_ssh(user) else "s0",
+    ])
+    query = (search_query or "").strip().lower()
+    safe_role = re.sub(r"[^a-zA-Z0-9_.-]+", "-", str(role or "anon")).strip("-") or "anon"
+    safe_query = re.sub(r"[^a-zA-Z0-9_.-]+", "-", query).strip("-")[:80]
+    return f"switchmap-{DASHBOARD_DEVICE_BROWSER_CACHE_VERSION}-device-browser-{safe_role}-{flags}-{safe_query}"
+
+
+def _dashboard_device_switches(search_query=""):
     switches = (
         Switch.objects.filter(is_active=True)
         .annotate(
@@ -307,6 +984,7 @@ def switch_list(request):
             | Q(ports__snmp_alias__icontains=search_query)
             | Q(ports__snmp_oper_status__icontains=search_query)
             | Q(ports__neighbor_device__icontains=search_query)
+            | Q(ports__neighbor_ip__icontains=search_query)
             | Q(ports__neighbor_port__icontains=search_query)
             | Q(ports__mac_addresses__icontains=search_query)
             | Q(ports__room__icontains=search_query)
@@ -326,20 +1004,63 @@ def switch_list(request):
     for switch in switches:
         _apply_dashboard_port_groups(switch)
         _attach_refresh_time_texts(switch)
+    return switches
+
+
+def _dashboard_device_browser_html(request, search_query=""):
+    use_cache = not bool((search_query or "").strip()) and DASHBOARD_DEVICE_BROWSER_CACHE_SECONDS > 0
+    cache_key = _dashboard_device_browser_cache_key(request, search_query) if use_cache else ""
+    if use_cache:
+        cached = cache.get(cache_key)
+        if cached is not None:
+            return cached
+
+    switches = _dashboard_device_switches(search_query)
+    html = render_to_string(
+        "inventory/includes/dashboard_device_browser.html",
+        {"switches": switches},
+        request=request,
+    )
+    if use_cache:
+        cache.set(cache_key, html, DASHBOARD_DEVICE_BROWSER_CACHE_SECONDS)
+    return html
+
+def dashboard_device_browser_fragment_view(request):
+    """Phase107R2: return the heavy dashboard device/port browser only when requested."""
+    search_query = request.GET.get("q", "").strip()
+    html = _dashboard_device_browser_html(request, search_query=search_query)
+    return HttpResponse(html)
+
+
+
+def switch_list(request):
+    search_query = request.GET.get("q", "").strip()
+    dashboard_insight = _dashboard_insight_payload()
+    dashboard_counters = dashboard_insight.get("counters", {})
+    alarm_dashboard = {
+        "active": dashboard_counters.get("active_alarms", 0),
+        "critical": dashboard_counters.get("critical_alarms", 0),
+        "warning": dashboard_counters.get("warning_alarms", 0),
+        "items": dashboard_insight.get("alarms", []),
+        "categories": dashboard_insight.get("alarm_categories", {}),
+    }
+    dashboard_device_browser_url = reverse("inventory:dashboard_device_browser_fragment")
+    if search_query:
+        dashboard_device_browser_url += "?" + urlencode({"q": search_query})
 
     return render(
         request,
         "inventory/switch_list.html",
         {
-            "switches": switches,
             "search_query": search_query,
-            "switch_count": len(switches),
-            "sfp_dashboard": _sfp_dashboard_payload(),
-            "alarm_dashboard": _alarm_dashboard_payload(),
-            "default_ssh_username": (switches[0].ssh_username if switches else "admin") or "admin",
+            "dashboard_insight": dashboard_insight,
+            "sfp_dashboard": dashboard_insight.get("sfp_dashboard", {}),
+            "alarm_dashboard": alarm_dashboard,
+            "backup_dashboard": dashboard_insight.get("backup_dashboard", {}),
+            "dashboard_device_browser_url": dashboard_device_browser_url,
+            "default_ssh_username": "admin",
         },
     )
-
 
 def switch_detail(request, switch_id):
     switch = get_object_or_404(
@@ -1376,6 +2097,28 @@ def _restore_candidate_dir():
     return candidate_dir
 
 
+# PHASE99_RESTORE_VALIDATE_SAFETY_GUARD
+RESTORE_CANDIDATE_MAX_UPLOAD_BYTES = int(getattr(settings, "SWITCHMAP_RESTORE_CANDIDATE_MAX_UPLOAD_BYTES", 50 * 1024 * 1024))
+RESTORE_CANDIDATE_MAX_SQLITE_BYTES = int(getattr(settings, "SWITCHMAP_RESTORE_CANDIDATE_MAX_SQLITE_BYTES", 250 * 1024 * 1024))
+RESTORE_CANDIDATE_MAX_ZIP_UNCOMPRESSED_BYTES = int(getattr(settings, "SWITCHMAP_RESTORE_CANDIDATE_MAX_ZIP_UNCOMPRESSED_BYTES", 250 * 1024 * 1024))
+RESTORE_CANDIDATE_CHUNK_BYTES = 1024 * 1024
+
+
+def _path_is_under(path, root):
+    try:
+        Path(path).resolve().relative_to(Path(root).resolve())
+        return True
+    except Exception:
+        return False
+
+
+def _delete_file_quietly(path):
+    try:
+        Path(path).unlink(missing_ok=True)
+    except Exception:
+        pass
+
+
 def _safe_backup_filename(filename):
     name = Path(str(filename or "")).name.strip()
     if not re.fullmatch(r"[A-Za-z0-9_.-]+", name or ""):
@@ -1393,11 +2136,9 @@ def _backup_file_path(filename):
     candidate_dir = _restore_candidate_dir().resolve()
     candidates = [backup_dir / name, candidate_dir / name]
     for path in candidates:
-        try:
-            resolved = path.resolve()
-        except FileNotFoundError:
+        if not path.exists() or not path.is_file():
             continue
-        if path.exists() and (str(resolved).startswith(str(backup_dir)) or str(resolved).startswith(str(candidate_dir))):
+        if _path_is_under(path, backup_dir) or _path_is_under(path, candidate_dir):
             return path
     raise Http404("Backup file not found.")
 
@@ -1471,28 +2212,48 @@ def _validate_sqlite_file(sqlite_path):
 
 def _validate_backup_file(path):
     suffix = path.suffix.lower()
+    try:
+        size = path.stat().st_size
+    except OSError as exc:
+        return False, f"Cannot read candidate file: {exc}"
+
     if suffix == ".sqlite3":
+        if size > RESTORE_CANDIDATE_MAX_SQLITE_BYTES:
+            return False, "SQLite candidate is larger than the allowed validation limit."
         return _validate_sqlite_file(path)
     if suffix != ".zip":
         return False, "Only .zip or .sqlite3 is allowed."
+    if size > RESTORE_CANDIDATE_MAX_UPLOAD_BYTES:
+        return False, "ZIP candidate is larger than the allowed upload limit."
 
-    with zipfile.ZipFile(path) as archive:
-        sqlite_members = [name for name in archive.namelist() if name.lower().endswith(".sqlite3") and not name.endswith("/")]
-        if len(sqlite_members) != 1:
-            return False, f"ZIP must contain exactly one .sqlite3 file. Found={len(sqlite_members)}"
-        member = sqlite_members[0]
-        with tempfile.NamedTemporaryFile(suffix=".sqlite3", delete=False) as temp_file:
-            temp_name = temp_file.name
-            with archive.open(member) as source:
-                for chunk in iter(lambda: source.read(1024 * 1024), b""):
-                    temp_file.write(chunk)
-        try:
-            return _validate_sqlite_file(Path(temp_name))
-        finally:
-            try:
-                os.unlink(temp_name)
-            except FileNotFoundError:
-                pass
+    temp_name = None
+    try:
+        with zipfile.ZipFile(path) as archive:
+            infos = [info for info in archive.infolist() if not info.is_dir()]
+            sqlite_infos = [info for info in infos if info.filename.lower().endswith(".sqlite3")]
+            if len(sqlite_infos) != 1 or len(infos) != 1:
+                return False, f"ZIP must contain only one .sqlite3 file. Found sqlite={len(sqlite_infos)} files={len(infos)}"
+            info = sqlite_infos[0]
+            member_name = info.filename.replace("\\", "/")
+            if member_name.startswith("/") or "../" in member_name or member_name.startswith("../"):
+                return False, "ZIP member path is not safe."
+            if info.file_size > RESTORE_CANDIDATE_MAX_SQLITE_BYTES or info.file_size > RESTORE_CANDIDATE_MAX_ZIP_UNCOMPRESSED_BYTES:
+                return False, "ZIP SQLite member is larger than the allowed validation limit."
+            with tempfile.NamedTemporaryFile(suffix=".sqlite3", delete=False) as temp_file:
+                temp_name = temp_file.name
+                written = 0
+                with archive.open(info) as source:
+                    for chunk in iter(lambda: source.read(RESTORE_CANDIDATE_CHUNK_BYTES), b""):
+                        written += len(chunk)
+                        if written > RESTORE_CANDIDATE_MAX_ZIP_UNCOMPRESSED_BYTES:
+                            return False, "ZIP uncompressed data exceeds the allowed validation limit."
+                        temp_file.write(chunk)
+        return _validate_sqlite_file(Path(temp_name))
+    except zipfile.BadZipFile:
+        return False, "Invalid ZIP file."
+    finally:
+        if temp_name:
+            _delete_file_quietly(temp_name)
 
 
 def backup_center_view(request):
@@ -1547,8 +2308,7 @@ def backup_download_view(request, filename):
     path = _backup_file_path(filename)
     _log_system_action(request, "backup_download", path.name)
     content_type = "application/zip" if path.suffix.lower() == ".zip" else "application/x-sqlite3"
-    response = HttpResponse(path.read_bytes(), content_type=content_type)
-    response["Content-Disposition"] = f'attachment; filename="{path.name}"'
+    response = FileResponse(open(path, "rb"), content_type=content_type, as_attachment=True, filename=path.name)
     response["Content-Length"] = str(path.stat().st_size)
     return response
 
@@ -1566,13 +2326,27 @@ def backup_validate_restore_view(request):
         messages.error(request, "Only .zip or .sqlite3 files are allowed.")
         return redirect("inventory:backup_center")
 
+    upload_size = int(getattr(upload, "size", 0) or 0)
+    if upload_size > RESTORE_CANDIDATE_MAX_UPLOAD_BYTES:
+        messages.error(request, "Restore candidate rejected: file is larger than the allowed validation limit.")
+        _log_system_action(request, "restore_candidate_rejected_size", f"{original_name} | size={upload_size}")
+        return redirect("inventory:backup_center")
+
     timestamp = timezone.localtime().strftime("%Y%m%d_%H%M%S")
     safe_original = re.sub(r"[^A-Za-z0-9_.-]+", "_", original_name).strip("._") or f"upload{suffix}"
     candidate_name = f"restore_candidate_{timestamp}_{safe_original}"
     candidate_path = _restore_candidate_dir() / candidate_name
 
+    written = 0
     with open(candidate_path, "wb") as destination:
         for chunk in upload.chunks():
+            written += len(chunk)
+            if written > RESTORE_CANDIDATE_MAX_UPLOAD_BYTES:
+                destination.close()
+                _delete_file_quietly(candidate_path)
+                messages.error(request, "Restore candidate rejected: file is larger than the allowed validation limit.")
+                _log_system_action(request, "restore_candidate_rejected_size", f"{candidate_name} | size>{RESTORE_CANDIDATE_MAX_UPLOAD_BYTES}")
+                return redirect("inventory:backup_center")
             destination.write(chunk)
 
     ok, validation_message = _validate_backup_file(candidate_path)
@@ -1582,6 +2356,8 @@ def backup_validate_restore_view(request):
     if ok:
         messages.success(request, f"Restore candidate validated. {validation_message}. Restore is NOT executed automatically.")
     else:
+        _delete_file_quietly(candidate_path)
+        _log_system_action(request, "restore_candidate_invalid_deleted", candidate_name)
         messages.error(request, f"Restore candidate rejected: {validation_message}")
     return redirect("inventory:backup_center")
 
@@ -1869,6 +2645,116 @@ def switch_bulk_ssh_action(request, switch_id):
     switch = get_object_or_404(Switch, id=switch_id, is_active=True)
     return _execute_bulk_ssh_action(request, switch)
 
+
+
+def _parse_multi_ssh_action_items(request, port):
+    raw = request.POST.get("actions_json") or request.POST.get("multi_actions") or ""
+    try:
+        items = json.loads(raw) if raw else []
+    except json.JSONDecodeError as exc:
+        raise SshActionError("فرمت Multi Action نامعتبر است.") from exc
+    if not isinstance(items, list):
+        raise SshActionError("فرمت Multi Action نامعتبر است.")
+
+    parsed = []
+    seen = set()
+    global_force = request.POST.get("force") in {"1", "true", "on", "yes"}
+    confirmed = request.POST.get("confirmed") in {"1", "true", "on", "yes"}
+
+    for item in items:
+        if not isinstance(item, dict):
+            continue
+        action = str(item.get("action") or "").strip()
+        value = str(item.get("value") or "").strip()
+        key = (action, value)
+        if not action or key in seen:
+            continue
+        seen.add(key)
+        if not can_run_ssh_action(getattr(request, "user", None), action):
+            raise SshActionError(f"Action مجاز نیست: {action_label(action)}")
+        if action_requires_force(action, port) and not global_force:
+            raise SshActionError(f"برای {action_label(action)} تیک اجازه تغییر روی Trunk/Uplink لازم است.")
+        if action_requires_confirmation(action) and not confirmed:
+            raise SshActionError(f"برای {action_label(action)} تأیید نهایی لازم است.")
+        parsed.append({"action": action, "value": value, "force": global_force})
+
+    if not parsed:
+        raise SshActionError("هیچ Action معتبری انتخاب نشده است.")
+    if len(parsed) > 6:
+        raise SshActionError("حداکثر 6 Action در یک اجرا مجاز است.")
+    return parsed
+
+
+def switchmap_ajax_multi_ssh_port_action(request):
+    if request.method != "POST":
+        return _json_error("فقط POST مجاز است.", status=405)
+
+    port_id = request.POST.get("port_id")
+    ssh_username = (request.POST.get("ssh_username") or request.POST.get("username") or "").strip()
+    ssh_password = request.POST.get("ssh_password") or request.POST.get("password") or ""
+    enable_password = request.POST.get("enable_password") or ""
+
+    if not port_id:
+        return _json_error("ابتدا پورت را انتخاب کن.", status=400)
+    if not ssh_username or not ssh_password:
+        return _json_error("Username و Password لازم است.", status=400)
+
+    port = get_object_or_404(Port.objects.select_related("switch"), id=port_id)
+    switch = port.switch
+
+    try:
+        action_items = _parse_multi_ssh_action_items(request, port)
+        result = run_port_multi_actions(
+            switch=switch,
+            port=port,
+            username=ssh_username,
+            password=ssh_password,
+            enable_password=enable_password,
+            action_items=action_items,
+            force=request.POST.get("force") in {"1", "true", "on", "yes"},
+        )
+    except SshActionError as exc:
+        PortActionLog.objects.create(
+            port=port,
+            switch=switch,
+            action="multi_ssh_action",
+            action_label="Multi SSH Action",
+            value="",
+            ssh_username=ssh_username,
+            success=False,
+            message=str(exc),
+            **_audit_log_context(request, ssh_username),
+        )
+        return _json_error(str(exc), status=400)
+
+    labels = [item.get("label") or action_label(item.get("action")) for item in result.get("items", [])]
+    commands = result.get("commands", [])
+
+    PortActionLog.objects.create(
+        port=port,
+        switch=switch,
+        action="multi_ssh_action",
+        action_label="Multi SSH Action",
+        value=" | ".join(labels),
+        ssh_username=ssh_username,
+        success=True,
+        message=f"OK | {len(labels)} action(s)",
+        commands="\n".join(commands),
+        **_audit_log_context(request, ssh_username),
+    )
+
+    _refresh_switch_after_action(switch)
+    port.refresh_from_db()
+
+    return JsonResponse({
+        "ok": True,
+        "message": f"Multi SSH با موفقیت انجام شد. تعداد: {len(labels)}",
+        "action": "multi_ssh_action",
+        "action_label": "Multi SSH Action",
+        "actions": result.get("items", []),
+        "commands": commands,
+        "port": _port_payload(port),
+    })
 
 def switchmap_ajax_ssh_port_action(request):
     if request.method != "POST":
@@ -2249,7 +3135,9 @@ def _build_topology_payload():
 
         is_internal = bool(matched_switch)
         role = _topology_role_for_port(port)
-        health, health_label = _topology_link_health(port, matched_switch, matched_port)
+        edge_info = classify_edge(port, matched_switch, matched_port, matched_by)
+        health = edge_info.get("health", "unknown")
+        health_label = edge_info.get("health_label", "Unknown")
 
         if is_internal:
             internal_switch_ids.add(port.switch_id)
@@ -2276,6 +3164,18 @@ def _build_topology_payload():
                 "direction": "two-way" if matched_port and matched_port.neighbor_device else "one-way",
                 "health": health,
                 "health_label": health_label,
+                "edge_id": edge_info.get("edge_id"),
+                "confidence": edge_info.get("confidence"),
+                "severity": edge_info.get("severity"),
+                "reason": edge_info.get("reason"),
+                "evidence": edge_info.get("evidence", []),
+                "evidence_count": edge_info.get("evidence_count", 0),
+                "parent_down": edge_info.get("parent_down", False),
+                "first_seen": edge_info.get("first_seen"),
+                "last_seen": edge_info.get("last_seen"),
+                "source_state": edge_info.get("source_state"),
+                "target_state": edge_info.get("target_state"),
+                "detail_url": edge_info.get("detail_url"),
             }
         )
 
@@ -2284,7 +3184,7 @@ def _build_topology_payload():
         for port in switch.ports.all():
             if not is_visible_switchmap_interface(port.interface_name):
                 continue
-            if _topology_role_for_port(port) == "uplink" and not port.neighbor_device:
+            if _topology_role_for_port(port) == "uplink" and not port.neighbor_device and topology_alarm_should_exist(port):
                 uplinks_without_neighbor.append(port)
 
     nodes = []
@@ -2365,14 +3265,47 @@ def _build_topology_payload():
         "unknown_uplink_count": len(uplinks_without_neighbor),
         "unknown_neighbor_count": len(unknown_neighbor_names),
         "duplicate_link_count": len(duplicate_links),
-        "down_link_count": sum(1 for link in links if link["health"] == "down"),
-        "warning_link_count": sum(1 for link in links if link["health"] == "warning"),
+        "down_link_count": sum(1 for link in links if link["health"] == "down" and edge_warning_allowed(link)),
+        "warning_link_count": sum(1 for link in links if edge_warning_allowed(link) and link["health"] != "down"),
         "up_link_count": sum(1 for link in links if link["health"] == "up"),
+        "confirmed_link_count": sum(1 for link in links if link.get("confidence") == "confirmed"),
+        "partial_link_count": sum(1 for link in links if link.get("confidence") == "partial"),
+        "inferred_link_count": sum(1 for link in links if link.get("confidence") == "inferred"),
+        "stale_link_count": sum(1 for link in links if link.get("confidence") == "stale"),
+        "suppressed_link_count": sum(1 for link in links if link.get("parent_down")),
     }
 
 def topology_view(request):
     payload = _build_topology_payload()
     return render(request, "inventory/topology.html", payload)
+
+
+def topology_edge_detail_view(request, port_id):
+    payload = _build_topology_payload()
+    edge = None
+    for item in payload.get("links", []):
+        source_port = item.get("source_port")
+        if source_port and source_port.id == port_id:
+            edge = item
+            break
+    if not edge:
+        port = get_object_or_404(Port.objects.select_related("switch"), id=port_id)
+        matched_switch = None
+        matched_port = None
+        edge_info = classify_edge(port, matched_switch, matched_port, "no-neighbor")
+        edge = {
+            "source_switch": port.switch,
+            "source_port": port,
+            "matched_switch": None,
+            "matched_port": None,
+            "matched_by": "no-neighbor",
+            "neighbor_device": port.neighbor_device,
+            "neighbor_port": port.neighbor_port,
+            "neighbor_source": port.neighbor_source,
+            "neighbor_ip": port.neighbor_ip,
+            **edge_info,
+        }
+    return render(request, "inventory/topology_edge_detail.html", {"edge": edge, "phase81_83_topology_drilldown": True})
 
 def reports_view(request):
     switches = Switch.objects.filter(is_active=True).order_by("name")
@@ -2720,31 +3653,24 @@ def _decimal_outside(value, minimum, maximum):
     return decimal_value < minimum or decimal_value > maximum
 
 
+# PHASE80_2_RESEARCHED_SFP_SUPPRESSION
+def _sfp_link_status_text(values):
+    return str(values.get("link_status") or "").strip().lower()
+
+
+def _sfp_optical_power_should_be_evaluated(values):
+    return _sfp_link_status_text(values) in {"connected", "up"}
+
+
 def _sfp_issue_labels_from_values(values):
-    labels = []
-
-    if values.get("err_disabled"):
-        labels.append("Err-disabled")
-    if _to_int(values.get("fcs_delta")) > 0 or _to_int(values.get("align_delta")) > 0:
-        labels.append("CRC Increased")
-    if _to_int(values.get("input_error_delta")) > 0 or _to_int(values.get("rcv_delta")) > 0:
-        labels.append("Input Error")
-    if _to_int(values.get("output_error_delta")) > 0 or _to_int(values.get("xmit_delta")) > 0:
-        labels.append("Output Error")
-    if _to_int(values.get("out_discard_delta")) > 0:
-        labels.append("Out Discards")
-    if _decimal_outside(values.get("rx_power_dbm"), SFP_RX_POWER_MIN_DBM, SFP_RX_POWER_MAX_DBM):
-        labels.append("Rx Power abnormal")
-    if _decimal_outside(values.get("tx_power_dbm"), SFP_TX_POWER_MIN_DBM, SFP_TX_POWER_MAX_DBM):
-        labels.append("Tx Power abnormal")
-    if _decimal_outside(values.get("temperature_c"), SFP_TEMP_MIN_C, SFP_TEMP_MAX_C):
-        labels.append("Temperature abnormal")
-
-    return labels
+    # PHASE83_1_NO_GENERIC_OPTICAL_THRESHOLDS
+    # Do not inject global Rx/Tx thresholds. Optical alarms require real per-module thresholds.
+    return policy_sfp_issue_labels_from_values(dict(values or {}))
 
 
 def _sfp_issue_labels_for_snapshot(item):
     return _sfp_issue_labels_from_values({
+        "link_status": getattr(item, "link_status", ""),
         "err_disabled": getattr(item, "err_disabled", False),
         "align_delta": getattr(item, "align_delta", 0),
         "fcs_delta": getattr(item, "fcs_delta", 0),
@@ -2757,7 +3683,6 @@ def _sfp_issue_labels_for_snapshot(item):
         "tx_power_dbm": getattr(item, "tx_power_dbm", None),
         "temperature_c": getattr(item, "temperature_c", None),
     })
-
 
 def _sfp_has_issue(item):
     return bool(_sfp_issue_labels_for_snapshot(item))
@@ -2845,22 +3770,20 @@ def _parse_sfp_transceivers(output):
 
 
 def _health_for_sfp(data):
+    # PHASE83_1_SFP_HEALTH_NO_DOWN_WARNING
     status = str(data.get("link_status") or "").strip().lower()
-    fcs_delta = _to_int(data.get("fcs_delta"))
-    input_delta = _to_int(data.get("input_error_delta"))
-    output_delta = _to_int(data.get("output_error_delta"))
     issue_labels = _sfp_issue_labels_from_values(data)
 
     if "Err-disabled" in issue_labels:
         return SfpMonitorSnapshot.Health.CRITICAL, "Err-disabled"
-    if fcs_delta >= 10 or input_delta >= 10 or output_delta >= 10:
-        return SfpMonitorSnapshot.Health.CRITICAL, " | ".join(issue_labels) or "error counter delta >= 10"
+    if any(label in issue_labels for label in ("CRC Increased", "Input Error", "Output Error")):
+        return SfpMonitorSnapshot.Health.WARNING, " | ".join(issue_labels)
     if issue_labels:
         return SfpMonitorSnapshot.Health.WARNING, " | ".join(issue_labels)
     if status in {"connected", "up"}:
         return SfpMonitorSnapshot.Health.HEALTHY, "OK"
-    if status in {"notconnect", "down", "disabled", "inactive", "suspended"}:
-        return SfpMonitorSnapshot.Health.WARNING, status
+    if status in {"notconnect", "down", "disabled", "inactive", "suspended", "sfpabsent", "xcvrabsent"}:
+        return SfpMonitorSnapshot.Health.UNKNOWN, f"{status} / no alarm"
     return SfpMonitorSnapshot.Health.UNKNOWN, "no status"
 
 
@@ -2924,13 +3847,22 @@ def _poll_sfp_monitor(switch, username, password, enable_password=""):
         data["err_disabled"] = "err-disabled" in str(data.get("link_status") or "").lower()
 
         previous = latest_map.get(interface_name)
-        data["align_delta"] = _delta(data.get("align_errors"), getattr(previous, "align_errors", 0))
-        data["fcs_delta"] = _delta(data.get("fcs_errors"), getattr(previous, "fcs_errors", 0))
-        data["xmit_delta"] = _delta(data.get("xmit_errors"), getattr(previous, "xmit_errors", 0))
-        data["rcv_delta"] = _delta(data.get("rcv_errors"), getattr(previous, "rcv_errors", 0))
-        data["input_error_delta"] = _delta(data.get("input_errors"), getattr(previous, "input_errors", 0))
-        data["output_error_delta"] = _delta(data.get("output_errors"), getattr(previous, "output_errors", 0))
-        data["out_discard_delta"] = _delta(data.get("out_discards"), getattr(previous, "out_discards", 0))
+        if previous is None:
+            data["align_delta"] = 0
+            data["fcs_delta"] = 0
+            data["xmit_delta"] = 0
+            data["rcv_delta"] = 0
+            data["input_error_delta"] = 0
+            data["output_error_delta"] = 0
+            data["out_discard_delta"] = 0
+        else:
+            data["align_delta"] = _delta(data.get("align_errors"), getattr(previous, "align_errors", 0))
+            data["fcs_delta"] = _delta(data.get("fcs_errors"), getattr(previous, "fcs_errors", 0))
+            data["xmit_delta"] = _delta(data.get("xmit_errors"), getattr(previous, "xmit_errors", 0))
+            data["rcv_delta"] = _delta(data.get("rcv_errors"), getattr(previous, "rcv_errors", 0))
+            data["input_error_delta"] = _delta(data.get("input_errors"), getattr(previous, "input_errors", 0))
+            data["output_error_delta"] = _delta(data.get("output_errors"), getattr(previous, "output_errors", 0))
+            data["out_discard_delta"] = _delta(data.get("out_discards"), getattr(previous, "out_discards", 0))
         data["health_state"], data["health_note"] = _health_for_sfp(data)
 
         created.append(SfpMonitorSnapshot.objects.create(
@@ -3106,6 +4038,7 @@ def _sfp_dashboard_payload():
                 "switch": item.switch.name,
                 "switch_id": item.switch_id,
                 "interface": item.interface_name,
+                "port_id": item.port_id,
                 "health": item.health_state,
                 "health_text": "Critical" if item.is_error else "Warning",
                 "is_error": item.is_error,
@@ -3256,8 +4189,9 @@ def _alarm_slug(value):
     return re.sub(r"[^a-z0-9]+", "-", str(value or "").strip().lower()).strip("-") or "alarm"
 
 
-def _alarm_upsert(*, fingerprint, source, category, severity, title, message, switch=None, port=None, details=""):
-    now = timezone.now()
+def _alarm_upsert(*, fingerprint, source, category, severity, title, message, switch=None, port=None, details="", count_occurrence=True, observed_at=None):
+    # PHASE80_ALARM_DEDUP_COOLDOWN
+    now = observed_at or timezone.now()
     alarm, created = AlarmNotification.objects.get_or_create(
         fingerprint=fingerprint,
         defaults={
@@ -3271,34 +4205,43 @@ def _alarm_upsert(*, fingerprint, source, category, severity, title, message, sw
             "switch": switch,
             "port": port,
             "occurrences": 1,
+            "last_seen": now,
         },
     )
-    if not created:
-        if alarm.status == AlarmNotification.Status.RESOLVED:
-            return alarm
-        update_fields = [
-            "source",
-            "category",
-            "severity",
-            "title",
-            "message",
-            "details",
-            "switch",
-            "port",
-            "last_seen",
-            "occurrences",
-        ]
-        alarm.source = source
-        alarm.category = category
-        alarm.severity = severity
-        alarm.title = title
-        alarm.message = message
-        alarm.details = details
-        alarm.switch = switch
-        alarm.port = port
+    if created:
+        return alarm
+
+    update_fields = [
+        "source",
+        "category",
+        "severity",
+        "title",
+        "message",
+        "details",
+        "switch",
+        "port",
+    ]
+    alarm.source = source
+    alarm.category = category
+    alarm.severity = severity
+    alarm.title = title
+    alarm.message = message
+    alarm.details = details
+    alarm.switch = switch
+    alarm.port = port
+
+    if alarm.status == AlarmNotification.Status.RESOLVED:
+        alarm.status = AlarmNotification.Status.ACTIVE
+        alarm.resolved_at = None
+        update_fields.extend(["status", "resolved_at"])
+        count_occurrence = True
+
+    if count_occurrence:
         alarm.last_seen = now
         alarm.occurrences = int(alarm.occurrences or 0) + 1
-        alarm.save(update_fields=update_fields)
+        update_fields.extend(["last_seen", "occurrences"])
+
+    alarm.save(update_fields=update_fields)
     return alarm
 
 
@@ -3310,151 +4253,29 @@ def _latest_sfp_alarm_items():
     return list(latest.values())
 
 
+
+def _phase80_observed_key(*parts):
+    return "|".join(str(part or "") for part in parts)
+
+
+def _phase80_port_observed_at(port):
+    return getattr(port, "snmp_last_poll", None) or getattr(port, "discovery_last_poll", None)
+
+
+def _phase80_is_important_down_port(port):
+    # PHASE80_2_ACTIONABLE_DOWN_ONLY
+    return is_actionable_interface_down(port)
+
+
 def _sync_alarm_notifications():
-    active_fingerprints = set()
+    # PHASE83R5_SINGLE_ALARM_WRITER
+    # UI/Alarm Center/Sync button must not create alarms directly.
+    from .alarm_engine import sync_alarm_notifications_v2
+    return sync_alarm_notifications_v2()
 
-    for switch in Switch.objects.filter(is_active=True).prefetch_related("ports"):
-        if switch.snmp_enabled and switch.snmp_last_error:
-            fingerprint = f"snmp-down:{switch.id}"
-            active_fingerprints.add(fingerprint)
-            _alarm_upsert(
-                fingerprint=fingerprint,
-                source="SNMP",
-                category=AlarmNotification.Category.SNMP,
-                severity=AlarmNotification.Severity.CRITICAL,
-                title="SNMP Down",
-                message=f"{switch.name}: {switch.snmp_last_error}",
-                switch=switch,
-                details=str(switch.snmp_last_error or ""),
-            )
-        if switch.discovery_last_error:
-            fingerprint = f"discovery-error:{switch.id}"
-            active_fingerprints.add(fingerprint)
-            _alarm_upsert(
-                fingerprint=fingerprint,
-                source="Discovery",
-                category=AlarmNotification.Category.TOPOLOGY,
-                severity=AlarmNotification.Severity.WARNING,
-                title="Discovery Error",
-                message=f"{switch.name}: {switch.discovery_last_error}",
-                switch=switch,
-                details=str(switch.discovery_last_error or ""),
-            )
-
-        for port in switch.ports.all():
-            if not is_visible_switchmap_interface(port.interface_name):
-                continue
-            if port.status == Port.Status.ERROR:
-                fingerprint = f"port-error:{switch.id}:{port.id}"
-                active_fingerprints.add(fingerprint)
-                _alarm_upsert(
-                    fingerprint=fingerprint,
-                    source="Port Status",
-                    category=AlarmNotification.Category.INTERFACE,
-                    severity=AlarmNotification.Severity.CRITICAL,
-                    title="Port Error",
-                    message=f"{switch.name} {port.interface_name} status is Error",
-                    switch=switch,
-                    port=port,
-                    details=port.description or port.snmp_alias or "",
-                )
-            if (
-                port.status == Port.Status.DOWN
-                and (is_uplink_interface(port.interface_name) or port.port_mode == Port.PortMode.TRUNK or port.neighbor_device)
-            ):
-                fingerprint = f"uplink-down:{switch.id}:{port.id}"
-                active_fingerprints.add(fingerprint)
-                _alarm_upsert(
-                    fingerprint=fingerprint,
-                    source="Topology",
-                    category=AlarmNotification.Category.TOPOLOGY,
-                    severity=AlarmNotification.Severity.CRITICAL,
-                    title="Uplink / Neighbor Down",
-                    message=f"{switch.name} {port.interface_name} is Down",
-                    switch=switch,
-                    port=port,
-                    details=f"Neighbor: {port.neighbor_device or '-'} {port.neighbor_port or ''}",
-                )
-
-    for item in _latest_sfp_alarm_items():
-        tags = _sfp_issue_labels_for_snapshot(item)
-        for tag in tags:
-            fingerprint = f"sfp:{item.switch_id}:{_alarm_slug(item.interface_name)}:{_alarm_slug(tag)}"
-            active_fingerprints.add(fingerprint)
-            severity = AlarmNotification.Severity.WARNING
-            if item.err_disabled or item.health_state == SfpMonitorSnapshot.Health.CRITICAL or tag in {"Err-disabled", "Input Error", "Output Error"}:
-                severity = AlarmNotification.Severity.CRITICAL
-            _alarm_upsert(
-                fingerprint=fingerprint,
-                source="SFP Monitor",
-                category=AlarmNotification.Category.SFP,
-                severity=severity,
-                title=tag,
-                message=f"{item.switch.name} {item.interface_name}: {tag}",
-                switch=item.switch,
-                port=item.port,
-                details=(
-                    f"CRCΔ={item.fcs_delta}, InputΔ={item.input_error_delta}, OutputΔ={item.output_error_delta}, "
-                    f"Rx={item.rx_power_dbm or '-'}, Tx={item.tx_power_dbm or '-'}, Temp={item.temperature_c or '-'}"
-                ),
-            )
-
-    managed_prefixes = (
-        "snmp-down:",
-        "discovery-error:",
-        "port-error:",
-        "uplink-down:",
-        "sfp:",
-    )
-    stale_q = Q()
-    for prefix in managed_prefixes:
-        stale_q |= Q(fingerprint__startswith=prefix)
-    stale = AlarmNotification.objects.filter(stale_q).exclude(fingerprint__in=active_fingerprints).exclude(status=AlarmNotification.Status.RESOLVED)
-    now = timezone.now()
-    stale.update(status=AlarmNotification.Status.RESOLVED, resolved_at=now)
-    return {
-        "active": AlarmNotification.objects.filter(status=AlarmNotification.Status.ACTIVE).count(),
-        "acknowledged": AlarmNotification.objects.filter(status=AlarmNotification.Status.ACKNOWLEDGED).count(),
-        "resolved": AlarmNotification.objects.filter(status=AlarmNotification.Status.RESOLVED).count(),
-    }
-
-
-def _alarm_queryset(request):
-    _sync_alarm_notifications()
-    alarms = AlarmNotification.objects.select_related("switch", "port").order_by("-last_seen", "-id")
-    query = request.GET.get("q", "").strip()
-    status = request.GET.get("status", "active").strip()
-    severity = request.GET.get("severity", "").strip()
-    category = request.GET.get("category", "").strip()
-    switch_id = request.GET.get("switch", "").strip()
-
-    if query:
-        alarms = alarms.filter(
-            Q(title__icontains=query)
-            | Q(message__icontains=query)
-            | Q(details__icontains=query)
-            | Q(source__icontains=query)
-            | Q(switch__name__icontains=query)
-            | Q(switch__management_ip__icontains=query)
-            | Q(port__interface_name__icontains=query)
-        )
-    if status:
-        alarms = alarms.filter(status=status)
-    if severity:
-        alarms = alarms.filter(severity=severity)
-    if category:
-        alarms = alarms.filter(category=category)
-    if switch_id:
-        alarms = alarms.filter(switch_id=switch_id)
-
-    return alarms, {
-        "query": query,
-        "status": status,
-        "severity": severity,
-        "category": category,
-        "switch_id": switch_id,
-    }
-
+    # PHASE83R_ALARM_ENGINE_V2_SINGLE_WRITER
+    from .alarm_engine import sync_alarm_notifications_v2
+    return sync_alarm_notifications_v2()
 
 def alarm_center_view(request):
     alarms, filters = _alarm_queryset(request)
@@ -3483,6 +4304,7 @@ def alarm_center_view(request):
             "selected_severity": filters["severity"],
             "selected_category": filters["category"],
             "selected_switch": filters["switch_id"],
+            "selected_alarm_id": request.GET.get("alarm", "").strip(),
             "active_count": active_count,
             "critical_count": critical_count,
             "warning_count": warning_count,
@@ -3498,7 +4320,11 @@ def alarm_center_view(request):
 @require_POST
 def alarm_sync_view(request):
     summary = _sync_alarm_notifications()
-    messages.success(request, f"Alarm Sync OK | Active={summary['active']} | Ack={summary['acknowledged']} | Resolved={summary['resolved']}")
+    active_count = summary.get('active', 0)
+    ack_count = summary.get('acknowledged', summary.get('ack', summary.get('acknowledged_count', 0)))
+    resolved_count = summary.get('resolved', 0)
+    sep = chr(124)
+    messages.success(request, 'Alarm Sync OK ' + sep + ' Active=' + str(active_count) + ' ' + sep + ' Ack=' + str(ack_count) + ' ' + sep + ' Resolved=' + str(resolved_count))
     return redirect("inventory:alarm_center")
 
 
@@ -3674,6 +4500,7 @@ def action_logs_view(request):
             "query": filters["query"],
             "status": filters["status"],
             "selected_switch": filters["switch_id"],
+            "selected_alarm_id": request.GET.get("alarm", "").strip(),
             "selected_action": filters["action"],
             "date_from": filters["date_from"],
             "date_to": filters["date_to"],
@@ -4244,3 +5071,5 @@ def switchmap_refresh_all_data(request):
     else:
         messages.warning(request, f"Refresh All با خطا تمام شد | ok={ok_count} | errors={error_count}")
     return redirect("inventory:switch_list")
+
+# Phase 66.5 Dashboard Command Center Layout

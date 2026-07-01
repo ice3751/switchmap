@@ -1,0 +1,130 @@
+{% extends "inventory/base.html" %}
+{% block title %}Backup Health{% endblock %}
+{% block content %}
+<div class="container-fluid" style="max-width:1400px;margin:0 auto;">
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;">
+    <div>
+      <h1 style="font-size:24px;margin:0;">Backup Health</h1>
+      <div style="color:#6b7280;font-size:13px;">{{ phase90_marker }}</div>
+    </div>
+    <form method="post" style="margin:0;">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="health_refresh">
+      <button class="btn btn-sm btn-primary" type="submit">Refresh Health</button>
+    </form>
+  </div>
+
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags|default:'info' }}" style="margin-bottom:10px;">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="row" style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
+    <div style="flex:1;min-width:180px;border:1px solid #e5e7eb;border-radius:12px;padding:14px;background:#fff;">
+      <div style="font-size:12px;color:#6b7280;">Health</div>
+      <div style="font-size:22px;font-weight:700;color:{% if health_ok %}#047857{% else %}#b91c1c{% endif %};">{% if health_ok %}OK{% else %}Needs Check{% endif %}</div>
+    </div>
+    <div style="flex:1;min-width:180px;border:1px solid #e5e7eb;border-radius:12px;padding:14px;background:#fff;">
+      <div style="font-size:12px;color:#6b7280;">Expected / OK</div>
+      <div style="font-size:22px;font-weight:700;">{{ expected|default:"-" }} / {{ ok_count|default:"-" }}</div>
+    </div>
+    <div style="flex:1;min-width:180px;border:1px solid #e5e7eb;border-radius:12px;padding:14px;background:#fff;">
+      <div style="font-size:12px;color:#6b7280;">Missing / Stale</div>
+      <div style="font-size:22px;font-weight:700;">{{ missing }} / {{ stale }}</div>
+    </div>
+    <div style="flex:1;min-width:180px;border:1px solid #e5e7eb;border-radius:12px;padding:14px;background:#fff;">
+      <div style="font-size:12px;color:#6b7280;">Index Rows</div>
+      <div style="font-size:22px;font-weight:700;">{{ index_stats.success_rows }} OK / {{ index_stats.failed_rows }} Fail</div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-bottom:16px;">
+    <div style="border:1px solid #e5e7eb;border-radius:12px;padding:14px;background:#fff;">
+      <h2 style="font-size:18px;margin:0 0 10px 0;">Policy / Auto-Include</h2>
+      <div style="font-size:13px;line-height:1.8;">
+        <div>Auto Include: <b>{{ policy.auto_include_new_devices|default:"-" }}</b></div>
+        <div>Schedule Time: <b>{{ policy.schedule_time|default:"-" }}</b></div>
+        <div>Stale Hours: <b>{{ policy.stale_hours|default:"-" }}</b></div>
+        <div>Backup Root: <code>{{ backup_root }}</code></div>
+        <div>Cisco Exclude IDs: <code>{{ policy.cisco.exclude_ids|default:"-" }}</code></div>
+        <div>MikroTik Exclude IDs: <code>{{ policy.mikrotik.exclude_ids|default:"-" }}</code></div>
+        <div>MikroTik Full Backup IDs: <code>{{ policy.mikrotik.full_backup_ids|default:"-" }}</code></div>
+      </div>
+    </div>
+
+    <div style="border:1px solid #e5e7eb;border-radius:12px;padding:14px;background:#fff;">
+      <h2 style="font-size:18px;margin:0 0 10px 0;">Retention</h2>
+      <form method="post" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="retention_dry_run">
+        <input name="keep" value="30" class="form-control form-control-sm" style="width:80px;">
+        <button class="btn btn-sm btn-secondary" type="submit">Dry-run</button>
+      </form>
+      <form method="post" style="display:flex;gap:8px;flex-wrap:wrap;">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="retention_apply">
+        <input name="keep" value="30" class="form-control form-control-sm" style="width:80px;" {% if not is_admin %}disabled{% endif %}>
+        <input name="confirm" placeholder="DELETE_OLD_BACKUPS" class="form-control form-control-sm" style="width:210px;" {% if not is_admin %}disabled{% endif %}>
+        <button class="btn btn-sm btn-danger" type="submit" {% if not is_admin %}disabled{% endif %}>Apply Retention</button>
+      </form>
+      <div style="font-size:12px;color:#6b7280;margin-top:8px;">Apply فقط Admin و فقط با Confirm فعال است. Restore واقعی فعال نیست.</div>
+    </div>
+  </div>
+
+  <div style="border:1px solid #e5e7eb;border-radius:12px;padding:14px;background:#fff;margin-bottom:16px;">
+    <h2 style="font-size:18px;margin:0 0 10px 0;">Missing / Stale Details</h2>
+    <div style="overflow:auto;">
+      <table class="table table-sm table-striped" style="width:100%;font-size:13px;">
+        <thead><tr><th>Family</th><th>Device ID</th><th>Type</th><th>Status</th><th>Age Hours</th><th>Created</th></tr></thead>
+        <tbody>
+        {% for item in health_issue_items %}
+          <tr>
+            <td>{{ item.family }}</td>
+            <td>{{ item.device_id }}</td>
+            <td>{{ item.backup_type }}</td>
+            <td>{{ item.status }}</td>
+            <td>{{ item.age_hours|default:"-" }}</td>
+            <td>{{ item.created_at|default:"-" }}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="6" style="color:#047857;">No Missing/Stale backup.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div style="border:1px solid #e5e7eb;border-radius:12px;padding:14px;background:#fff;margin-bottom:16px;">
+    <h2 style="font-size:18px;margin:0 0 10px 0;">Latest Backup Per Device / Type</h2>
+    <div style="overflow:auto;">
+      <table class="table table-sm table-striped" style="width:100%;font-size:13px;">
+        <thead><tr><th>Family</th><th>Device</th><th>Type</th><th>Created</th><th>File</th><th>Size</th></tr></thead>
+        <tbody>
+        {% for row in latest_rows %}
+          <tr>
+            <td>{{ row.family }}</td>
+            <td>{{ row.device }}</td>
+            <td>{{ row.backup_type }}</td>
+            <td>{{ row.created_at }}</td>
+            <td><code>{{ row.file_name }}</code></td>
+            <td>{{ row.size }}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="6" style="color:#6b7280;">No backup index rows found.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div style="border:1px solid #e5e7eb;border-radius:12px;padding:14px;background:#fff;">
+    <h2 style="font-size:18px;margin:0 0 10px 0;">Report Files</h2>
+    <div style="font-size:13px;line-height:1.8;">
+      <div>Policy: <code>{{ policy_path }}</code></div>
+      <div>Health: <code>{{ health_report_path }}</code></div>
+      <div>Retention: <code>{{ retention_report_path }}</code></div>
+    </div>
+  </div>
+</div>
+{% endblock %}

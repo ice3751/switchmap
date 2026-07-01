@@ -6,6 +6,7 @@
 <p class="page-subtitle">آلارم‌های فعال از SNMP، SFP، Interface Error، Uplink Down و Topology</p>
 {% endblock %}
 {% block page_actions %}
+<a class="btn btn-ghost" href="{% url 'inventory:alarm_rules' %}">Rule Report</a>
 {% if swmap_can_ssh %}
 <form method="post" action="{% url 'inventory:alarm_sync' %}" class="inline-form">
     {% csrf_token %}
@@ -15,90 +16,55 @@
 {% endblock %}
 
 {% block content %}
+<!-- PHASE79_9_1_ALARM_FILTER_VISIBLE_FIX -->
 <section class="summary-bar-grid alarm-summary-grid">
-    <div class="summary-tile is-error"><span>Active</span><strong>{{ active_count }}</strong></div>
-    <div class="summary-tile is-error"><span>Critical</span><strong>{{ critical_count }}</strong></div>
-    <div class="summary-tile is-disabled"><span>Warning</span><strong>{{ warning_count }}</strong></div>
-    <div class="summary-tile"><span>Acknowledged</span><strong>{{ ack_count }}</strong></div>
-    <div class="summary-tile"><span>Resolved</span><strong>{{ resolved_count }}</strong></div>
+    <a class="summary-tile is-error" href="{% url 'inventory:alarm_center' %}?status=active"><span>Active</span><strong>{{ active_count }}</strong></a>
+    <a class="summary-tile is-error" href="{% url 'inventory:alarm_center' %}?status=active&severity=critical"><span>Critical</span><strong>{{ critical_count }}</strong></a>
+    <a class="summary-tile is-disabled" href="{% url 'inventory:alarm_center' %}?status=active&severity=warning"><span>Warning</span><strong>{{ warning_count }}</strong></a>
+    <a class="summary-tile" href="{% url 'inventory:alarm_center' %}?status=acknowledged"><span>Acknowledged</span><strong>{{ ack_count }}</strong></a>
+    <a class="summary-tile" href="{% url 'inventory:alarm_center' %}?status=resolved"><span>Resolved</span><strong>{{ resolved_count }}</strong></a>
+    <div class="summary-tile alarm-result-tile"><span>Filtered Result</span><strong>{{ filtered_count }}</strong></div>
 </section>
 
-<details class="surface-card search-panel ui-collapsible alarm-filter-panel">
-    <summary class="ui-collapsible-summary">
-        <span>
-            <strong>Filter Alarms</strong>
-            <small>Status / Severity / Switch / Text</small>
-        </span>
-        <span class="status-pill muted">{{ page_obj.paginator.count }} مورد</span>
-    </summary>
-    <div class="ui-collapsible-body">
-        <form method="get" class="filter-grid alarm-filter-grid">
-            <div>
-                <label>Search</label>
-                <input class="input" type="search" name="q" value="{{ query }}" placeholder="Switch / Port / Message">
-            </div>
-            <div>
-                <label>Status</label>
-                <select class="input" name="status">
-                    <option value="">همه</option>
-                    {% for value,label in status_choices %}
-                        <option value="{{ value }}" {% if selected_status == value %}selected{% endif %}>{{ label }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div>
-                <label>Severity</label>
-                <select class="input" name="severity">
-                    <option value="">همه</option>
-                    {% for value,label in severity_choices %}
-                        <option value="{{ value }}" {% if selected_severity == value %}selected{% endif %}>{{ label }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div>
-                <label>Category</label>
-                <select class="input" name="category">
-                    <option value="">همه</option>
-                    {% for value,label in category_choices %}
-                        <option value="{{ value }}" {% if selected_category == value %}selected{% endif %}>{{ label }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div>
-                <label>Switch</label>
-                <select class="input" name="switch">
-                    <option value="">همه</option>
-                    {% for switch in switches %}
-                        <option value="{{ switch.id }}" {% if selected_switch == switch.id|stringformat:'s' %}selected{% endif %}>{{ switch.name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="filter-actions">
-                <button class="btn btn-primary" type="submit">Filter</button>
-                <a class="btn btn-ghost" href="{% url 'inventory:alarm_center' %}">Reset</a>
-            </div>
-        </form>
-    </div>
-</details>
+<!-- PHASE79_9_2_COMPACT_ALARM_FILTER -->
+{% if query or selected_severity or selected_type or selected_switch or selected_port or selected_source or selected_date_from or selected_date_to or selected_status != 'active' %}
+<div class="alarm-active-filter-row alarm-compact-active-filters">
+    {% for label,value in filter_badges %}
+        <span class="alarm-filter-chip"><b>{{ label }}</b>{{ value }}</span>
+    {% endfor %}
+    <a class="btn btn-ghost btn-small" href="{% url 'inventory:alarm_center' %}">Reset</a>
+</div>
+{% endif %}
 
 <section class="surface-card table-panel ui-data-panel">
-    <div class="table-title-row alarm-table-title-row">
+    <div class="table-title-row alarm-table-title-row phase79-9-2-alarm-toolbar">
         <div>
             <h3>Alarms</h3>
             <span class="inline-state">View Only فقط مشاهده می‌کند؛ Acknowledge / Resolve برای Operator و Admin است.</span>
         </div>
-        {% if swmap_can_ssh %}
-            <form id="alarm-bulk-form" method="post" action="{% url 'inventory:alarm_bulk_action' %}" class="alarm-bulk-actions">
-                {% csrf_token %}
-                <input type="hidden" name="next" value="{{ request.get_full_path }}">
-                <select class="input" name="bulk_action" required>
-                    <option value="">Bulk Action</option>
-                    <option value="acknowledge">Acknowledge selected</option>
-                    <option value="resolve">Resolve selected</option>
-                </select>
-                <button class="btn btn-secondary btn-small" type="submit">Apply</button>
-            </form>
-        {% endif %}
+        <div class="alarm-toolbar-actions">
+            <details class="alarm-inline-filter" {% if query %}open{% endif %}>
+                <summary class="btn btn-ghost btn-small alarm-filter-icon" title="Filter">🔎 فیلتر</summary>
+                <form method="get" class="alarm-inline-filter-form">
+                    <input type="hidden" name="status" value="{{ selected_status|default:'active' }}">
+                    <input class="input" type="search" name="q" value="{{ query }}" placeholder="Switch / Port / Message" autofocus>
+                    <button class="btn btn-primary btn-small" type="submit">Enter</button>
+                    {% if query %}<a class="btn btn-ghost btn-small" href="{% url 'inventory:alarm_center' %}?status={{ selected_status|default:'active' }}">×</a>{% endif %}
+                </form>
+            </details>
+            {% if swmap_can_ssh %}
+                <form id="alarm-bulk-form" method="post" action="{% url 'inventory:alarm_bulk_action' %}" class="alarm-bulk-actions">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+                    <select class="input" name="bulk_action" required>
+                        <option value="">Bulk Action</option>
+                        <option value="acknowledge">Acknowledge selected</option>
+                        <option value="resolve">Resolve selected</option>
+                    </select>
+                    <button class="btn btn-secondary btn-small" type="submit">Apply</button>
+                </form>
+            {% endif %}
+        </div>
     </div>
     <div class="table-wrap">
         <table class="data-table alarm-table">
@@ -107,7 +73,7 @@
                     {% if swmap_can_ssh %}<th class="alarm-select-col"><input type="checkbox" data-alarm-select-all aria-label="Select all alarms"></th>{% endif %}
                     <th>Severity</th>
                     <th>Status</th>
-                    <th>Category</th>
+                    <th>Type</th>
                     <th>Switch</th>
                     <th>Port</th>
                     <th>Title</th>
@@ -120,7 +86,7 @@
             </thead>
             <tbody>
                 {% for alarm in page_obj.object_list %}
-                    <tr class="alarm-row alarm-severity-{{ alarm.severity }} alarm-status-{{ alarm.status }}">
+                    <tr id="alarm-{{ alarm.id }}" data-alarm-id="{{ alarm.id }}" class="alarm-row alarm-severity-{{ alarm.severity }} alarm-status-{{ alarm.status }} {% if selected_alarm_id == alarm.id|stringformat:'s' %}alarm-row-selected{% endif %}">
                         {% if swmap_can_ssh %}
                             <td class="alarm-select-col">
                                 {% if alarm.status != 'resolved' %}
@@ -132,9 +98,9 @@
                         <td><span class="alarm-pill alarm-pill-status">{{ alarm.get_status_display }}</span></td>
                         <td>{{ alarm.get_category_display }}</td>
                         <td>{% if alarm.switch %}<a class="table-link" href="{% url 'inventory:switch_detail' alarm.switch.id %}">{{ alarm.switch.name }}</a>{% else %}-{% endif %}</td>
-                        <td class="ltr">{% if alarm.port %}{{ alarm.port.interface_name }}{% else %}-{% endif %}</td>
-                        <td><strong>{{ alarm.title }}</strong><br><small class="ltr">{{ alarm.source }}</small></td>
-                        <td>{{ alarm.message }}{% if alarm.details %}<br><small class="ltr">{{ alarm.details }}</small>{% endif %}</td>
+                        <td class="ltr">{% if alarm.port and alarm.switch %}<a class="table-link" href="{% url 'inventory:switch_detail' alarm.switch.id %}?port={{ alarm.port.id }}">{{ alarm.port.interface_name }}</a>{% else %}-{% endif %}</td>
+                        <td><a class="table-link" href="{% url 'inventory:alarm_detail' alarm.id %}"><strong>{{ alarm.title }}</strong></a><br><small class="ltr">{{ alarm.source }}</small></td>
+                        <td><a class="table-link" href="{% url 'inventory:alarm_detail' alarm.id %}">{{ alarm.message|default:"Detail" }}</a>{% if alarm.details %}<br><small class="ltr">{{ alarm.details }}</small>{% endif %}</td>
                         <td class="ltr">{{ alarm.occurrences }}</td>
                         <td class="ltr">{{ alarm.first_seen_text }}</td>
                         <td class="ltr">{{ alarm.last_seen_text }}</td>
@@ -158,7 +124,7 @@
                         </td>
                     </tr>
                 {% empty %}
-                    <tr><td colspan="{% if swmap_can_ssh %}12{% else %}11{% endif %}">آلارمی پیدا نشد.</td></tr>
+                    <tr><td colspan="{% if swmap_can_ssh %}12{% else %}11{% endif %}">آلارمی با این فیلترها پیدا نشد.</td></tr>
                 {% endfor %}
             </tbody>
         </table>
@@ -166,12 +132,24 @@
 
     {% if page_obj.paginator.num_pages > 1 %}
         <div class="pagination-row">
-            {% if page_obj.has_previous %}<a class="btn btn-ghost" href="?page={{ page_obj.previous_page_number }}">قبلی</a>{% endif %}
+            {% if page_obj.has_previous %}<a class="btn btn-ghost" href="?{% if filter_querystring %}{{ filter_querystring }}&{% endif %}page={{ page_obj.previous_page_number }}">قبلی</a>{% endif %}
             <span>Page {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
-            {% if page_obj.has_next %}<a class="btn btn-ghost" href="?page={{ page_obj.next_page_number }}">بعدی</a>{% endif %}
+            {% if page_obj.has_next %}<a class="btn btn-ghost" href="?{% if filter_querystring %}{{ filter_querystring }}&{% endif %}page={{ page_obj.next_page_number }}">بعدی</a>{% endif %}
         </div>
     {% endif %}
 </section>
+
+<style>
+.phase79-9-2-alarm-toolbar{gap:12px;align-items:flex-start;}
+.alarm-toolbar-actions{display:flex;gap:8px;align-items:flex-start;justify-content:flex-end;flex-wrap:wrap;}
+.alarm-inline-filter{position:relative;z-index:5;}
+.alarm-inline-filter>summary{list-style:none;cursor:pointer;white-space:nowrap;}
+.alarm-inline-filter>summary::-webkit-details-marker{display:none;}
+.alarm-inline-filter-form{position:absolute;top:42px;right:0;display:flex;gap:8px;align-items:center;background:#fff;border:1px solid #cfe0f6;border-radius:14px;padding:10px;box-shadow:0 16px 32px rgba(15,23,42,.14);min-width:360px;}
+.alarm-inline-filter-form .input{min-width:250px;}
+.alarm-compact-active-filters{margin:10px 0 12px 0;display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+@media (max-width: 900px){.alarm-inline-filter-form{position:static;margin-top:8px;min-width:0;}.alarm-toolbar-actions{justify-content:stretch;}.alarm-inline-filter-form .input{min-width:0;width:100%;}}
+</style>
 
 <script>
 document.addEventListener("DOMContentLoaded", function () {

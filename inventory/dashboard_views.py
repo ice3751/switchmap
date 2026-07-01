@@ -17,6 +17,8 @@ from .views import (
     switch_snmp_test,
     switch_sync_snmp_ports,
     switchmap_refresh_all_data,
+    switchmap_dashboard_data_view,
+    dashboard_device_browser_fragment_view,
     switchmap_refresh_switch_step,
 )
 

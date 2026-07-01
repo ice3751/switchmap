@@ -1,0 +1,19 @@
+{% extends "inventory/base.html" %}
+{% block title %}Template Preview | SwitchMap{% endblock %}
+{% block body_class %}phase77-body{% endblock %}
+{% block content %}
+<section class="phase77-shell">
+    <header class="phase77-page-head"><div><p class="phase77-eyebrow">Phase 77</p><h1>Preview: {{ template_obj.name }}</h1><p>{{ action_label }} · {{ risk_text }}</p></div><a class="phase77-btn secondary" href="{% url 'inventory:automation_templates' %}">بازگشت</a></header>
+    <form class="phase77-filterbar" method="get">
+        <select name="port"><option value="">انتخاب پورت</option>{% for port in ports %}<option value="{{ port.id }}" {% if selected_port and selected_port.id == port.id %}selected{% endif %}>{{ port.switch.name }} - {{ port.interface_name }} - {{ port.description|default:port.connected_device }}</option>{% endfor %}</select>
+        <button class="phase77-btn" type="submit">Preview Command</button>
+    </form>
+    <section class="phase77-panel">
+        {% if selected_port %}<p>Target: <b>{{ selected_port.switch.name }}</b> / <b class="ltr">{{ selected_port.interface_name }}</b></p>{% endif %}
+        {% if error %}<div class="phase77-alert danger">{{ error }}</div>{% endif %}
+        {% if commands %}<pre class="phase77-code">conf t
+{% for command in commands %}{{ command }}
+{% endfor %}end</pre>{% else %}<div class="phase77-empty">برای مشاهده Preview یک پورت انتخاب کن.</div>{% endif %}
+    </section>
+</section>
+{% endblock %}

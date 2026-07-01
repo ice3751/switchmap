@@ -6,7 +6,8 @@ from collections import defaultdict
 
 from django.utils import timezone
 
-from inventory.models import Port
+from inventory.models import Port, Switch
+from inventory.phase79_history import record_port_connection_event, record_port_identity_snapshot
 
 SYS_DESCR = (1, 3, 6, 1, 2, 1, 1, 1, 0)
 IF_DESCR = (1, 3, 6, 1, 2, 1, 2, 2, 1, 2)
@@ -20,6 +21,8 @@ IF_ALIAS = (1, 3, 6, 1, 2, 1, 31, 1, 1, 1, 18)
 DOT1D_BASE_PORT_IFINDEX = (1, 3, 6, 1, 2, 1, 17, 1, 4, 1, 2)
 DOT1D_TP_FDB_PORT = (1, 3, 6, 1, 2, 1, 17, 4, 3, 1, 2)
 DOT1D_TP_FDB_STATUS = (1, 3, 6, 1, 2, 1, 17, 4, 3, 1, 3)
+IP_NET_TO_MEDIA_PHYS_ADDRESS = (1, 3, 6, 1, 2, 1, 4, 22, 1, 2)
+IP_NET_TO_MEDIA_NET_ADDRESS = (1, 3, 6, 1, 2, 1, 4, 22, 1, 3)
 DOT1Q_PVID = (1, 3, 6, 1, 2, 1, 17, 7, 1, 4, 5, 1, 1)
 
 VM_VLAN = (1, 3, 6, 1, 4, 1, 9, 9, 68, 1, 2, 2, 1, 2)
@@ -359,13 +362,23 @@ class SnmpClient:
 
 def normalize_interface_name(name):
     name = str(name or "").strip()
+
+    mikrotik_physical_patterns = [
+        r"(ether\d+)(?:[-_].*)?$",
+        r"(sfp-sfpplus\d+)(?:[-_].*)?$",
+    ]
+    for pattern in mikrotik_physical_patterns:
+        match = re.match(pattern, name, flags=re.IGNORECASE)
+        if match:
+            return match.group(1).lower()
+
     replacements = [
-        (r"^GigabitEthernet", "Gi"),
-        (r"^TenGigabitEthernet", "Te"),
-        (r"^FastEthernet", "Fa"),
-        (r"^FortyGigabitEthernet", "Fo"),
-        (r"^TwentyFiveGigE", "Twe"),
-        (r"^TwoGigabitEthernet", "Tw"),
+        (r"GigabitEthernet", "Gi"),
+        (r"TenGigabitEthernet", "Te"),
+        (r"FastEthernet", "Fa"),
+        (r"FortyGigabitEthernet", "Fo"),
+        (r"TwentyFiveGigE", "Twe"),
+        (r"TwoGigabitEthernet", "Tw"),
     ]
 
     for pattern, replacement in replacements:
@@ -395,16 +408,20 @@ def speed_to_mbps(if_high_speed, if_speed):
 
 
 def status_from_snmp(admin_status, oper_status):
+    # PHASE83R4_IFMIB_SAFE_STATUS_MAP
+    # IF-MIB ifOperStatus values:
+    # 1=up, 2=down, 3=testing, 4=unknown, 5=dormant, 6=notPresent, 7=lowerLayerDown.
+    # Values 3/4/5/6/7 are not evidence of a physical/interface fault by themselves.
     if admin_status == 2:
         return Port.Status.DISABLED
 
     if oper_status == 1:
         return Port.Status.UP
 
-    if oper_status in (2, 7):
+    if oper_status in (2, 3, 4, 5, 6, 7):
         return Port.Status.DOWN
 
-    return Port.Status.ERROR
+    return Port.Status.DOWN
 
 
 def format_mac(mac_index):
@@ -413,6 +430,114 @@ def format_mac(mac_index):
 
     mac_bytes = mac_index[-6:]
     return ":".join(f"{part:02x}" for part in mac_bytes)
+
+
+def format_mac_value(value):
+    if value is None:
+        return ""
+
+    if isinstance(value, bytes):
+        data = value
+    elif isinstance(value, bytearray):
+        data = bytes(value)
+    elif isinstance(value, str):
+        text = value.strip().lower()
+        if re.match(r"^[0-9a-f]{2}(:[0-9a-f]{2}){5}$", text):
+            return text
+        hex_text = re.sub(r"[^0-9a-fA-F]", "", value)
+        if len(hex_text) == 12:
+            return ":".join(hex_text[i:i + 2].lower() for i in range(0, 12, 2))
+        return ""
+    else:
+        try:
+            data = bytes(value)
+        except Exception:
+            return ""
+
+    if len(data) != 6:
+        return ""
+    if not any(data):
+        return ""
+    return ":".join(f"{part:02x}" for part in data)
+
+
+def ipv4_from_index_parts(parts):
+    try:
+        values = [int(part) for part in parts[-4:]]
+    except Exception:
+        return ""
+    if len(values) != 4 or any(part < 0 or part > 255 for part in values):
+        return ""
+    return ".".join(str(part) for part in values)
+
+
+def clean_identity_value(value):
+    text = str(value or "").replace("\x00", "").strip()
+    return text
+
+
+def is_meaningful_neighbor(value):
+    text = clean_identity_value(value).lower()
+    return bool(text and text not in {"-", "unknown", "none", "null"})
+
+
+PROJECT_NEIGHBOR_IDENTITY_ALIASES = {
+    # Project-specific LLDP/MNDP/CDP identities observed from MikroTik/Cisco devices.
+    # Values are the Switch.name records currently stored in SwitchMap.
+    "switchcorefactory": "CRS354",
+    "capxlmanagment": "Cap-Managment",
+    "capxlmanagement": "Cap-Managment",
+    "capxltolid": "Cap-Tolid",
+    "capxledari": "Cap-Edari",
+    "rbcoreghazvin": "RB5009",
+    "n3kcoresw": "NEXUS",
+    "ppstehraniranmall": "RB2011-Iranmall",
+}
+
+
+def normalize_identity_key(value):
+    text = clean_identity_value(value).lower()
+    text = re.sub(r"\([^)]*\)", "", text)
+    text = text.replace(".winac-co.com", "")
+    text = text.replace(".local", "")
+    if "." in text:
+        text = text.split(".", 1)[0]
+    return re.sub(r"[^a-z0-9]+", "", text)
+
+
+def add_identity_lookup(lookup, key, switch):
+    key = normalize_identity_key(key)
+    if key and key not in lookup:
+        lookup[key] = switch
+
+
+def build_managed_switch_lookup():
+    lookup = {}
+    switches = list(Switch.objects.filter(is_active=True).only("name", "management_ip"))
+    by_name_key = {}
+    for sw in switches:
+        for value in (sw.name, str(sw.management_ip or "")):
+            add_identity_lookup(lookup, value, sw)
+        by_name_key[normalize_identity_key(sw.name)] = sw
+
+    for alias, target_name in PROJECT_NEIGHBOR_IDENTITY_ALIASES.items():
+        target = by_name_key.get(normalize_identity_key(target_name))
+        if target:
+            add_identity_lookup(lookup, alias, target)
+    return lookup
+
+
+def resolve_managed_switch_by_identity(identity, lookup):
+    key = normalize_identity_key(identity)
+    if not key:
+        return None
+    if key in lookup:
+        return lookup[key]
+    # Allow suffixes/serial text such as N3K-Core-SW.winac-co.com(FOC...) to still match a known alias.
+    for saved_key, sw in lookup.items():
+        if len(saved_key) >= 5 and (key.startswith(saved_key) or saved_key.startswith(key)):
+            return sw
+    return None
 
 
 def vlan_bitmap_to_list(raw_bytes, base_vlan=0):
@@ -684,6 +809,8 @@ def poll_switch_ports(switch, dry_run=False, show_ignored=False):
         if dry_run:
             continue
 
+        phase79_old_status = port.status
+
         port.snmp_if_index = if_index
         port.snmp_raw_name = str(raw_name or "")
         port.snmp_alias = str(alias_value or "")
@@ -734,6 +861,14 @@ def poll_switch_ports(switch, dry_run=False, show_ignored=False):
                 "updated_at",
             ]
         )
+        try:
+            if phase79_old_status != new_status:
+                if phase79_old_status == Port.Status.UP and new_status != Port.Status.UP:
+                    record_port_connection_event(port, event_type="down", source="snmp_status", observed_at=now, previous_status=phase79_old_status)
+                elif new_status == Port.Status.UP and phase79_old_status != Port.Status.UP:
+                    record_port_connection_event(port, event_type="up", source="snmp_status", observed_at=now, previous_status=phase79_old_status)
+        except Exception:
+            pass
         updated_count += 1
 
     if not dry_run:
@@ -935,42 +1070,105 @@ def build_ifindex_port_map(switch, client):
 def poll_switch_discovery(switch, dry_run=False):
     client = make_client(switch, retries=1)
     now = timezone.now()
+    optional_errors = {}
+
+    def optional_walk(label, oid, indexed=False, raw=False, max_steps=10000):
+        try:
+            if indexed:
+                return client.walk_indexed(oid, max_steps=max_steps, raw=raw)
+            if raw:
+                return client.walk_raw(oid, max_steps=max_steps)
+            return client.walk(oid, max_steps=max_steps)
+        except Exception as exc:
+            optional_errors[label] = str(exc)
+            return {}
 
     try:
         by_ifindex, by_interface, _, _ = build_ifindex_port_map(switch, client)
-        dot1d_base_port = client.walk(DOT1D_BASE_PORT_IFINDEX)
-        dot1d_fdb_port = client.walk_indexed(DOT1D_TP_FDB_PORT)
-        dot1d_fdb_status = client.walk_indexed(DOT1D_TP_FDB_STATUS)
-        cdp_device_id = client.walk_indexed(CDP_CACHE_DEVICE_ID)
-        cdp_device_port = client.walk_indexed(CDP_CACHE_DEVICE_PORT)
-        lldp_loc_port_id = client.walk(LLDP_LOC_PORT_ID)
-        lldp_rem_sys_name = client.walk_indexed(LLDP_REM_SYS_NAME)
-        lldp_rem_port_id = client.walk_indexed(LLDP_REM_PORT_ID)
-        lldp_rem_port_desc = client.walk_indexed(LLDP_REM_PORT_DESC)
     except Exception as exc:
         switch.discovery_last_error = str(exc)
         switch.discovery_last_poll = now
-        switch.save(update_fields=["discovery_last_error", "discovery_last_poll"])
+        if not dry_run:
+            switch.save(update_fields=["discovery_last_error", "discovery_last_poll"])
         raise SnmpError(str(exc)) from exc
+
+    dot1d_base_port = optional_walk("DOT1D_BASE_PORT_IFINDEX", DOT1D_BASE_PORT_IFINDEX)
+    dot1d_fdb_port = optional_walk("DOT1D_TP_FDB_PORT", DOT1D_TP_FDB_PORT, indexed=True)
+    dot1d_fdb_status = optional_walk("DOT1D_TP_FDB_STATUS", DOT1D_TP_FDB_STATUS, indexed=True)
+    arp_mac_raw = optional_walk("IP_NET_TO_MEDIA_PHYS_ADDRESS", IP_NET_TO_MEDIA_PHYS_ADDRESS, indexed=True, raw=True)
+    cdp_device_id = optional_walk("CDP_CACHE_DEVICE_ID", CDP_CACHE_DEVICE_ID, indexed=True)
+    cdp_device_port = optional_walk("CDP_CACHE_DEVICE_PORT", CDP_CACHE_DEVICE_PORT, indexed=True)
+    lldp_loc_port_id = optional_walk("LLDP_LOC_PORT_ID", LLDP_LOC_PORT_ID)
+    lldp_rem_sys_name = optional_walk("LLDP_REM_SYS_NAME", LLDP_REM_SYS_NAME, indexed=True)
+    lldp_rem_port_id = optional_walk("LLDP_REM_PORT_ID", LLDP_REM_PORT_ID, indexed=True)
+    lldp_rem_port_desc = optional_walk("LLDP_REM_PORT_DESC", LLDP_REM_PORT_DESC, indexed=True)
+
+    managed_switch_lookup = build_managed_switch_lookup()
 
     discovery = defaultdict(lambda: {
         "source": "",
         "device": "",
         "port": "",
-        "macs": [],
+        "macs": set(),
+        "ips": set(),
+        "inventory_ip": "",
+        "inventory_match": "",
+        "confidence": "none",
     })
+
+    arp_ips_by_mac = defaultdict(set)
+    arp_ips_by_ifindex = defaultdict(set)
+    for index, raw_mac in arp_mac_raw.items():
+        if len(index) < 5:
+            continue
+        try:
+            if_index = int(index[0])
+        except Exception:
+            continue
+        ip_address = ipv4_from_index_parts(index[-4:])
+        mac = format_mac_value(raw_mac)
+        if not ip_address or not mac:
+            continue
+        arp_ips_by_mac[mac].add(ip_address)
+        arp_ips_by_ifindex[if_index].add(ip_address)
 
     for mac_index, bridge_port in dot1d_fdb_port.items():
         status = dot1d_fdb_status.get(mac_index)
         if status not in (None, 3):
             continue
 
-        if_index = dot1d_base_port.get(int(bridge_port or 0))
-        port = by_ifindex.get(int(if_index or 0))
+        try:
+            bridge_port_int = int(bridge_port or 0)
+            if_index = int(dot1d_base_port.get(bridge_port_int) or 0)
+        except Exception:
+            continue
+
+        port = by_ifindex.get(if_index)
         mac = format_mac(mac_index)
 
         if port and mac:
-            discovery[port.id]["macs"].append(mac)
+            current = discovery[port.id]
+            current["macs"].add(mac)
+            for ip_address in arp_ips_by_mac.get(mac, set()):
+                current["ips"].add(ip_address)
+            if not current["confidence"] or current["confidence"] == "none":
+                current["confidence"] = "fdb"
+
+    # ARP-only fallback: safe only when the interface maps directly to a known port.
+    # It does not set a topology neighbor by itself; it only enriches IP/MAC on single-endpoint ports.
+    for mac, ip_addresses in arp_ips_by_mac.items():
+        # Index-based ARP mapping is handled via arp_ips_by_ifindex below; keep this for MAC/IP lookup only.
+        pass
+
+    for if_index, ip_addresses in arp_ips_by_ifindex.items():
+        port = by_ifindex.get(if_index)
+        if not port:
+            continue
+        current = discovery[port.id]
+        for ip_address in ip_addresses:
+            current["ips"].add(ip_address)
+        if current["confidence"] == "none":
+            current["confidence"] = "arp-ifindex"
 
     for index, device_id in lldp_rem_sys_name.items():
         if len(index) < 3:
@@ -986,10 +1184,16 @@ def poll_switch_discovery(switch, dry_run=False):
 
         remote_port = lldp_rem_port_desc.get(index) or lldp_rem_port_id.get(index) or ""
         current = discovery[port.id]
-        if not current["device"]:
+        if is_meaningful_neighbor(device_id):
+            remote_device = clean_identity_value(device_id)
             current["source"] = "LLDP"
-            current["device"] = str(device_id or "")
-            current["port"] = str(remote_port or "")
+            current["device"] = remote_device
+            current["port"] = clean_identity_value(remote_port)
+            current["confidence"] = "lldp"
+            matched_switch = resolve_managed_switch_by_identity(remote_device, managed_switch_lookup)
+            if matched_switch:
+                current["inventory_ip"] = str(matched_switch.management_ip or "")
+                current["inventory_match"] = matched_switch.name
 
     for index, device_id in cdp_device_id.items():
         if len(index) < 2:
@@ -1003,59 +1207,116 @@ def poll_switch_discovery(switch, dry_run=False):
 
         remote_port = cdp_device_port.get(index, "")
         current = discovery[port.id]
-        current["source"] = "CDP"
-        current["device"] = str(device_id or "")
-        current["port"] = str(remote_port or "")
+        if is_meaningful_neighbor(device_id):
+            remote_device = clean_identity_value(device_id)
+            current["source"] = "CDP"
+            current["device"] = remote_device
+            current["port"] = clean_identity_value(remote_port)
+            current["confidence"] = "cdp"
+            matched_switch = resolve_managed_switch_by_identity(remote_device, managed_switch_lookup)
+            if matched_switch:
+                current["inventory_ip"] = str(matched_switch.management_ip or "")
+                current["inventory_match"] = matched_switch.name
 
     matched_count = 0
     updated_count = 0
     neighbor_count = 0
     mac_port_count = 0
+    arp_entry_count = len(arp_ips_by_mac)
+    single_endpoint_count = 0
+    skipped_trunk_ip_count = 0
+    inventory_match_count = 0
+    dryrun_rows = []
 
     ports = list(Port.objects.filter(switch=switch))
 
     for port in ports:
         data = discovery.get(port.id, {})
-        macs = sorted(set(data.get("macs", [])))
+        macs = sorted(set(data.get("macs", set())))
+        ips = sorted(set(data.get("ips", set())))
         source = data.get("source", "")
         device = data.get("device", "")
         remote_port = data.get("port", "")
+        inventory_ip = data.get("inventory_ip", "")
+        inventory_match = data.get("inventory_match", "")
+        confidence = data.get("confidence", "none")
 
-        if source or macs:
+        if source or macs or ips:
             matched_count += 1
 
         if source:
             neighbor_count += 1
 
+        if inventory_match:
+            inventory_match_count += 1
+
         if macs:
             mac_port_count += 1
 
+        single_endpoint = len(macs) == 1 and len(ips) == 1
+        should_set_endpoint_identity = single_endpoint and not source
+        should_set_neighbor_ip = len(ips) == 1 and (source or single_endpoint)
+        if not should_set_neighbor_ip and source and inventory_ip:
+            # LLDP/CDP identity matched an existing SwitchMap device. This is safer than picking a random IP from a trunk.
+            should_set_neighbor_ip = True
+        if single_endpoint:
+            single_endpoint_count += 1
+        if len(ips) > 1 or len(macs) > 1:
+            skipped_trunk_ip_count += 1
+
+        neighbor_ip_value = ips[0] if (should_set_neighbor_ip and len(ips) == 1) else (inventory_ip if should_set_neighbor_ip else None)
+        primary_mac_value = macs[0] if single_endpoint else ""
+
         if dry_run:
+            if source or macs or ips:
+                dryrun_rows.append({
+                    "interface": port.interface_name,
+                    "source": source or ("ARP/FDB" if should_set_endpoint_identity else "FDB/ARP" if macs or ips else ""),
+                    "device": device or (neighbor_ip_value or ""),
+                    "remote_port": remote_port,
+                    "neighbor_ip": neighbor_ip_value or "",
+                    "inventory_match": inventory_match,
+                    "mac_count": len(macs),
+                    "ip_count": len(ips),
+                    "confidence": confidence + ("+inventory" if inventory_match else ""),
+                })
             continue
 
+        update_fields = ["discovery_last_poll", "updated_at"]
+        port.discovery_last_poll = now
+
+        # CDP/LLDP are authoritative for topology. ARP/FDB-only single endpoints are searchable identity,
+        # not forced switch-to-switch topology unless the port has no better neighbor data.
         port.neighbor_source = source
         port.neighbor_device = device
         port.neighbor_port = remote_port
-        port.neighbor_ip = None
+        port.neighbor_ip = neighbor_ip_value
+        update_fields.extend(["neighbor_source", "neighbor_device", "neighbor_port", "neighbor_ip"])
+
         port.mac_count = min(len(macs), 65535)
         port.mac_addresses = "\n".join(macs[:50])
-        port.discovery_last_poll = now
-        port.save(
-            update_fields=[
-                "neighbor_source",
-                "neighbor_device",
-                "neighbor_port",
-                "neighbor_ip",
-                "mac_count",
-                "mac_addresses",
-                "discovery_last_poll",
-                "updated_at",
-            ]
-        )
+        update_fields.extend(["mac_count", "mac_addresses"])
+
+        if primary_mac_value and not (port.mac_address or "").strip():
+            port.mac_address = primary_mac_value
+            update_fields.append("mac_address")
+
+        if neighbor_ip_value and not port.ip_address:
+            port.ip_address = neighbor_ip_value
+            update_fields.append("ip_address")
+
+        port.save(update_fields=sorted(set(update_fields)))
+        try:
+            if source or macs or ips:
+                record_port_identity_snapshot(port, source="discovery", observed_at=now)
+        except Exception:
+            pass
         updated_count += 1
 
     if not dry_run:
         switch.discovery_last_poll = now
+        # Optional table failures such as RB5009 FDB_PORT timeout should not mark discovery failed when
+        # IF/LLDP/ARP data was still collected successfully.
         switch.discovery_last_error = ""
         switch.save(update_fields=["discovery_last_poll", "discovery_last_error"])
 
@@ -1066,6 +1327,12 @@ def poll_switch_discovery(switch, dry_run=False):
         "updated": updated_count,
         "neighbors": neighbor_count,
         "mac_ports": mac_port_count,
+        "arp_entries": arp_entry_count,
+        "single_endpoints": single_endpoint_count,
+        "skipped_trunk_ip": skipped_trunk_ip_count,
+        "inventory_matches": inventory_match_count,
+        "optional_errors": optional_errors,
+        "dryrun_rows": dryrun_rows[:20],
         "target": client.last_remote_address,
         "local": client.last_local_address,
     }

@@ -19,6 +19,9 @@
     <div class="summary-tile"><span>Uplink بدون Neighbor</span><strong>{{ unknown_uplink_count }}</strong></div>
     <div class="summary-tile"><span>Duplicate</span><strong>{{ duplicate_link_count }}</strong></div>
     <div class="summary-tile danger-tile"><span>Down / Error</span><strong>{{ down_link_count }}</strong></div>
+    <div class="summary-tile"><span>Confirmed</span><strong>{{ confirmed_link_count }}</strong></div>
+    <div class="summary-tile warning-tile"><span>Partial</span><strong>{{ partial_link_count }}</strong></div>
+    <div class="summary-tile"><span>Inferred</span><strong>{{ inferred_link_count }}</strong></div>
 </section>
 
 <section class="surface-card topology-control-card">
@@ -60,11 +63,11 @@
 
         <div class="topology-map-links">
             {% for link in topology_map.links|slice:":28" %}
-                <a class="topology-map-link health-{{ link.health }}" href="{% url 'inventory:switch_detail' link.source_switch.id %}?port={{ link.source_port.id }}">
+                <a class="topology-map-link health-{{ link.health }}" href="{{ link.detail_url }}">
                     <span class="ltr">{{ link.source_switch.name }} / {{ link.source_port.interface_name }}</span>
                     <b></b>
                     <span class="ltr">{{ link.matched_switch.name }} / {% if link.matched_port %}{{ link.matched_port.interface_name }}{% else %}{{ link.neighbor_port|default:"-" }}{% endif %}</span>
-                    <em>{{ link.health_label }} • {{ link.matched_by }}</em>
+                    <em>{{ link.health_label }} • {{ link.confidence }} • {{ link.matched_by }}</em>
                 </a>
             {% empty %}
                 <div class="topology-map-empty">فعلاً لینک داخلی Match شده وجود ندارد.</div>
@@ -155,7 +158,7 @@
 
         <div class="topology-link-stack phase33-link-stack">
             {% for link in internal_links|slice:":160" %}
-                <a class="topology-link-card health-{{ link.health }} {% if link.is_uplink %}uplink-link{% endif %}" href="{% url 'inventory:switch_detail' link.source_switch.id %}?port={{ link.source_port.id }}">
+                <a class="topology-link-card health-{{ link.health }} {% if link.is_uplink %}uplink-link{% endif %}" href="{{ link.detail_url }}">
                     <div class="topology-link-side">
                         <strong>{{ link.source_switch.name }}</strong>
                         <span class="ltr">{{ link.source_port.interface_name }}</span>
@@ -164,7 +167,7 @@
                     <div class="topology-link-mid">
                         <span class="link-line"></span>
                         <span class="topology-health-pill {{ link.health }}">{{ link.health_label }}</span>
-                        <small>{{ link.neighbor_source|default:"CDP/LLDP" }} • {{ link.direction }} • {{ link.matched_by }}</small>
+                        <small>{{ link.neighbor_source|default:"CDP/LLDP/MNDP" }} • {{ link.direction }} • {{ link.confidence }} • {{ link.matched_by }}</small>
                     </div>
                     <div class="topology-link-side target">
                         <strong>{{ link.matched_switch.name }}</strong>
@@ -196,21 +199,25 @@
                         <th>Neighbor Port</th>
                         <th>Neighbor IP</th>
                         <th>Health</th>
+                        <th>Confidence</th>
+                        <th>Evidence</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for link in external_links %}
                         <tr>
-                            <td><a class="table-link" href="{% url 'inventory:switch_detail' link.source_switch.id %}?port={{ link.source_port.id }}">{{ link.source_switch.name }}</a></td>
+                            <td><a class="table-link" href="{{ link.detail_url }}">{{ link.source_switch.name }}</a></td>
                             <td class="ltr">{{ link.source_port.interface_name }}</td>
                             <td>{{ link.neighbor_source|default:"-" }}</td>
                             <td class="ltr">{{ link.neighbor_device|default:"Unknown" }}</td>
                             <td class="ltr">{{ link.neighbor_port|default:"-" }}</td>
                             <td class="ltr">{{ link.neighbor_ip|default:"-" }}</td>
                             <td><span class="topology-health-pill {{ link.health }}">{{ link.health_label }}</span></td>
+                            <td>{{ link.confidence|default:"unknown" }}</td>
+                            <td>{{ link.evidence_count|default:0 }}</td>
                         </tr>
                     {% empty %}
-                        <tr><td colspan="7">مورد ناشناس وجود ندارد.</td></tr>
+                        <tr><td colspan="9">مورد ناشناس وجود ندارد.</td></tr>
                     {% endfor %}
                 </tbody>
             </table>
@@ -237,7 +244,7 @@
                 <tbody>
                     {% for port in uplinks_without_neighbor|slice:":180" %}
                         <tr>
-                            <td><a class="table-link" href="{% url 'inventory:switch_detail' port.switch.id %}?port={{ port.id }}">{{ port.switch.name }}</a></td>
+                            <td><a class="table-link" href="{% url 'inventory:topology_edge_detail' port.id %}">{{ port.switch.name }}</a></td>
                             <td class="ltr">{{ port.interface_name }}</td>
                             <td>{{ port.get_status_display }}</td>
                             <td>{{ port.get_port_mode_display }}</td>
@@ -270,7 +277,7 @@
                 <tbody>
                     {% for port in duplicate_links|slice:":120" %}
                         <tr>
-                            <td><a class="table-link" href="{% url 'inventory:switch_detail' port.switch.id %}?port={{ port.id }}">{{ port.switch.name }}</a></td>
+                            <td><a class="table-link" href="{% url 'inventory:topology_edge_detail' port.id %}">{{ port.switch.name }}</a></td>
                             <td class="ltr">{{ port.interface_name }}</td>
                             <td class="ltr">{{ port.neighbor_device|default:"-" }}</td>
                             <td class="ltr">{{ port.neighbor_port|default:"-" }}</td>

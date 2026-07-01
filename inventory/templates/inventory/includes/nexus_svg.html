@@ -67,6 +67,10 @@
                                         data-switch-ip="{{ switch_ip|default:'' }}"
                                         data-switch-user="{{ switch_user|default:'' }}"
                                         data-interface-name="{{ port.interface_name }}"
+                                        data-interface="{{ port.interface_name }}"
+                                        data-port-label="{{ port.description|default_if_none:'' }}"
+                                        data-port-description="{{ port.description|default_if_none:'' }}"
+                                        data-search-code="{{ port.description|default_if_none:'' }} {{ port.cable_label|default_if_none:'' }} {{ port.outlet|default_if_none:'' }}"
                                         data-port-name="{{ port.interface_name }}"
                                         data-status="{{ port.status|default_if_none:'' }}"
                                         data-port-status="{{ port.status|default_if_none:'' }}"
@@ -112,6 +116,10 @@
                                         data-switch-ip="{{ switch_ip|default:'' }}"
                                         data-switch-user="{{ switch_user|default:'' }}"
                                         data-interface-name="{{ port.interface_name }}"
+                                        data-interface="{{ port.interface_name }}"
+                                        data-port-label="{{ port.description|default_if_none:'' }}"
+                                        data-port-description="{{ port.description|default_if_none:'' }}"
+                                        data-search-code="{{ port.description|default_if_none:'' }} {{ port.cable_label|default_if_none:'' }} {{ port.outlet|default_if_none:'' }}"
                                         data-port-name="{{ port.interface_name }}"
                                         data-status="{{ port.status|default_if_none:'' }}"
                                         data-port-status="{{ port.status|default_if_none:'' }}"
@@ -196,3 +204,5 @@
     </div>
     {% if map_mode != 'dashboard' %}<div class="nexus-caption">Nexus layout: 48 main Ethernet ports are shown in odd/even physical rows; ports 49-52 are shown as the right uplink block.</div>{% endif %}
 </div>
+{# PHASE70_LIMITED_QUICK_SEARCH_FIX: data attributes only; no layout/render change #}
+{# PHASE70_1_SEARCH_EXACT_UI_FIX: data attributes verified only; no layout/render change #}

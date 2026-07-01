@@ -1,0 +1,131 @@
+{% extends "inventory/base.html" %}
+{% block title %}Cisco Backup Center | SwitchMap{% endblock %}
+{% block extra_head %}
+<style>
+  .phase84-cisco-center{direction:rtl;--p84-border:#d8e3f1;--p84-muted:#64748b;--p84-card:#fff;--p84-blue:#2563eb;--p84-green:#16a34a;--p84-red:#ef4444;--p84-amber:#f59e0b}
+  .phase84-cisco-center .phase84-hero{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:18px;padding:22px;border:1px solid var(--p84-border);border-top:5px solid var(--p84-blue);border-radius:18px;background:linear-gradient(180deg,#fff,#f8fbff)}
+  .phase84-cisco-center h1,.phase84-cisco-center h2,.phase84-cisco-center h3{margin:0;color:#0f172a}
+  .phase84-cisco-center .muted{color:var(--p84-muted)}
+  .phase84-cisco-center .small{font-size:12px}
+  .phase84-cisco-center .ltr{direction:ltr;text-align:left;unicode-bidi:plaintext}
+  .phase84-cards{display:grid;grid-template-columns:repeat(5,minmax(140px,1fr));gap:12px;margin-bottom:18px}
+  .phase84-stat{padding:16px;border:1px solid var(--p84-border);border-radius:16px;background:var(--p84-card);box-shadow:0 8px 24px rgba(15,23,42,.04)}
+  .phase84-stat small{display:block;color:var(--p84-muted);font-weight:700}.phase84-stat strong{display:block;margin-top:6px;font-size:24px;color:#020617}
+  .phase84-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}.phase84-grid-wide{display:grid;grid-template-columns:1.1fr .9fr;gap:16px;align-items:start}
+  .phase84-panel{padding:18px;border:1px solid var(--p84-border);border-radius:18px;background:var(--p84-card);box-shadow:0 10px 26px rgba(15,23,42,.04);margin-bottom:16px}
+  .phase84-panel-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}.phase84-panel-head p{margin:4px 0 0}
+  .phase84-form{display:grid;gap:12px}.phase84-form-row{display:grid;gap:6px}.phase84-form-row label{font-weight:800;color:#0f172a}.phase84-form-row input,.phase84-form-row select{width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid var(--p84-border);border-radius:12px;background:#fff;direction:ltr;text-align:left}.phase84-form-row .helptext{font-size:12px;color:var(--p84-muted)}
+  .phase84-checks{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}.phase84-checks label{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px;border:1px solid var(--p84-border);border-radius:12px;background:#f8fafc}.phase84-checks input{width:auto}
+  .phase84-actions{display:flex;gap:10px;justify-content:flex-start;margin-top:8px}.phase84-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 15px;border-radius:12px;border:1px solid #bfdbfe;background:#eff6ff;color:#1d4ed8;font-weight:900;text-decoration:none;cursor:pointer}.phase84-btn.primary{background:var(--p84-blue);border-color:var(--p84-blue);color:#fff}.phase84-btn.ghost{background:#fff;color:#334155}.phase84-btn.warning{background:#fff7ed;border-color:#fed7aa;color:#c2410c}
+  .phase84-alert{padding:12px 14px;border-radius:14px;margin-bottom:14px;border:1px solid #bbf7d0;background:#f0fdf4;color:#166534;font-weight:800}.phase84-alert.warn{border-color:#fed7aa;background:#fff7ed;color:#9a3412}
+  .phase84-table{width:100%;border-collapse:separate;border-spacing:0 8px}.phase84-table th{font-size:12px;color:#334155;text-align:right;padding:10px;background:#eaf3ff}.phase84-table td{padding:12px;background:#fff;border-top:1px solid var(--p84-border);border-bottom:1px solid var(--p84-border)}.phase84-table td:first-child{border-right:1px solid var(--p84-border);border-radius:0 12px 12px 0}.phase84-table td:last-child{border-left:1px solid var(--p84-border);border-radius:12px 0 0 12px}.phase84-table-wrap{overflow:auto}
+  .phase84-badge{display:inline-flex;align-items:center;justify-content:center;padding:5px 10px;border-radius:999px;font-size:12px;font-weight:900}.phase84-badge.ok{background:#dcfce7;color:#15803d}.phase84-badge.fail{background:#fee2e2;color:#b91c1c}.phase84-badge.info{background:#dbeafe;color:#1d4ed8}.phase84-badge.warn{background:#fef3c7;color:#92400e}
+  .phase84-filter{display:grid;grid-template-columns:1fr 1fr auto;gap:10px;margin:8px 0 14px}.phase84-filter select{padding:10px;border:1px solid var(--p84-border);border-radius:12px;background:#fff}
+  .phase84-scheduled-panel{margin-top:16px}.phase84-code{white-space:pre-wrap;direction:ltr;text-align:left;unicode-bidi:plaintext;padding:12px;border:1px dashed #bfdbfe;border-radius:12px;background:#f8fafc;color:#0f172a;font-size:12px}.phase84-command-list{display:grid;gap:8px}
+  @media(max-width:1100px){.phase84-cards{grid-template-columns:repeat(2,1fr)}.phase84-grid,.phase84-grid-wide{grid-template-columns:1fr}.phase84-filter{grid-template-columns:1fr}}
+</style>
+{% endblock %}
+{% block content %}
+<!-- PHASE85_CISCO_BACKUP_UI_CLEANUP -->
+<div class="page-shell phase84-cisco-center" data-phase84-cisco-backup-center="{{ phase84_marker }}">
+  <section class="phase84-hero">
+    <div>
+      <h1>Cisco Backup Center</h1>
+      <p class="muted">Backup مستقل Cisco برای running-config / startup-config / version / inventory</p>
+      <p class="muted small">Preview و Diff ماسک می‌شوند؛ فایل کامل فقط برای Admin قابل Download است.</p>
+    </div>
+    <div class="phase84-actions">
+      <a class="phase84-btn ghost" href="{% url 'inventory:config_backups' %}">Config Diff قدیمی</a>
+      <a class="phase84-btn ghost" href="{% url 'inventory:backup_center' %}">SQLite Backup</a>
+    </div>
+  </section>
+
+  <section class="phase84-cards">
+    <div class="phase84-stat"><small>کل Backupها</small><strong>{{ backup_stats.total }}</strong></div>
+    <div class="phase84-stat"><small>موفق</small><strong>{{ backup_stats.success }}</strong></div>
+    <div class="phase84-stat"><small>ناموفق</small><strong>{{ backup_stats.failed }}</strong></div>
+    <div class="phase84-stat"><small>Running</small><strong>{{ backup_stats.running }}</strong></div>
+    <div class="phase84-stat"><small>Startup</small><strong>{{ backup_stats.startup }}</strong></div>
+  </section>
+
+  {% if backup_stats.failed %}<div class="phase84-alert warn">{{ backup_stats.failed }} Backup ناموفق در History وجود دارد.</div>{% endif %}
+
+  <section class="phase84-grid">
+    <div class="phase84-panel">
+      <div class="phase84-panel-head"><div><h2>Backup دستی یک دستگاه</h2><p class="muted small">برای تست یا Backup فوری یک Cisco.</p></div></div>
+      <form method="post" action="{% url 'inventory:cisco_backup_run' %}" class="phase84-form">
+        {% csrf_token %}
+        <div class="phase84-form-row"><label>{{ backup_form.switch.label }}</label>{{ backup_form.switch }}{{ backup_form.switch.errors }}</div>
+        <div class="phase84-form-row"><label>{{ backup_form.backup_type.label }}</label>{{ backup_form.backup_type }}{{ backup_form.backup_type.errors }}</div>
+        <div class="phase84-form-row"><label>{{ backup_form.username.label }}</label>{{ backup_form.username }}{{ backup_form.username.errors }}</div>
+        <div class="phase84-form-row"><label>{{ backup_form.password.label }}</label>{{ backup_form.password }}{{ backup_form.password.errors }}</div>
+        <div class="phase84-form-row"><label>{{ backup_form.enable_password.label }}</label>{{ backup_form.enable_password }}{{ backup_form.enable_password.errors }}<span class="helptext">اگر Enable لازم نیست خالی بماند.</span></div>
+        <div class="phase84-actions"><button class="phase84-btn primary" type="submit">Run Backup</button></div>
+      </form>
+    </div>
+
+    <div class="phase84-panel">
+      <div class="phase84-panel-head"><div><h2>Batch Backup</h2><p class="muted small">برای شروع، Selected و تعداد محدود امن‌تر است.</p></div></div>
+      <form method="post" action="{% url 'inventory:cisco_backup_batch' %}" class="phase84-form">
+        {% csrf_token %}
+        <div class="phase84-form-row"><label>{{ batch_form.target.label }}</label>{{ batch_form.target }}{{ batch_form.target.errors }}</div>
+        <div class="phase84-form-row"><label>{{ batch_form.switches.label }}</label><div class="phase84-checks">{{ batch_form.switches }}</div>{{ batch_form.switches.errors }}</div>
+        <div class="phase84-form-row"><label>{{ batch_form.backup_types.label }}</label><div class="phase84-checks">{{ batch_form.backup_types }}</div>{{ batch_form.backup_types.errors }}</div>
+        <div class="phase84-form-row"><label>{{ batch_form.username.label }}</label>{{ batch_form.username }}{{ batch_form.username.errors }}</div>
+        <div class="phase84-form-row"><label>{{ batch_form.password.label }}</label>{{ batch_form.password }}{{ batch_form.password.errors }}</div>
+        <div class="phase84-form-row"><label>{{ batch_form.enable_password.label }}</label>{{ batch_form.enable_password }}{{ batch_form.enable_password.errors }}</div>
+        <div class="phase84-actions"><button class="phase84-btn primary" type="submit">Run Batch</button></div>
+      </form>
+    </div>
+  </section>
+
+  <section class="phase84-panel">
+    <div class="phase84-panel-head"><div><h2>Backup History</h2><p class="muted small">فقط Metadata نمایش داده می‌شود. فایل مستقیم از Web قابل دسترسی نیست.</p></div></div>
+    <form method="get" class="phase84-filter">
+      <select name="switch">
+        <option value="">All Devices</option>
+        {% for sw in switches %}<option value="{{ sw.id }}" {% if switch_filter == sw.id|stringformat:"s" %}selected{% endif %}>{{ sw.name }}</option>{% endfor %}
+      </select>
+      <select name="type">
+        {% for key,label in type_choices %}<option value="{{ key }}" {% if type_filter == key %}selected{% endif %}>{{ label }}</option>{% endfor %}
+      </select>
+      <button class="phase84-btn ghost" type="submit">Filter</button>
+    </form>
+    <div class="phase84-table-wrap">
+      <table class="phase84-table">
+        <thead><tr><th>Device</th><th>Type</th><th>Jalali</th><th>Created</th><th>Size</th><th>Hash</th><th>Sensitive</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody>
+        {% for item in backups %}
+          <tr>
+            <td><strong>{{ item.device }}</strong><br><small class="ltr">{{ item.management_ip }}</small></td>
+            <td>{{ item.backup_type_label }}</td>
+            <td>{{ item.jalali_date }}</td>
+            <td class="ltr"><small>{{ item.created_at }}</small></td>
+            <td class="ltr">{{ item.size }}</td>
+            <td class="ltr"><small>{{ item.file_hash|default:"-"|slice:":16" }}</small></td>
+            <td>{% if item.sensitive_line_count %}<span class="phase84-badge warn">{{ item.sensitive_line_count }}</span>{% else %}<span class="phase84-badge info">0</span>{% endif %}</td>
+            <td>{% if item.success %}<span class="phase84-badge ok">OK</span>{% else %}<span class="phase84-badge fail">FAIL</span>{% endif %}</td>
+            <td><a class="phase84-btn ghost" href="{% url 'inventory:cisco_backup_detail' item.backup_id %}">Detail</a>{% if item.error %}<br><small class="muted">{{ item.error|truncatechars:80 }}</small>{% endif %}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="9">Backup ثبت نشده است.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="phase84-panel phase84-scheduled-panel">
+    <div class="phase84-panel-head"><div><h2>Scheduled Backup Prepare</h2><p class="muted small">رمز داخل فرم ذخیره نمی‌شود. Scheduled Job فقط با Credential محافظت‌شده Windows DPAPI کار می‌کند.</p></div><span class="phase84-badge {% if scheduled_prepare.credential_status.exists %}ok{% else %}warn{% endif %}">{% if scheduled_prepare.credential_status.exists %}Credential OK{% else %}Credential Missing{% endif %}</span></div>
+    <div class="phase84-command-list">
+      {% for cmd in scheduled_prepare.credential_commands %}<div class="phase84-code">{{ cmd }}</div>{% endfor %}
+      <p class="muted small">نمونه Selected: {{ scheduled_prepare.scheduled_selected_label }}</p>
+      <div class="phase84-code">{{ scheduled_prepare.scheduled_selected_command }}</div>
+      <p class="muted small">نمونه All Cisco:</p>
+      <div class="phase84-code">{{ scheduled_prepare.scheduled_all_command }}</div>
+      <p class="muted small">نمونه ساخت Scheduled Task ویندوز:</p>
+      <div class="phase84-code">{{ scheduled_prepare.scheduled_task_example }}</div>
+    </div>
+  </section>
+</div>
+{% endblock %}

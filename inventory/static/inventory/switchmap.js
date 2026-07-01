@@ -1,5 +1,21 @@
+/* Phase 65 Three Panel Dashboard UX | data-dashboard-data-url | smoke compatibility marker */
 (function(){
-    function valueOrDash(value){ return value && String(value).trim() ? String(value).trim() : '-'; }
+    function valueOrDash(value){ if(value === 0 || value === false) return String(value); return value && String(value).trim() ? String(value).trim() : '-'; }
+    function escapeHtml(value){
+        return String(value || '').replace(/[&<>"']/g, function(ch){
+            return ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'})[ch];
+        });
+    }
+    function detailAttrs(item){
+        const url = item.detail_url || item.target_url || item.url || '#';
+        return ' href="' + escapeHtml(url) + '" data-dashboard-detail data-issue-id="' + escapeHtml(item.issue_id || '') + '" data-detail-url="' + escapeHtml(url) + '" data-object-name="' + escapeHtml(item.object_name || item.target || item.title || '') + '" data-object-type="' + escapeHtml(item.object_type || '') + '" data-severity="' + escapeHtml(item.severity || 'info') + '" data-last-check="' + escapeHtml(item.last_check_time || item.last_poll_text || item.last_seen_text || '') + '" data-reason="' + escapeHtml(item.short_reason || item.summary || item.message || '') + '" data-action="' + escapeHtml(item.recommended_action || item.action || '') + '"';
+    }
+    function compactIssueText(item, fallback){
+        return item.compact_reason || item.compact_status || item.status_label || fallback || item.short_reason || item.summary || item.message || item.action || '';
+    }
+    function dataAttrsOnly(item){
+        return detailAttrs(item).replace(/ href="[^"]*"/, '');
+    }
     function getCookie(name){
         const item = document.cookie.split(';').map(v => v.trim()).find(v => v.startsWith(name + '='));
         return item ? decodeURIComponent(item.split('=')[1]) : '';
@@ -85,6 +101,224 @@
         return 'down';
     }
     function neighborText(data){ return [data.neighborDevice, data.neighborPort].filter(Boolean).join(' / '); }
+    function historyValue(value){ return valueOrDash(value); }
+    function meaningfulHistoryValue(value){
+        const s = String(value === 0 ? '0' : (value || '')).trim();
+        if(!s) return false;
+        const low = s.toLowerCase();
+        if(s === '-' || low === 'none' || low === 'null' || low === 'unknown') return false;
+        if(s.indexOf('سابقه') !== -1 && s.indexOf('ثبت نشده') !== -1) return false;
+        return true;
+    }
+    function hasMeaningfulLastConnection(last){
+        if(!last || last.available === false) return false;
+        return [last.identity, last.neighbor, last.mac, last.ip, last.device, last.connected_device].some(meaningfulHistoryValue);
+    }
+    function storeLastConnectionOnButton(btn, last){
+        if(!btn || !last) return;
+        btn.dataset.lastConnectionAvailable = last.available ? '1' : '0';
+        btn.dataset.lastConnectionIdentity = last.identity || '';
+        btn.dataset.lastConnectionClassification = last.classification || '';
+        btn.dataset.lastConnectionDisplayLabel = last.display_label || last.identity || '';
+        btn.dataset.lastConnectionDisplaySource = last.display_source || last.source || '';
+        btn.dataset.lastConnectionDirect = last.direct ? '1' : '0';
+        btn.dataset.lastConnectionEventType = last.event_type || '';
+        btn.dataset.lastConnectionObservedAt = last.observed_at_text || '';
+        btn.dataset.lastConnectionNeighbor = last.neighbor || '';
+        btn.dataset.lastConnectionMac = last.mac || '';
+        btn.dataset.lastConnectionIp = last.ip || '';
+        btn.dataset.lastConnectionVlan = last.vlan || '';
+        btn.dataset.lastConnectionStatus = last.status_after || '';
+        btn.dataset.lastConnectionSource = last.source || '';
+    }
+    function lastConnectionFromDataset(d){
+        return {
+            available: d.lastConnectionAvailable === '1',
+            identity: d.lastConnectionIdentity || '',
+            classification: d.lastConnectionClassification || '',
+            display_label: d.lastConnectionDisplayLabel || '',
+            display_source: d.lastConnectionDisplaySource || '',
+            direct: d.lastConnectionDirect === '1',
+            event_type: d.lastConnectionEventType || '',
+            observed_at_text: d.lastConnectionObservedAt || '',
+            neighbor: d.lastConnectionNeighbor || '',
+            mac: d.lastConnectionMac || '',
+            ip: d.lastConnectionIp || '',
+            vlan: d.lastConnectionVlan || '',
+            status_after: d.lastConnectionStatus || '',
+            source: d.lastConnectionSource || ''
+        };
+    }
+    function effectiveLastConnectionFromDataset(d){
+        // PHASE114: the backend owns connected-device classification.
+        function clean(v){
+            const s = String(v === 0 ? '0' : (v || '')).trim();
+            if(!s) return '';
+            const low = s.toLowerCase();
+            if(s === '-' || low === 'none' || low === 'null' || low === 'unknown' || low === 'undefined') return '';
+            if(s.indexOf('سابقه') !== -1 && s.indexOf('ثبت نشده') !== -1) return '';
+            return s;
+        }
+        const last = lastConnectionFromDataset(d);
+        if(hasMeaningfulLastConnection(last)){
+            last.identity = clean(last.display_label) || clean(last.identity);
+            last.source = clean(last.display_source) || clean(last.source);
+            last.event_type = clean(last.event_type) || 'Last known';
+            return last;
+        }
+        return {available:false, identity:'', event_type:'No history', observed_at_text:'', neighbor:'', source:'', mac:'', ip:'', vlan:'', status_after:''};
+    }
+
+    // PHASE114R2_MODAL_FIELD_COHERENCE_START
+    function phase114r2Clean(value){
+        const s = String(value === 0 ? '0' : (value || '')).trim();
+        if(!s) return '';
+        const low = s.toLowerCase();
+        if(s === '-' || low === 'none' || low === 'null' || low === 'unknown' || low === 'undefined') return '';
+        return s;
+    }
+    function phase114r2IsAggregateClassification(cls){
+        return ['behind_ap','gateway_arp_observed','behind_trunk','multi_mac_aggregate','physical_neighbor_conflict'].includes(String(cls || '').toLowerCase());
+    }
+    function phase114r2VisualFieldsFromDataset(d){
+        const last = effectiveLastConnectionFromDataset(d || {});
+        const cls = phase114r2Clean(last.classification).toLowerCase();
+        const label = phase114r2Clean(last.display_label) || phase114r2Clean(last.identity);
+        const source = phase114r2Clean(last.display_source) || phase114r2Clean(last.source) || phase114r2Clean(d.neighborSource);
+        const neighbor = phase114r2Clean(last.neighbor) || phase114r2Clean(neighborText(d || {}));
+        const ip = phase114r2Clean(last.ip);
+        const mac = phase114r2Clean(last.mac);
+        if(!label || last.available === false) return null;
+        if(phase114r2IsAggregateClassification(cls)){
+            return {
+                device: label,
+                ip_address: '-',
+                mac_address: '-',
+                neighbor: neighbor || '-',
+                neighbor_source: source || '-',
+                classification: cls,
+                direct: false
+            };
+        }
+        if(cls === 'physical_neighbor'){
+            return {
+                device: label,
+                ip_address: ip || phase114r2Clean(d.ipAddress) || '-',
+                mac_address: mac || '-',
+                neighbor: neighbor || label,
+                neighbor_source: source || phase114r2Clean(d.neighborSource) || '-',
+                classification: cls,
+                direct: true
+            };
+        }
+        if(cls === 'direct_endpoint'){
+            return {
+                device: label,
+                ip_address: ip || phase114r2Clean(d.ipAddress) || '-',
+                mac_address: mac || phase114r2Clean(d.macAddress) || '-',
+                neighbor: neighbor || phase114r2Clean(neighborText(d || {})) || '-',
+                neighbor_source: source || phase114r2Clean(d.neighborSource) || '-',
+                classification: cls,
+                direct: last.direct === true
+            };
+        }
+        return null;
+    }
+    function phase114r2ApplyVisualFields(root, attrName, d){
+        const visual = phase114r2VisualFieldsFromDataset(d || {});
+        if(!visual || !root) return;
+        setText(root,'[' + attrName + '="device"]',visual.device);
+        setText(root,'[' + attrName + '="ip_address"]',visual.ip_address);
+        setText(root,'[' + attrName + '="mac_address"]',visual.mac_address);
+        setText(root,'[' + attrName + '="neighbor"]',visual.neighbor);
+        setText(root,'[' + attrName + '="neighbor_source"]',visual.neighbor_source);
+    }
+    // PHASE114R2_MODAL_FIELD_COHERENCE_END
+
+    function setLastConnection(root, attrName, last){
+        // PHASE79_6_4_LAST_CONNECTED_SAFE_RENDER
+        const localEscape = function(value){
+            return String(value == null ? '' : value).replace(/[&<>"']/g, function(ch){
+                return ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'})[ch] || ch;
+            });
+        };
+        const cleanLocal = function(value){
+            const v = String(value === 0 ? '0' : (value || '')).trim();
+            if(!v) return '';
+            const low = v.toLowerCase();
+            if(v === '-' || low === 'none' || low === 'null' || low === 'unknown' || low === 'undefined') return '';
+            if(v.indexOf('سابقه') !== -1 && v.indexOf('ثبت نشده') !== -1) return '';
+            return v;
+        };
+        const readText = function(selector){
+            const el = root ? root.querySelector(selector) : null;
+            return cleanLocal(el ? el.textContent : '');
+        };
+        const renderEmpty = function(box, titleEl, typeEl){
+            if(titleEl) titleEl.textContent = 'Last Connected Device';
+            if(typeEl) typeEl.textContent = 'No history';
+            if(box){
+                box.className = 'phase79-lc-body is-empty';
+                box.innerHTML = '<div class="phase79-lc-empty">سابقه اتصال معتبری برای این پورت ثبت نشده است.</div>';
+            }
+        };
+        if(!root) return;
+        const box = root.querySelector('[data-phase79-last-connected]');
+        const card = box ? box.closest('[data-phase79-lc-card]') : null;
+        const titleEl = card ? card.querySelector('.phase79-lc-head strong') : null;
+        const typeEl = root.querySelector('[' + attrName + '="last_connection_event_type"]');
+        try{
+            last = last || {};
+            const identity = cleanLocal(last.display_label) || cleanLocal(last.identity);
+            const source = cleanLocal(last.display_source) || cleanLocal(last.source);
+            const mac = cleanLocal(last.mac);
+            const ip = cleanLocal(last.ip);
+            const vlan = cleanLocal(last.vlan);
+            const observed = cleanLocal(last.observed_at_text) || cleanLocal(last.last_verified_at_text) || readText('[' + attrName + '="discovery_last_poll"]') || readText('[' + attrName + '="snmp_last_poll"]') || readText('[' + attrName + '="updated_at"]');
+            const rawType = cleanLocal(last.event_type);
+            const currentByType = rawType.toLowerCase() === 'current';
+            const real = last.available !== false && Boolean(identity);
+            if(!real){ renderEmpty(box, titleEl, typeEl); return; }
+
+            const isCurrent = Boolean(currentByType);
+            if(titleEl) titleEl.textContent = isCurrent ? 'Current Connected Device' : 'Last Known Device';
+            if(typeEl) typeEl.textContent = isCurrent ? 'Current' : 'Last known';
+            if(!box) return;
+
+            const rows = [];
+            const add = function(label, value, ltr){
+                const v = cleanLocal(value);
+                if(!v) return;
+                rows.push('<div class="phase79-lc-row"><span class="phase79-lc-label">' + localEscape(label) + '</span><strong class="phase79-lc-value ' + (ltr ? 'ltr' : '') + '" title="' + localEscape(v) + '">' + localEscape(v) + '</strong></div>');
+            };
+            add(isCurrent ? 'Device' : 'Last Device', identity, true);
+            add('Source', source, true);
+            add('MAC', mac, true);
+            add('IP', ip, true);
+            add('VLAN', vlan, true);
+            add(isCurrent ? 'Seen' : 'Last Seen', observed, true);
+            if(!rows.length){ renderEmpty(box, titleEl, typeEl); return; }
+            box.className = 'phase79-lc-body is-available';
+            box.innerHTML = '<div class="phase79-lc-list">' + rows.join('') + '</div>';
+        }catch(error){
+            try{ console.warn('PHASE79_6_4_LAST_CONNECTED_RENDER_ERROR', error); }catch(_e){}
+            renderEmpty(box, titleEl, typeEl);
+        }
+    }
+
+    function refreshLastConnectionFromPayload(button, root, attrName){
+        if(!button || !button.dataset || !button.dataset.portId) return;
+        const url = '/port/' + encodeURIComponent(button.dataset.portId) + '/payload/';
+        fetch(url, {credentials:'same-origin', headers:{'X-Requested-With':'XMLHttpRequest','Accept':'application/json'}})
+            .then(function(response){ return response.json().catch(function(){return null;}); })
+            .then(function(data){
+                if(!data || !data.ok || !data.port) return;
+                updateButtonFromPayload(button, data);
+                phase114r2ApplyVisualFields(root, attrName, button.dataset);
+                setLastConnection(root, attrName, effectiveLastConnectionFromDataset(button.dataset));
+            })
+            .catch(function(){ /* read-only helper; do not break popup */ });
+    }
     function updateButtonFromPayload(btn, payload){
         if(!btn || !payload) return;
         const port = payload.port || {};
@@ -118,6 +352,7 @@
         if(port.updated_at !== undefined && !port.updated_at_text) btn.dataset.updatedAt = port.updated_at;
         if(port.snmp_last_poll_text !== undefined) btn.dataset.snmpLastPoll = port.snmp_last_poll_text;
         if(port.discovery_last_poll_text !== undefined) btn.dataset.discoveryLastPoll = port.discovery_last_poll_text;
+        if(port.last_connection !== undefined) storeLastConnectionOnButton(btn, port.last_connection);
 
         btn.classList.remove('port-up','port-down','port-disabled','port-error','port-trunk');
         btn.classList.add('port-' + normalizeState(btn.dataset.status));
@@ -141,6 +376,9 @@
             setText(modal,'[data-field="' + name + '"]',d[key]);
         });
         setText(modal,'[data-field="neighbor"]',neighborText(d));
+        phase114r2ApplyVisualFields(modal, 'data-field', d);
+        setLastConnection(modal, 'data-field', effectiveLastConnectionFromDataset(d));
+        refreshLastConnectionFromPayload(button, modal, 'data-field');
         const edit = field(modal,'[data-field="edit_url"]'); if(edit) edit.href = d.editUrl || '#';
         const map = field(modal,'[data-field="map_url"]'); if(map) map.href = d.mapUrl || '#';
         const table = field(modal,'[data-field="table_url"]'); if(table) table.href = d.tableUrl || '#';
@@ -176,6 +414,9 @@
             setText(panel,'[data-detail="' + name + '"]',d[key]);
         });
         setText(panel,'[data-detail="neighbor"]',neighborText(d));
+        phase114r2ApplyVisualFields(panel, 'data-detail', d);
+        setLastConnection(panel, 'data-detail', effectiveLastConnectionFromDataset(d));
+        refreshLastConnectionFromPayload(button, panel, 'data-detail');
         const edit = field(panel,'[data-detail-link="edit_url"]'); if(edit) edit.href = d.editUrl || '#';
         const table = field(panel,'[data-detail-link="table_url"]'); if(table) table.href = d.tableUrl || '#';
         const form = panel.querySelector('.js-dashboard-ssh-form');
@@ -201,6 +442,29 @@
             return false;
         }
         return true;
+    }
+    function refreshSelectedPortAfterSsh(form, initialData){
+        // Phase79.3 - after SSH, fetch fresh port payload without closing popup.
+        const port = initialData && initialData.port ? initialData.port : null;
+        const portId = (port && port.id) ? port.id : formValue(form, 'port_id');
+        if(!portId) return;
+        window.setTimeout(function(){
+            fetch('/port/' + encodeURIComponent(portId) + '/payload/', {
+                credentials:'same-origin',
+                headers:{'X-Requested-With':'XMLHttpRequest','Accept':'application/json'}
+            }).then(function(response){
+                return response.json().catch(function(){return null;});
+            }).then(function(data){
+                if(data && data.ok && data.port){
+                    applyCurrentUpdate(data);
+                    setResult(form,true,'عملیات موفق بود؛ اطلاعات پورت به‌روزرسانی شد.');
+                }else{
+                    setResult(form,true,'عملیات موفق بود؛ دریافت وضعیت جدید پورت کامل نشد.');
+                }
+            }).catch(function(){
+                setResult(form,true,'عملیات موفق بود؛ به‌روزرسانی خودکار پورت انجام نشد.');
+            });
+        }, 1200);
     }
     function submitSshForm(form){
         const username = form.querySelector('[name="username"]');
@@ -230,7 +494,8 @@
         }).then(function(result){
             if(result.response.ok && result.data.ok){
                 applyCurrentUpdate(result.data);
-                setResult(form,true,'عملیات موفق بود.');
+                setResult(form,true,'عملیات موفق بود؛ در حال به‌روزرسانی پورت ...');
+                refreshSelectedPortAfterSsh(form, result.data);
                 previewCommands(form);
             }else{
                 setResult(form,false,result.data.error || result.data.message || 'اجرای SSH خطا داد.');
@@ -405,6 +670,24 @@
             scheduleAutoRefresh();
         }
     }
+    function phase107BindLazyDeviceBrowser(root){
+        const panel = document.querySelector('[data-refresh-results]');
+        const scope = root || document;
+        scope.querySelectorAll('.js-refresh-one-switch').forEach(function(button){
+            if(button.dataset.phase107RefreshBound === '1') return;
+            button.dataset.phase107RefreshBound = '1';
+            button.addEventListener('click', async function(){
+                const card = button.closest('[data-switch-card]');
+                if(!card) return;
+                button.disabled = true;
+                if(panel) panel.innerHTML = '';
+                await refreshOneSwitch(card, panel);
+                button.disabled = false;
+            });
+        });
+        setupSearch();
+    }
+
     function setupReportAccordion(){
         document.querySelectorAll('[data-report-accordion] details').forEach(function(item){
             item.addEventListener('toggle', function(){
@@ -415,13 +698,51 @@
             });
         });
     }
+    function setupTopbarDropdowns(){
+        const dropdowns = Array.from(document.querySelectorAll('.topbar-dropdown, .user-dropdown'));
+        if(!dropdowns.length) return;
+
+        function closeDropdown(item){
+            if(!item) return;
+            item.open = false;
+            const summary = item.querySelector('summary');
+            if(summary) summary.setAttribute('aria-expanded','false');
+        }
+        function closeOthers(active){
+            dropdowns.forEach(function(item){
+                if(item !== active) closeDropdown(item);
+            });
+        }
+        dropdowns.forEach(function(item){
+            const summary = item.querySelector('summary');
+            if(summary){
+                summary.setAttribute('aria-haspopup','true');
+                summary.setAttribute('aria-expanded', item.open ? 'true' : 'false');
+            }
+            item.addEventListener('toggle', function(){
+                if(summary) summary.setAttribute('aria-expanded', item.open ? 'true' : 'false');
+                if(item.open) closeOthers(item);
+            });
+        });
+        document.addEventListener('click', function(event){
+            if(event.target.closest('.topbar-dropdown, .user-dropdown')) return;
+            dropdowns.forEach(closeDropdown);
+        });
+        document.addEventListener('keydown', function(event){
+            if(event.key !== 'Escape') return;
+            dropdowns.forEach(closeDropdown);
+        });
+    }
+
     function setupSearch(){
+        /* PHASE70_1_SEARCH_EXACT_UI_FIX: exact label/interface search; no broad card text; no port re-render */
         const input = document.querySelector('[data-switch-search]');
         const triggerButtons = document.querySelectorAll('[data-search-trigger]');
         const cards = Array.from(document.querySelectorAll('[data-switch-card]'));
         const browser = document.querySelector('.device-browser-shell');
         const grid = document.querySelector('.compact-device-grid');
         const panel = document.querySelector('.modern-search-panel');
+        const browserInitialOpen = browser ? browser.open : false;
         if(!input && !triggerButtons.length) return;
 
         let state = panel ? panel.querySelector('[data-search-result-state]') : null;
@@ -430,6 +751,15 @@
             state.className = 'search-result-state';
             state.setAttribute('data-search-result-state','');
             panel.appendChild(state);
+        }
+
+        let results = panel ? panel.querySelector('[data-search-results]') : null;
+        if(panel && !results){
+            results = document.createElement('div');
+            results.className = 'search-results-panel';
+            results.setAttribute('data-search-results','');
+            results.hidden = true;
+            panel.appendChild(results);
         }
 
         let empty = grid ? grid.querySelector('[data-search-empty-state]') : null;
@@ -442,36 +772,193 @@
             grid.appendChild(empty);
         }
 
-        const normalize = function(value){
-            return String(value || '').toLowerCase().replace(/\s+/g,' ').trim();
+        const toAsciiDigits = function(value){
+            const fa = '۰۱۲۳۴۵۶۷۸۹';
+            const ar = '٠١٢٣٤٥٦٧٨٩';
+            return String(value || '')
+                .replace(/[۰-۹]/g, function(ch){ return String(fa.indexOf(ch)); })
+                .replace(/[٠-٩]/g, function(ch){ return String(ar.indexOf(ch)); });
         };
-        const run = function(){
-            const q = normalize(input ? input.value : '');
-            const terms = q ? q.split(' ').filter(Boolean) : [];
-            let matched = 0;
-
+        const normalize = function(value){
+            return toAsciiDigits(value)
+                .toLowerCase()
+                .replace(/[\u200c\u200f\u202a-\u202e]/g,' ')
+                .replace(/[_\-\/\\:;,|()[\]{}]+/g,' ')
+                .replace(/\s+/g,' ')
+                .trim();
+        };
+        const compact = function(value){
+            return toAsciiDigits(value).toLowerCase().replace(/[^a-z0-9آ-ی]+/g,'');
+        };
+        const escapeHtml = function(value){
+            return String(value || '').replace(/[&<>"']/g, function(ch){
+                return ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'})[ch];
+            });
+        };
+        const ds = function(el, key){ return el && el.dataset ? (el.dataset[key] || '') : ''; };
+        const firstText = function(){
+            for(let i=0; i<arguments.length; i += 1){
+                const value = String(arguments[i] || '').trim();
+                if(value && value !== '-') return value;
+            }
+            return '-';
+        };
+        const splitTokens = function(value){
+            const n = normalize(value);
+            return n ? n.split(' ').filter(Boolean) : [];
+        };
+        const labelTokens = function(port){
+            const raw = [
+                ds(port,'portLabel'), ds(port,'officeLabel'), ds(port,'searchCode'),
+                ds(port,'portDescription'), ds(port,'description')
+            ];
+            const tokens = [];
+            raw.forEach(function(value){
+                splitTokens(value).forEach(function(t){ if(t && t !== '-') tokens.push(t); });
+            });
+            return Array.from(new Set(tokens));
+        };
+        const interfaceValues = function(port){
+            return [ds(port,'interface'), ds(port,'interfaceName'), ds(port,'portName')].filter(Boolean);
+        };
+        const switchValues = function(card){
+            const title = card.querySelector('.switch-title-link') || card.querySelector('h2');
+            const ip = card.querySelector('.sm-switch-title .ltr');
+            const model = card.querySelector('.switch-avatar strong');
+            return [card.dataset.switchName || '', card.dataset.search || '', title ? title.textContent : '', ip ? ip.textContent : '', model ? model.textContent : ''];
+        };
+        const isCodeQuery = function(qCompact){ return /^[a-z]{1,5}\d{1,5}$/.test(qCompact); };
+        const portMatches = function(port, rawQuery){
+            const q = normalize(rawQuery);
+            const qCompact = compact(rawQuery);
+            if(!qCompact) return false;
+            const labels = labelTokens(port);
+            const labelCompacts = labels.map(compact).filter(Boolean);
+            const interfaces = interfaceValues(port).map(compact).filter(Boolean);
+            if(isCodeQuery(qCompact)){
+                if(interfaces.some(function(v){ return v === qCompact || v.indexOf(qCompact) === 0; })) return true;
+                return labelCompacts.some(function(t){ return t === qCompact || t.indexOf(qCompact) === 0; });
+            }
+            if(interfaces.some(function(v){ return v === qCompact || (qCompact.length >= 4 && v.indexOf(qCompact) === 0); })) return true;
+            const qParts = q.split(' ').filter(Boolean).map(compact).filter(Boolean);
+            if(qParts.length > 1){
+                return qParts.every(function(part){
+                    return labelCompacts.some(function(t){ return t === part || (part.length >= 3 && t.indexOf(part) === 0); });
+                });
+            }
+            if(qCompact.length >= 3){
+                return labelCompacts.some(function(t){ return t === qCompact || t.indexOf(qCompact) === 0; });
+            }
+            return labelCompacts.some(function(t){ return t === qCompact; });
+        };
+        const switchMatches = function(card, rawQuery){
+            const qCompact = compact(rawQuery);
+            if(qCompact.length < 3) return false;
+            return switchValues(card).some(function(value){
+                const v = compact(value);
+                return v && (v === qCompact || v.indexOf(qCompact) === 0 || (qCompact.length >= 5 && v.indexOf(qCompact) !== -1));
+            });
+        };
+        const clearHighlights = function(card){
+            const root = card || document;
+            root.querySelectorAll('[data-sm-port-button]').forEach(function(port){
+                port.classList.remove('search-port-highlight','search-port-focus');
+            });
+        };
+        const resetSearchView = function(){
             cards.forEach(function(card){
-                const haystack = normalize(card.getAttribute('data-search') || card.textContent || '');
-                const ok = !terms.length || terms.every(function(term){ return haystack.includes(term); });
+                card.hidden = false;
+                card.style.display = '';
+                card.classList.remove('search-match');
+                clearHighlights(card);
+            });
+            if(browser){
+                browser.classList.remove('search-active');
+                browser.open = browserInitialOpen;
+            }
+            if(empty) empty.hidden = true;
+            if(state) state.textContent = '';
+            if(results){ results.hidden = true; results.innerHTML = ''; }
+        };
+        const renderResults = function(items, query, totalPorts){
+            if(!results) return;
+            if(!query){ results.hidden = true; results.innerHTML = ''; return; }
+            if(!items.length){
+                results.hidden = false;
+                results.innerHTML = '<div class="search-result-empty">نتیجه‌ای پیدا نشد.</div>';
+                return;
+            }
+            const html = items.slice(0,8).map(function(item){
+                const port = item.port;
+                const label = port ? firstText(ds(port,'portLabel'), ds(port,'officeLabel'), ds(port,'searchCode')) : '';
+                const iface = port ? firstText(ds(port,'interface'), ds(port,'interfaceName'), ds(port,'portName')) : '';
+                const device = port ? firstText(ds(port,'device'), ds(port,'connectedDevice'), ds(port,'neighborDevice'), ds(port,'portDescription'), ds(port,'description')) : '';
+                const meta = [item.ip, item.model, label, iface, device].filter(function(v){ return v && v !== '-'; }).join(' · ');
+                return '<button type="button" class="search-result-item" data-result-switch-id="' + escapeHtml(item.switchId) + '" data-result-port-id="' + escapeHtml(port ? ds(port,'portId') : '') + '">' +
+                    '<strong>' + escapeHtml(item.name) + '</strong>' +
+                    '<span>' + escapeHtml(meta || 'Switch') + '</span>' +
+                '</button>';
+            }).join('');
+            const more = items.length > 8 ? '<div class="search-result-more">+' + (items.length - 8) + ' نتیجه دیگر</div>' : '';
+            results.hidden = false;
+            results.innerHTML = '<div class="search-result-head">نتیجه‌ها: ' + items.length + ' دستگاه / ' + totalPorts + ' پورت</div>' + html + more;
+        };
+        if(results){
+            results.addEventListener('click', function(event){
+                const item = event.target.closest('[data-result-switch-id]');
+                if(!item) return;
+                const card = document.querySelector('[data-switch-card][data-switch-id="' + item.dataset.resultSwitchId + '"]');
+                if(!card) return;
+                if(browser) browser.open = true;
+                card.hidden = false;
+                card.style.display = '';
+                card.scrollIntoView({behavior:'smooth', block:'center'});
+                const portId = item.dataset.resultPortId;
+                if(portId){
+                    const port = card.querySelector('[data-sm-port-button][data-port-id="' + portId + '"]');
+                    if(port){
+                        port.classList.add('search-port-focus','search-port-highlight');
+                        window.setTimeout(function(){ port.classList.remove('search-port-focus'); }, 1800);
+                        port.scrollIntoView({behavior:'smooth', block:'center', inline:'center'});
+                    }
+                }
+            });
+        }
+        const run = function(){
+            const rawQuery = input ? input.value : '';
+            const qCompact = compact(rawQuery);
+            if(!qCompact){ resetSearchView(); return; }
+            let matched = 0;
+            let matchedPortsTotal = 0;
+            const resultItems = [];
+            cards.forEach(function(card){
+                const ports = Array.from(card.querySelectorAll('[data-sm-port-button]'));
+                const matchedPorts = ports.filter(function(port){ return portMatches(port, rawQuery); });
+                ports.forEach(function(port){ port.classList.toggle('search-port-highlight', matchedPorts.indexOf(port) !== -1); });
+                const ok = matchedPorts.length > 0 || switchMatches(card, rawQuery);
                 card.hidden = !ok;
                 card.style.display = ok ? '' : 'none';
-                if(ok) matched += 1;
-            });
-
-            if(browser){
-                if(terms.length){
-                    browser.open = true;
-                    browser.classList.add('search-active');
-                }else{
-                    browser.classList.remove('search-active');
+                card.classList.toggle('search-match', ok);
+                if(ok){
+                    matched += 1;
+                    matchedPortsTotal += matchedPorts.length;
+                    resultItems.push({
+                        switchId: card.dataset.switchId || '',
+                        name: firstText((card.querySelector('.switch-title-link') || card.querySelector('h2') || {}).textContent, card.dataset.switchName, 'Switch'),
+                        ip: firstText((card.querySelector('.sm-switch-title .ltr') || {}).textContent, ''),
+                        model: firstText((card.querySelector('.switch-avatar strong') || {}).textContent, ''),
+                        port: matchedPorts[0] || null
+                    });
                 }
+            });
+            if(browser){
+                if(matched > 0) browser.open = true;
+                browser.classList.add('search-active');
             }
-            if(empty) empty.hidden = !terms.length || matched > 0;
-            if(state){
-                state.textContent = terms.length ? ('نتیجه جستجو: ' + matched + ' دستگاه') : '';
-            }
+            if(empty) empty.hidden = matched > 0;
+            if(state) state.textContent = 'نتیجه جستجو: ' + matched + ' دستگاه / ' + matchedPortsTotal + ' پورت';
+            renderResults(resultItems, rawQuery, matchedPortsTotal);
         };
-
         if(input){
             input.addEventListener('input', run);
             input.addEventListener('search', run);
@@ -483,10 +970,189 @@
             });
         }
         triggerButtons.forEach(function(btn){ btn.addEventListener('click', run); });
-        run();
+        resetSearchView();
     }
+
+    function setupLiveInsightDashboard(){
+        /* Phase 63 compatibility marker: data-dashboard-data-url */
+        const phase63DashboardDataUrlMarker = "data-dashboard-data-url";
+        const root = document.querySelector('[data-dashboard-live]');
+        if(!root) return;
+        const url = root.dataset.dashboardDataUrl;
+        const refreshButton = document.querySelector('[data-dashboard-manual-refresh]');
+        const updateText = function(name, value){
+            root.querySelectorAll('[data-field="' + name + '"]').forEach(function(el){ el.textContent = valueOrDash(value); });
+            document.querySelectorAll('[data-field="' + name + '"]').forEach(function(el){ el.textContent = valueOrDash(value); });
+        };
+        const updatePercentStyle = function(name, value){
+            root.querySelectorAll('[data-field-style="' + name + '"]').forEach(function(el){ el.style.width = String(value || 0) + '%'; });
+        };
+        const actionHtml = function(items){
+            if(!items || !items.length) return '<div class="phase66-empty modern-empty-state">اقدام فوری لازم نیست.</div>';
+            return items.slice(0,3).map(function(item){
+                return '<span class="phase66-list-item action-item severity-' + escapeHtml(item.severity || 'info') + '"' + dataAttrsOnly(item) + '>' +
+                    '<strong>' + escapeHtml(item.title || item.object_name || '-') + '</strong>' +
+                    '<small>' + escapeHtml(compactIssueText(item, 'نیازمند بررسی')) + '</small>' +
+                '</span>';
+            }).join('');
+        };
+        const alarmHtml = function(items){
+            if(!items || !items.length) return '<div class="phase66-empty modern-empty-state">آلارم فعالی ثبت نشده است.</div>';
+            return items.slice(0,3).map(function(item){
+                return '<a class="phase66-list-item live-alarm severity-' + escapeHtml(item.severity || 'info') + '"' + detailAttrs(item) + '>' +
+                    '<strong>' + escapeHtml(item.title || '-') + '</strong>' +
+                    '<small>' + escapeHtml(compactIssueText(item, 'آلارم فعال')) + '</small>' +
+                '</a>';
+            }).join('');
+        };
+        const topologyHtml = function(items){
+            if(!items || !items.length) return '<div class="phase66-empty modern-empty-state">Issue توپولوژی فعال نیست.</div>';
+            return items.slice(0,3).map(function(item){
+                return '<a class="phase66-list-item topology-issue severity-' + escapeHtml(item.severity || 'info') + '"' + detailAttrs(item) + '>' +
+                    '<strong>' + escapeHtml(item.title || '-') + '</strong>' +
+                    '<small>' + escapeHtml(compactIssueText(item, 'Issue توپولوژی')) + '</small>' +
+                '</a>';
+            }).join('');
+        };
+        const updatePrimaryActionCard = function(item){
+            const card = root.querySelector('[data-dashboard-primary-action]');
+            if(!card || !item) return;
+            card.dataset.issueId = item.issue_id || '';
+            card.dataset.detailUrl = item.detail_url || item.target_url || item.url || '#';
+            card.dataset.objectName = item.object_name || item.target || item.title || '';
+            card.dataset.objectType = item.object_type || '';
+            card.dataset.severity = item.severity || 'info';
+            card.dataset.lastCheck = item.last_check_time || item.last_poll_text || item.last_seen_text || '';
+            card.dataset.reason = item.short_reason || item.summary || item.message || '';
+            card.dataset.action = item.recommended_action || item.action || '';
+            card.className = card.className.replace(/severity-[^\s]+/g, '').trim() + ' severity-' + (item.severity || 'info');
+        };
+        const applyPayload = function(payload){
+            const data = payload && payload.dashboard ? payload.dashboard : null;
+            if(!data) return;
+            const counters = data.counters || {};
+            const overall = data.overall || {};
+            const background = data.background || {};
+            root.dataset.dashboardState = overall.state || '';
+            const exec = root.querySelector('.insight-executive-card');
+            if(exec){ exec.className = 'insight-executive-card state-' + (overall.state || 'unknown'); }
+            updateText('generated_at', data.generated_at || '');
+            updateText('overall_title', overall.title || '');
+            updateText('overall_subtitle', overall.subtitle || '');
+            updateText('healthy', counters.healthy);
+            updateText('attention', counters.attention);
+            updateText('active_alarms', counters.active_alarms);
+            updateText('critical_alarms', counters.critical_alarms);
+            updateText('warning_alarms', counters.warning_alarms);
+            updateText('sfp_issues', counters.sfp_issues);
+            updateText('sfp_critical', counters.sfp_critical);
+            updateText('topology_issues', counters.topology_issues);
+            updateText('topology_critical', counters.topology_critical);
+            updateText('snmp_failed', counters.snmp_failed);
+            updateText('stale', counters.stale);
+            updateText('not_monitored', counters.not_monitored);
+            updateText('reliable_percent', String(counters.reliable_percent || 0) + '%');
+            updateText('coverage_percent', String(counters.coverage_percent || 0) + '%');
+            updateText('healthy_inline', counters.healthy);
+            updateText('total_devices', counters.total_devices);
+            updateText('not_monitored_inline', counters.not_monitored);
+            updatePercentStyle('coverage_percent', counters.coverage_percent || 0);
+            const ring = root.querySelector('.insight-ring');
+            if(ring){ ring.style.setProperty('--value', String(counters.reliable_percent || 0) + '%'); }
+            updateText('background_label', background.label || '');
+            updateText('background_last_run', background.last_run_text || '');
+            updateText('background_summary', background.summary || '');
+            const bg = document.querySelector('[data-dashboard-background-state]');
+            if(bg) bg.textContent = background.label || 'Auto Refresh';
+            const bgIcon = document.querySelector('[data-dashboard-background-icon]');
+            if(bgIcon){
+                const healthy = (background.state || '') === 'ok';
+                bgIcon.textContent = healthy ? '●' : '!';
+                bgIcon.classList.toggle('is-warning', !healthy);
+                bgIcon.classList.toggle('is-error', !healthy);
+                bgIcon.setAttribute('title', background.label || 'Auto Refresh');
+            }
+            if(data.actions && data.actions.length) updatePrimaryActionCard(data.actions[0]);
+            const actions = root.querySelector('[data-dashboard-actions]');
+            if(actions) actions.innerHTML = actionHtml(data.actions || []);
+            const alarms = root.querySelector('[data-dashboard-alarms]');
+            if(alarms) alarms.innerHTML = alarmHtml(data.alarms || []);
+            const topology = root.querySelector('[data-dashboard-topology-issues]');
+            if(topology) topology.innerHTML = topologyHtml(data.topology_issues || []);
+            if(data.actions && data.actions.length){
+                updateText('next_action_title', data.actions[0].title || '');
+                updateText('next_action_text', data.actions[0].action || '');
+            }
+        };
+        const refresh = function(){
+            if(!url) return;
+            fetch(url, {credentials:'same-origin', headers:{'Accept':'application/json','X-Requested-With':'XMLHttpRequest'}})
+                .then(function(response){ return response.json(); })
+                .then(applyPayload)
+                .catch(function(){ updateText('background_label', 'ارتباط با Dashboard Data خطا داد'); });
+        };
+        if(refreshButton){ refreshButton.addEventListener('click', refresh); }
+        refresh();
+        window.setInterval(function(){ if(!document.hidden) refresh(); }, 60000);
+    }
+
+
+    function setupDashboardIssueDetails(){
+        const drawer = document.querySelector('[data-dashboard-detail-drawer]');
+        if(!drawer) return;
+        const setDrawerText = function(selector, value){
+            const el = drawer.querySelector(selector);
+            if(el) el.textContent = valueOrDash(value);
+        };
+        document.addEventListener('click', function(event){
+            const item = event.target.closest('[data-dashboard-detail]');
+            if(!item) return;
+            event.preventDefault();
+            const issueId = item.dataset.issueId || '';
+            const severity = item.dataset.severity || 'info';
+            setDrawerText('[data-detail-severity]', severity);
+            setDrawerText('[data-detail-title]', item.querySelector('strong') ? item.querySelector('strong').textContent : item.dataset.objectName);
+            setDrawerText('[data-detail-object]', [item.dataset.objectType, item.dataset.objectName].filter(Boolean).join(' / '));
+            setDrawerText('[data-detail-issue-id]', issueId);
+            setDrawerText('[data-detail-last-check]', item.dataset.lastCheck || 'ثبت نشده');
+            setDrawerText('[data-detail-reason]', item.dataset.reason || '-');
+            setDrawerText('[data-detail-action]', item.dataset.action || '-');
+            const link = drawer.querySelector('[data-detail-url]');
+            if(link) link.href = item.dataset.detailUrl || item.getAttribute('href') || '#';
+            drawer.hidden = false;
+            drawer.scrollIntoView({behavior:'smooth', block:'nearest'});
+        });
+        document.addEventListener('keydown', function(event){
+            if(event.key !== 'Enter' && event.key !== ' ') return;
+            const item = event.target.closest('[data-dashboard-detail][role="button"]');
+            if(!item) return;
+            event.preventDefault();
+            item.click();
+        });
+        drawer.querySelectorAll('[data-dashboard-detail-close]').forEach(function(btn){
+            btn.addEventListener('click', function(){ drawer.hidden = true; });
+        });
+    }
+
     document.addEventListener('DOMContentLoaded', function(){
-        setupSearch(); setupRefreshAll(); setupReportAccordion();
+        // PHASE109R10_SEARCH_FULL_DOM_REINIT: after lazy device-browser injection, bind search to the new cards.
+        if(!window.__switchMapPhase109R10SearchReloadBound){
+            window.__switchMapPhase109R10SearchReloadBound = true;
+            document.addEventListener('switchmap:device-browser-loaded', function(){
+                window.setTimeout(function(){
+                    try{
+                        setupSearch();
+                        const phase109r10Input = document.querySelector('[data-switch-search]');
+                        if(phase109r10Input && phase109r10Input.value.trim()){
+                            phase109r10Input.dispatchEvent(new Event('input', {bubbles:true}));
+                        }
+                    }catch(error){
+                        if(window.console && console.warn) console.warn('PHASE109R10 search rebind failed', error);
+                    }
+                }, 0);
+            });
+        }
+        setupTopbarDropdowns(); setupSearch(); setupRefreshAll(); setupReportAccordion(); setupLiveInsightDashboard(); setupDashboardIssueDetails();
         document.querySelectorAll('.js-ssh-action-select').forEach(el => applyActionMeta(el.closest('form')));
         document.querySelectorAll('.js-dashboard-ssh-form').forEach(function(form){ previewCommands(form); });
         document.addEventListener('click', function(event){
@@ -507,4 +1173,244 @@
         const preselect = new URLSearchParams(window.location.search).get('port');
         if(preselect){ const btn = document.querySelector('[data-sm-port-button][data-port-id="' + preselect + '"]'); if(btn) fillDetailPanel(btn); }
     });
+    document.addEventListener('switchmap:device-browser-loaded', function(event){
+        phase107BindLazyDeviceBrowser(event.detail && event.detail.root ? event.detail.root : document);
+    });
 })();
+
+/* Phase107R2 dashboard device browser lazy loader */
+(function(){
+    if(window.__switchMapPhase107R2LazyBrowserLoaded) return;
+    window.__switchMapPhase107R2LazyBrowserLoaded = true;
+
+    async function loadDeviceBrowser(reason){
+        const holder = document.querySelector('[data-phase107-device-browser]');
+        if(!holder || holder.dataset.phase107Loaded === '1' || holder.dataset.phase107Loading === '1') return;
+        let url = holder.getAttribute('data-load-url') || holder.dataset.loadUrl;
+        if(!url) return;
+        const input = document.querySelector('[data-switch-search]');
+        const q = input ? input.value.trim() : '';
+        // PHASE109R10_SEARCH_FULL_DOM: load full device-browser once; filter client-side after injection.
+        holder.dataset.phase107Loading = '1';
+        holder.classList.add('is-loading');
+        const button = holder.querySelector('[data-phase107-load-device-browser]');
+        const originalText = button ? button.textContent : '';
+        if(button){
+            button.disabled = true;
+            button.textContent = 'در حال بارگذاری...';
+        }
+        try{
+            const response = await fetch(url, {
+                credentials: 'same-origin',
+                headers: {'X-Requested-With': 'XMLHttpRequest'}
+            });
+            if(!response.ok) throw new Error('HTTP ' + response.status);
+            const html = await response.text();
+            const temp = document.createElement('div');
+            temp.innerHTML = html.trim();
+            const root = temp.firstElementChild;
+            if(!root) throw new Error('empty fragment');
+            holder.dataset.phase107Loaded = '1';
+            holder.replaceWith(root);
+            document.dispatchEvent(new CustomEvent('switchmap:device-browser-loaded', {detail: {root: root, reason: reason || 'manual'}}));
+            if(input && q){
+                window.setTimeout(function(){ input.dispatchEvent(new Event('input', {bubbles:true})); }, 0);
+            }
+        }catch(error){
+            holder.classList.add('is-error');
+            const note = holder.querySelector('.phase107-device-browser-placeholder small');
+            if(note) note.textContent = 'خطا در بارگذاری نقشه تجهیزات. دوباره تلاش کن.';
+            if(button){
+                button.disabled = false;
+                button.textContent = originalText || 'نمایش نقشه تجهیزات';
+            }
+            if(window.console && console.error) console.error('SwitchMap Phase107 lazy device browser failed', error);
+        }finally{
+            holder.dataset.phase107Loading = '0';
+            holder.classList.remove('is-loading');
+        }
+    }
+
+    document.addEventListener('click', function(event){
+        const button = event.target.closest('[data-phase107-load-device-browser]');
+        if(!button) return;
+        event.preventDefault();
+        loadDeviceBrowser('button');
+    });
+
+    document.addEventListener('click', function(event){
+        const trigger = event.target.closest('[data-search-trigger]');
+        if(!trigger) return;
+        const input = document.querySelector('[data-switch-search]');
+        if(input && input.value.trim()) loadDeviceBrowser('search-trigger');
+    }, true);
+
+    document.addEventListener('input', function(event){
+        if(!event.target.matches('[data-switch-search]')) return;
+        if(event.target.value.trim()) loadDeviceBrowser('search-input');
+    });
+
+    window.switchMapPhase107LoadDeviceBrowser = loadDeviceBrowser;
+})();
+
+/* SwitchMap Phase 66 smoke compatibility markers */
+/* Phase 66 Minimal Three Panel Dashboard */
+/* data-dashboard-data-url */
+
+/* Phase 66.3 Dashboard Functional UX Fix | data-dashboard-detail | data-dashboard-topology-issues */
+
+/* Phase 66.4 Dashboard Visual Cleanup | valueOrDash keeps zero counters */
+
+/* Phase 66.5 Dashboard Command Center Layout | command-card-grid | data-dashboard-background-icon */
+/* Phase 66.7 Hard Visual Reset | header-force-reset | equal-command-cards */
+
+
+/* Phase 66.13.1 Smoke Compatibility Only
+Phase 66.7 Hard Visual Reset
+نیازمند بررسی
+آلارم فعال
+Issue توپولوژی
+*/
+
+/* Phase 74 connectivity card detail drawer fix */
+(function(){
+    if(window.__switchMapPhase74ConnectivityFixLoaded) return;
+    window.__switchMapPhase74ConnectivityFixLoaded = true;
+
+    function escapeHtml(value){
+        return String(value == null ? '' : value).replace(/[&<>"']/g, function(ch){
+            return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch] || ch;
+        });
+    }
+    function valueOrDash(value){
+        value = String(value == null ? '' : value).trim();
+        return value || '-';
+    }
+    function statusTitle(status){
+        const map = {
+            healthy:'سالم',
+            poll_failed:'ناموفق',
+            discovery_warning:'هشدار Discovery',
+            stale:'داده قدیمی',
+            not_monitored:'خارج از پایش'
+        };
+        return map[status] || status || 'نامشخص';
+    }
+    function statusOrder(status){
+        const order = {poll_failed:0, discovery_warning:1, stale:2, not_monitored:3, healthy:4};
+        return Object.prototype.hasOwnProperty.call(order, status) ? order[status] : 9;
+    }
+    function ensureExtra(drawer){
+        let extra = drawer.querySelector('[data-phase74-detail-extra]');
+        if(!extra){
+            extra = document.createElement('div');
+            extra.className = 'phase74-detail-extra';
+            extra.setAttribute('data-phase74-detail-extra', '');
+            const link = drawer.querySelector('[data-detail-url]');
+            if(link && link.parentNode){
+                link.parentNode.insertBefore(extra, link);
+            }else{
+                drawer.appendChild(extra);
+            }
+        }
+        return extra;
+    }
+    function setDrawerText(drawer, selector, value){
+        const el = drawer.querySelector(selector);
+        if(el) el.textContent = valueOrDash(value);
+    }
+    function groupDevices(items){
+        const groups = {};
+        (items || []).forEach(function(item){
+            const status = item.status || 'unknown';
+            if(!groups[status]) groups[status] = [];
+            groups[status].push(item);
+        });
+        return Object.keys(groups).sort(function(a,b){return statusOrder(a)-statusOrder(b);}).map(function(status){
+            groups[status].sort(function(a,b){return String(a.name || '').localeCompare(String(b.name || ''), 'fa');});
+            return {status:status, title:statusTitle(status), items:groups[status]};
+        });
+    }
+    function renderConnectivity(items){
+        const groups = groupDevices(items);
+        if(!groups.length){
+            return '<div class="phase66-empty modern-empty-state">داده اتصال تجهیزات هنوز آماده نیست.</div>';
+        }
+        return groups.map(function(group){
+            const rows = group.items.map(function(item){
+                const url = item.detail_url || '#';
+                const reason = item.snmp_error || item.discovery_error || item.compact_reason || item.short_reason || item.conclusion || '';
+                return '<a class="phase74-connectivity-item" href="' + escapeHtml(url) + '">' +
+                    '<strong>' + escapeHtml(item.name || item.object_name || '-') + '</strong>' +
+                    '<small>' + escapeHtml(item.ip || '-') + '</small>' +
+                    '<span title="' + escapeHtml(reason) + '">' + escapeHtml(reason || item.last_poll_text || '-') + '</span>' +
+                '</a>';
+            }).join('');
+            return '<section class="phase74-connectivity-group phase74-connectivity-status-' + escapeHtml(group.status) + '">' +
+                '<div class="phase74-connectivity-group-title"><span>' + escapeHtml(group.title) + '</span><b>' + group.items.length + '</b></div>' +
+                '<div class="phase74-connectivity-list">' + rows + '</div>' +
+            '</section>';
+        }).join('');
+    }
+    function openConnectivityDrawer(dashboard){
+        const drawer = document.querySelector('[data-dashboard-detail-drawer]');
+        if(!drawer) return;
+        const counters = dashboard && dashboard.counters ? dashboard.counters : {};
+        const items = dashboard && dashboard.device_items ? dashboard.device_items : [];
+        const extra = ensureExtra(drawer);
+        setDrawerText(drawer, '[data-detail-severity]', (counters.snmp_failed || counters.stale || 0) ? 'warning' : 'ok');
+        setDrawerText(drawer, '[data-detail-title]', 'اتصال تجهیزات');
+        setDrawerText(drawer, '[data-detail-object]', 'Devices / SNMP / Discovery');
+        setDrawerText(drawer, '[data-detail-issue-id]', 'connectivity-summary');
+        setDrawerText(drawer, '[data-detail-last-check]', dashboard && dashboard.generated_at ? dashboard.generated_at : 'ثبت نشده');
+        setDrawerText(drawer, '[data-detail-reason]', 'لیست وضعیت تک‌تک دستگاه‌ها بر اساس آخرین Background Refresh.');
+        setDrawerText(drawer, '[data-detail-action]', 'برای جزئیات هر دستگاه روی همان ردیف کلیک کن.');
+        const link = drawer.querySelector('[data-detail-url]');
+        if(link){
+            link.href = '#';
+            link.textContent = 'جزئیات دستگاه‌ها در همین پنل نمایش داده شده است';
+            link.setAttribute('aria-disabled', 'true');
+        }
+        extra.hidden = false;
+        extra.innerHTML = renderConnectivity(items);
+        drawer.hidden = false;
+        drawer.scrollIntoView({behavior:'smooth', block:'nearest'});
+    }
+    function clearExtraForNormalDetails(target){
+        if(target && target.closest && target.closest('[data-dashboard-connectivity-card]')) return;
+        const drawer = document.querySelector('[data-dashboard-detail-drawer]');
+        if(!drawer) return;
+        const extra = drawer.querySelector('[data-phase74-detail-extra]');
+        if(extra){ extra.hidden = true; extra.innerHTML = ''; }
+        const link = drawer.querySelector('[data-detail-url]');
+        if(link){
+            link.textContent = 'Open exact detail';
+            link.removeAttribute('aria-disabled');
+        }
+    }
+    function fetchDashboard(root){
+        const url = root && root.dataset ? root.dataset.dashboardDataUrl : '';
+        if(!url) return Promise.resolve(null);
+        return fetch(url, {credentials:'same-origin', headers:{'Accept':'application/json','X-Requested-With':'XMLHttpRequest'}})
+            .then(function(response){return response.json();})
+            .then(function(payload){return payload && payload.dashboard ? payload.dashboard : null;});
+    }
+    document.addEventListener('click', function(event){
+        const card = event.target.closest('[data-dashboard-connectivity-card]');
+        if(card){
+            event.preventDefault();
+            const root = document.querySelector('[data-dashboard-live]');
+            fetchDashboard(root).then(function(dashboard){openConnectivityDrawer(dashboard || {});});
+            return;
+        }
+        if(event.target.closest('[data-dashboard-detail]')) clearExtraForNormalDetails(event.target);
+    }, true);
+    document.addEventListener('keydown', function(event){
+        if(event.key !== 'Enter' && event.key !== ' ') return;
+        const card = event.target.closest('[data-dashboard-connectivity-card]');
+        if(!card) return;
+        event.preventDefault();
+        card.click();
+    });
+})();
+

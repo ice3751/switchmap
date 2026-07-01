@@ -5865,3 +5865,54 @@ body{
     .mikrotik-brand-bar{grid-template-columns:auto minmax(130px,1fr) auto !important;}
     .mikrotik-model-stack em{display:none;}
 }
+
+
+/* PHASE79_8_MULTI_SSH_ACTION */
+.phase79-multi-ssh-box{border:1px solid rgba(148,163,184,.35);border-radius:14px;background:rgba(248,250,252,.9);padding:10px;margin:10px 0;direction:ltr;text-align:left}
+.phase79-multi-head{display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:12px;color:#1e293b;margin-bottom:8px}
+.phase79-multi-head span{font-size:11px;color:#64748b;background:#eef6ff;border-radius:999px;padding:2px 8px}
+.phase79-multi-list{display:grid;grid-template-columns:1fr;gap:6px;max-height:210px;overflow:auto;padding-right:2px}
+.phase79-multi-row{display:grid;grid-template-columns:minmax(150px,1fr) minmax(0,150px);gap:8px;align-items:center;border:1px solid rgba(203,213,225,.8);border-radius:10px;padding:6px 8px;background:#fff;font-size:12px;color:#0f172a}
+.phase79-multi-row input[type="checkbox"]{vertical-align:middle;margin-right:6px}
+.phase79-multi-value{height:30px;min-height:30px;font-size:12px;padding:4px 8px}
+.phase79-multi-no-value{color:#94a3b8;text-align:center;font-size:12px}
+@media (max-width:900px){.phase79-multi-row{grid-template-columns:1fr}.phase79-multi-value{width:100%}}
+
+
+/* PHASE79_8_1_MULTI_SSH_UI_RESULT_ORDER */
+.phase79-8-1-multi-box{direction:ltr;text-align:left;background:#f8fafc;border:1px solid #cbd5e1;border-radius:14px;padding:8px;margin:8px 0 10px;max-height:none;overflow:visible}
+.phase79-8-1-multi-box .phase79-multi-head{margin-bottom:4px}
+.phase79-multi-hint{font-size:11px;color:#64748b;margin:0 0 6px;direction:rtl;text-align:right}
+.phase79-8-1-multi-box .phase79-multi-list{max-height:154px;overflow:auto;display:grid;gap:5px;padding:2px 3px 2px 0}
+.phase79-8-1-multi-box .phase79-multi-row{display:grid;grid-template-columns:24px minmax(92px,1fr) minmax(0,112px) 50px;align-items:center;gap:6px;border:1px solid #dbe4ef;border-radius:10px;background:#fff;padding:5px 6px;font-size:12px}
+.phase79-8-1-multi-box .phase79-multi-row.is-selected{border-color:#93c5fd;background:#eff6ff}
+.phase79-order-num{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:999px;background:#e2e8f0;color:#334155;font-size:11px;font-weight:900}
+.phase79-multi-check{display:flex;align-items:center;gap:6px;margin:0;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#0f172a}
+.phase79-multi-check input{width:auto;min-height:auto;margin:0}
+.phase79-8-1-multi-box .phase79-multi-value{height:28px;min-height:28px;padding:3px 7px;font-size:12px;border-radius:9px}
+.phase79-order-controls{display:flex;gap:3px;justify-content:flex-end}
+.phase79-order-controls button{width:22px;height:22px;border-radius:7px;border:1px solid #cbd5e1;background:#fff;color:#1e293b;font-weight:900;cursor:pointer;padding:0;line-height:18px}
+.phase79-order-controls button:hover{background:#e0f2fe;border-color:#93c5fd}
+.phase79-multi-result{display:block;margin:8px 0;padding:8px 10px;border-radius:12px;border:1px solid #cbd5e1;background:#f8fafc;color:#0f172a;font-size:12px;line-height:1.65;white-space:normal;direction:rtl;text-align:right;min-height:0}
+.phase79-multi-result:empty{display:none}
+.phase79-multi-result.ok{border-color:#86efac;background:#f0fdf4;color:#166534}
+.phase79-multi-result.fail{border-color:#fecaca;background:#fef2f2;color:#991b1b}
+.phase79-multi-result ol{margin:4px 18px 0 0;padding:0;font-weight:700}
+.phase79-multi-result li{margin:0}
+.command-preview-box .phase79-multi-ssh-box{display:none!important}
+@media (max-width:900px){.phase79-8-1-multi-box .phase79-multi-row{grid-template-columns:24px 1fr 1fr 50px}.phase79-8-1-multi-box .phase79-multi-list{max-height:180px}}
+
+
+/* PHASE79_8_2_PLATFORM_ACTION_GUARD */
+.phase79-multi-row.is-platform-disabled{
+    opacity:.55;
+    background:rgba(148,163,184,.14);
+}
+.phase79-multi-row.is-platform-disabled .phase79-multi-check{
+    text-decoration:line-through;
+}
+.phase79-platform-note{
+    color:#b91c1c;
+    font-size:11px;
+    white-space:nowrap;
+}

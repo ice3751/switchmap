@@ -3,35 +3,35 @@
     <div class="sm-3850-svg-shell {% if map_mode == 'full' %}is-full{% else %}is-dashboard{% endif %}">
         <svg class="sm-3850-svg" viewBox="0 0 1180 150" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Cisco Catalyst 3850 port map">
             <defs>
-                <linearGradient id="sm3850Body" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id="sm3850Body-{{ switch_obj.id }}" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0" stop-color="#26313d"/>
                     <stop offset="0.18" stop-color="#111922"/>
                     <stop offset="1" stop-color="#05080d"/>
                 </linearGradient>
-                <linearGradient id="sm3850Panel" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id="sm3850Panel-{{ switch_obj.id }}" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0" stop-color="#34404c"/>
                     <stop offset="1" stop-color="#121a23"/>
                 </linearGradient>
-                <linearGradient id="sm3850Port" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id="sm3850Port-{{ switch_obj.id }}" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0" stop-color="#dce5ee"/>
                     <stop offset="0.52" stop-color="#9eabb7"/>
                     <stop offset="1" stop-color="#697684"/>
                 </linearGradient>
-                <linearGradient id="sm3850Jack" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id="sm3850Jack-{{ switch_obj.id }}" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="0" stop-color="#182230"/>
                     <stop offset="1" stop-color="#020617"/>
                 </linearGradient>
-                <linearGradient id="sm3850Nm" x1="0" y1="0" x2="1" y2="1">
+                <linearGradient id="sm3850Nm-{{ switch_obj.id }}" x1="0" y1="0" x2="1" y2="1">
                     <stop offset="0" stop-color="#e5edf6"/>
                     <stop offset="0.55" stop-color="#aebccd"/>
                     <stop offset="1" stop-color="#6f7f91"/>
                 </linearGradient>
-                <filter id="sm3850Shadow" x="-8%" y="-25%" width="116%" height="160%">
+                <filter id="sm3850Shadow-{{ switch_obj.id }}" x="-8%" y="-25%" width="116%" height="160%">
                     <feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#0f172a" flood-opacity="0.24"/>
                 </filter>
             </defs>
 
-            <rect class="svg-body" x="18" y="20" width="1144" height="110" rx="9" fill="url(#sm3850Body)" filter="url(#sm3850Shadow)"/>
+            <rect class="svg-body" x="18" y="20" width="1144" height="110" rx="9" fill="url(#sm3850Body-{{ switch_obj.id }})" filter="url(#sm3850Shadow-{{ switch_obj.id }})"/>
             <rect class="svg-body-line" x="20" y="22" width="1140" height="106" rx="8" fill="none"/>
             <circle class="svg-screw" cx="32" cy="75" r="5"/>
             <circle class="svg-screw" cx="1148" cy="75" r="5"/>
@@ -52,7 +52,7 @@
             </g>
 
             <g class="svg-main-panel">
-                <rect x="210" y="50" width="800" height="62" rx="4"/>
+                <rect x="210" y="50" width="800" height="62" rx="4" style="fill:url(#sm3850Panel-{{ switch_obj.id }})"/>
                 <rect class="svg-panel-shine" x="211" y="51" width="798" height="12" rx="4"/>
                 {% for port in top_ports %}
                     {% port_edit_url port as p_edit_url %}
@@ -63,6 +63,10 @@
                        data-switch-ip="{{ switch_ip|default:'-' }}"
                        data-switch-user="{{ switch_user|default:'admin' }}"
                        data-interface="{{ port|port_label }}"
+                       data-port-label="{{ port.description|default_if_none:'' }}"
+                       data-port-description="{{ port|port_description }}"
+                       data-office-label="{{ port.description|default_if_none:'' }}"
+                       data-search-code="{{ port.description|default_if_none:'' }} {{ port.cable_label|default_if_none:'' }} {{ port.outlet|default_if_none:'' }} {{ port.interface_name|default_if_none:'' }} {{ port.snmp_raw_name|default_if_none:'' }} {{ port.snmp_alias|default_if_none:'' }} {{ port.neighbor_device|default_if_none:'' }} {{ port.neighbor_ip|default_if_none:'' }} {{ port.neighbor_port|default_if_none:'' }}"
                        data-status="{{ port|port_state_label }}"
                        data-port-mode="{{ port|port_mode }}"
                        data-access-vlan="{{ port|port_vlan }}"
@@ -76,7 +80,7 @@
                        data-device="{{ port|port_device }}"
                        data-ip-address="{{ port|port_ip }}"
                        data-mac-address="{{ port|port_mac }}"
-                       data-description="{{ port|port_description }}"
+                       data-description="{{ port.description|default_if_none:'' }} {{ port|port_description }}"
                        data-neighbor-source="{{ port.neighbor_source|default:'' }}"
                        data-updated-at="{{ port.updated_at|date:'Y-m-d H:i:s'|default:'-' }}"
                        data-snmp-last-poll="{{ port.snmp_last_poll|date:'Y-m-d H:i:s'|default:'-' }}"
@@ -85,9 +89,9 @@
                        data-map-url="{% url 'inventory:switch_detail' switch_obj.id %}?port={{ port|port_pk }}"
                        data-table-url="{% url 'inventory:switch_ports_table' switch_obj.id %}">
                         <title>{{ port|port_title }}</title>
-                        <rect class="port-frame" x="0" y="0" width="25" height="21" rx="3"/>
+                        <rect class="port-frame" x="0" y="0" width="25" height="21" rx="3" style="fill:url(#sm3850Port-{{ switch_obj.id }})"/>
                         <circle class="port-led" cx="5" cy="5" r="2.6"/>
-                        <rect class="port-jack" x="7" y="11" width="14" height="6" rx="1.5"/>
+                        <rect class="port-jack" x="7" y="11" width="14" height="6" rx="1.5" style="fill:url(#sm3850Jack-{{ switch_obj.id }})"/>
                         <text class="port-number" x="18" y="8" text-anchor="middle">{{ port.display_order }}</text>
                     </g>
                 {% endfor %}
@@ -100,6 +104,10 @@
                        data-switch-ip="{{ switch_ip|default:'-' }}"
                        data-switch-user="{{ switch_user|default:'admin' }}"
                        data-interface="{{ port|port_label }}"
+                       data-port-label="{{ port.description|default_if_none:'' }}"
+                       data-port-description="{{ port|port_description }}"
+                       data-office-label="{{ port.description|default_if_none:'' }}"
+                       data-search-code="{{ port.description|default_if_none:'' }} {{ port.cable_label|default_if_none:'' }} {{ port.outlet|default_if_none:'' }} {{ port.interface_name|default_if_none:'' }} {{ port.snmp_raw_name|default_if_none:'' }} {{ port.snmp_alias|default_if_none:'' }} {{ port.neighbor_device|default_if_none:'' }} {{ port.neighbor_ip|default_if_none:'' }} {{ port.neighbor_port|default_if_none:'' }}"
                        data-status="{{ port|port_state_label }}"
                        data-port-mode="{{ port|port_mode }}"
                        data-access-vlan="{{ port|port_vlan }}"
@@ -113,7 +121,7 @@
                        data-device="{{ port|port_device }}"
                        data-ip-address="{{ port|port_ip }}"
                        data-mac-address="{{ port|port_mac }}"
-                       data-description="{{ port|port_description }}"
+                       data-description="{{ port.description|default_if_none:'' }} {{ port|port_description }}"
                        data-neighbor-source="{{ port.neighbor_source|default:'' }}"
                        data-updated-at="{{ port.updated_at|date:'Y-m-d H:i:s'|default:'-' }}"
                        data-snmp-last-poll="{{ port.snmp_last_poll|date:'Y-m-d H:i:s'|default:'-' }}"
@@ -122,16 +130,16 @@
                        data-map-url="{% url 'inventory:switch_detail' switch_obj.id %}?port={{ port|port_pk }}"
                        data-table-url="{% url 'inventory:switch_ports_table' switch_obj.id %}">
                         <title>{{ port|port_title }}</title>
-                        <rect class="port-frame" x="0" y="0" width="25" height="21" rx="3"/>
+                        <rect class="port-frame" x="0" y="0" width="25" height="21" rx="3" style="fill:url(#sm3850Port-{{ switch_obj.id }})"/>
                         <circle class="port-led" cx="5" cy="5" r="2.6"/>
-                        <rect class="port-jack" x="7" y="11" width="14" height="6" rx="1.5"/>
+                        <rect class="port-jack" x="7" y="11" width="14" height="6" rx="1.5" style="fill:url(#sm3850Jack-{{ switch_obj.id }})"/>
                         <text class="port-number" x="18" y="8" text-anchor="middle">{{ port.display_order }}</text>
                     </g>
                 {% endfor %}
             </g>
 
             <g class="svg-uplink-module">
-                <rect x="1038" y="42" width="108" height="76" rx="6"/>
+                <rect x="1038" y="42" width="108" height="76" rx="6" style="fill:url(#sm3850Nm-{{ switch_obj.id }})"/>
                 <text class="nm-title" x="1049" y="55">C3850-NM</text>
                 {% for port in uplink_ports %}
                     {% port_edit_url port as p_edit_url %}
@@ -142,6 +150,10 @@
                        data-switch-ip="{{ switch_ip|default:'-' }}"
                        data-switch-user="{{ switch_user|default:'admin' }}"
                        data-interface="{{ port|port_label }}"
+                       data-port-label="{{ port.description|default_if_none:'' }}"
+                       data-port-description="{{ port|port_description }}"
+                       data-office-label="{{ port.description|default_if_none:'' }}"
+                       data-search-code="{{ port.description|default_if_none:'' }} {{ port.cable_label|default_if_none:'' }} {{ port.outlet|default_if_none:'' }} {{ port.interface_name|default_if_none:'' }} {{ port.snmp_raw_name|default_if_none:'' }} {{ port.snmp_alias|default_if_none:'' }} {{ port.neighbor_device|default_if_none:'' }} {{ port.neighbor_ip|default_if_none:'' }} {{ port.neighbor_port|default_if_none:'' }}"
                        data-status="{{ port|port_state_label }}"
                        data-port-mode="{{ port|port_mode }}"
                        data-access-vlan="{{ port|port_vlan }}"
@@ -155,7 +167,7 @@
                        data-device="{{ port|port_device }}"
                        data-ip-address="{{ port|port_ip }}"
                        data-mac-address="{{ port|port_mac }}"
-                       data-description="{{ port|port_description }}"
+                       data-description="{{ port.description|default_if_none:'' }} {{ port|port_description }}"
                        data-neighbor-source="{{ port.neighbor_source|default:'' }}"
                        data-updated-at="{{ port.updated_at|date:'Y-m-d H:i:s'|default:'-' }}"
                        data-snmp-last-poll="{{ port.snmp_last_poll|date:'Y-m-d H:i:s'|default:'-' }}"
@@ -164,9 +176,9 @@
                        data-map-url="{% url 'inventory:switch_detail' switch_obj.id %}?port={{ port|port_pk }}"
                        data-table-url="{% url 'inventory:switch_ports_table' switch_obj.id %}">
                         <title>{{ port|port_title }}</title>
-                        <rect class="port-frame" x="0" y="0" width="41" height="24" rx="3"/>
+                        <rect class="port-frame" x="0" y="0" width="41" height="24" rx="3" style="fill:url(#sm3850Port-{{ switch_obj.id }})"/>
                         <circle class="port-led" cx="6" cy="6" r="2.6"/>
-                        <rect class="port-jack" x="13" y="14" width="18" height="6" rx="1.5"/>
+                        <rect class="port-jack" x="13" y="14" width="18" height="6" rx="1.5" style="fill:url(#sm3850Jack-{{ switch_obj.id }})"/>
                         <text class="port-number te-label" x="31" y="9" text-anchor="middle">{{ port|port_short_label }}</text>
                     </g>
                 {% empty %}
@@ -176,3 +188,9 @@
         </svg>
     </div>
 </div>
+
+{# phase69-5-quick-search-hard-repair #}
+
+{# PHASE70_LIMITED_QUICK_SEARCH_FIX: data attributes only; no layout/render change #}
+{# PHASE70_1_SEARCH_EXACT_UI_FIX: data attributes verified only; no layout/render change #}
+{# PHASE70_2_SVG_GRADIENT_SCOPE_FIX: scoped SVG gradient/filter IDs per switch; no layout/render size change #}

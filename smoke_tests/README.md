@@ -1,20 +1,21 @@
-# SwitchMap Smoke Tests
+# SwitchMap Smoke Tests — Phase94R3 Baseline
 
-Smoke tests are grouped by expected behavior:
+This folder contains the active read-only verification runner for the live SwitchMap baseline.
 
-- `current`: active regression checks that should pass on the current UI and access-control model.
-- `production`: deployment-oriented checks that run with production-like environment overrides.
-- `legacy`: older phase checks kept for historical context. These may fail because they target pre-login routes or superseded CSS/UI markers.
+Safety constraints:
 
-Run the active suite:
+- no visible test devices
+- no database mutation
+- no SSH/SNMP execution
+- no backup write
+- no restore execution
+- no service restart
+- no Scheduled Task modification
 
-```powershell
-venv\Scripts\python.exe smoke_tests\run_smoke.py current
+Run from `C:\SwitchMap`:
+
+```cmd
+venv\Scripts\python.exe smoke_tests\run_smoke.py --strict
 ```
 
-Run the production suite:
-
-```powershell
-venv\Scripts\python.exe smoke_tests\run_smoke.py production
-```
-
+The runner writes reports to `logs` only.

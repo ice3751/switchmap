@@ -1,0 +1,524 @@
+/* SwitchMap Phase 43-47 safe UI consolidation
+   Scope: dashboard polish, quick search, topbar behavior, health summary, visual map stability.
+   No model, migration, env, or permission changes. */
+
+:root{
+    --phase43-focus:#38bdf8;
+    --phase43-soft-blue:#eff6ff;
+    --phase43-blue:#2563eb;
+    --phase43-line:#d7e3f1;
+    --phase43-muted:#64748b;
+    --phase43-dark:#0f172a;
+}
+
+/* Phase 43/45 - stable topbar dropdowns */
+.app-topbar{
+    isolation:isolate;
+}
+.topbar-dropdown,
+.user-dropdown{
+    position:relative;
+    z-index:520;
+}
+.topbar-dropdown[open],
+.user-dropdown[open]{
+    z-index:760;
+}
+.topbar-dropdown[open] > summary,
+.user-dropdown[open] > summary{
+    background:rgba(50,112,255,.24);
+    color:#fff;
+}
+.dropdown-panel,
+.user-panel{
+    z-index:780;
+}
+.switch-menu-panel{
+    overscroll-behavior:contain;
+    scrollbar-width:thin;
+}
+.switch-menu-panel .switch-menu-group{
+    min-width:0;
+}
+.switch-menu-item strong,
+.switch-menu-item small{
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+/* Phase 43/46 - dashboard spacing and panel safety */
+.modern-page-shell,
+.page-shell.modern-page-shell{
+    max-width:1760px;
+}
+.modern-dashboard-actions,
+.dashboard-actions,
+.card-actions-inline,
+.toolbar-group{
+    flex-wrap:wrap;
+}
+.modern-status-row > .surface-card,
+.modern-notification-panel,
+.modern-search-panel{
+    min-width:0;
+    overflow:hidden;
+}
+.modern-mini-list{
+    max-height:220px;
+    overflow:auto;
+    padding-left:2px;
+    scrollbar-width:thin;
+}
+.modern-kpi-card small,
+.modern-mini-item span,
+.panel-headline span{
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+.smart-refresh-mini{
+    overflow:hidden;
+}
+.smart-refresh-mini small,
+.smart-refresh-mini span,
+.smart-refresh-mini strong{
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+/* Phase 44 - advanced quick search */
+.modern-search-form{
+    align-items:start;
+}
+.modern-search-panel .search-result-state{
+    min-height:18px;
+}
+.search-results-panel{
+    margin-top:12px;
+    display:grid;
+    gap:7px;
+}
+.search-results-panel[hidden]{
+    display:none!important;
+}
+.search-result-head,
+.search-result-more,
+.search-result-empty{
+    padding:8px 10px;
+    border-radius:12px;
+    background:#f8fbff;
+    border:1px dashed #cbd5e1;
+    color:var(--phase43-muted);
+    font-size:12px;
+    font-weight:900;
+}
+.search-result-item{
+    appearance:none;
+    width:100%;
+    border:1px solid #dbeafe;
+    border-radius:13px;
+    background:linear-gradient(180deg,#fff,#f8fbff);
+    color:#0f172a;
+    padding:9px 10px;
+    text-align:right;
+    cursor:pointer;
+    font-family:inherit;
+    display:grid;
+    gap:3px;
+}
+.search-result-item:hover,
+.search-result-item:focus{
+    outline:none;
+    border-color:#93c5fd;
+    box-shadow:0 0 0 3px rgba(37,99,235,.10);
+}
+.search-result-item strong{
+    font-size:13px;
+    font-weight:950;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+.search-result-item span{
+    font-size:11px;
+    color:var(--phase43-muted);
+    direction:ltr;
+    text-align:left;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+.sm-switch-card.search-match{
+    border-color:#93c5fd;
+    box-shadow:0 20px 52px rgba(37,99,235,.12);
+}
+.dynamic-port.search-port-highlight,
+.nexus-port.search-port-highlight,
+.search-port-highlight.dynamic-port,
+.search-port-highlight.nexus-port{
+    outline:2px solid var(--phase43-focus)!important;
+    outline-offset:2px!important;
+    box-shadow:0 0 0 3px rgba(56,189,248,.20), inset 0 0 0 1px rgba(255,255,255,.5)!important;
+}
+.sm-svg-port.search-port-highlight .port-frame,
+.sm-svg-port.search-port-focus .port-frame{
+    stroke:var(--phase43-focus)!important;
+    stroke-width:3!important;
+    filter:drop-shadow(0 0 4px rgba(56,189,248,.65));
+}
+.dynamic-port.search-port-focus,
+.nexus-port.search-port-focus{
+    outline:3px solid var(--phase43-focus)!important;
+    outline-offset:3px!important;
+}
+
+/* Phase 47 - visual map stabilization; geometry is preserved. */
+.sm-switch-card,
+.sm-map-card,
+.detail-side-panel,
+.device-browser-shell{
+    min-width:0;
+}
+.sm-map-scroll,
+.sm-3850-svg-scroll,
+.dynamic-device-panel,
+.nexus-map-wrap{
+    max-width:100%!important;
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+    scrollbar-width:thin;
+}
+.sm-3850-svg-shell,
+.dynamic-device-face,
+.nexus-chassis{
+    box-sizing:border-box!important;
+}
+.sm-3850-svg{
+    display:block!important;
+}
+.sm-dashboard-scroll .sm-3850-svg{
+    min-height:124px!important;
+}
+.sm-fullmap-layout .sm-map-card .sm-3850-svg-scroll{
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+}
+.sm-fullmap-layout .sm-map-card .sm-3850-svg-shell.is-full .sm-3850-svg{
+    min-height:150px!important;
+}
+.nexus-map-wrap .nexus-chassis{
+    min-width:760px!important;
+}
+.nexus-map-dashboard .nexus-chassis{
+    min-width:900px!important;
+}
+.nexus-map-full .nexus-chassis{
+    min-width:1040px!important;
+}
+.nexus-port-no,
+.dynamic-port-label,
+.dynamic-port-subtitle{
+    text-rendering:geometricPrecision;
+}
+.dynamic-device-panel.is-dashboard .dynamic-device-face{
+    min-width:max(680px, var(--mk-face-min, 680px))!important;
+}
+.dynamic-device-panel.is-full .dynamic-device-face{
+    min-width:max(920px, var(--mk-face-min, 920px))!important;
+}
+.dynamic-port-row,
+.dynamic-uplink-row,
+.dynamic-wireless-row{
+    min-width:0;
+}
+.dynamic-port{
+    flex:0 0 auto;
+}
+.legend.compact-legend{
+    flex-wrap:wrap;
+}
+
+/* Full map readable detail panel */
+.sm-fullmap-layout .detail-side-panel{
+    overflow:visible!important;
+}
+.sm-fullmap-layout .detail-side-panel .key-item strong,
+.port-modal-info .key-item strong{
+    overflow-wrap:anywhere;
+}
+.sm-fullmap-layout .detail-side-panel .ltr,
+.port-modal-info .ltr{
+    direction:ltr;
+    unicode-bidi:isolate;
+}
+
+@media(max-width:1180px){
+    .switch-menu-panel{
+        min-width:min(720px,92vw)!important;
+        max-width:92vw!important;
+        grid-template-columns:repeat(2,minmax(180px,1fr));
+    }
+    .modern-mini-list{
+        max-height:260px;
+    }
+}
+@media(max-width:680px){
+    .switch-menu-panel{
+        grid-template-columns:1fr;
+    }
+    .search-results-panel{
+        max-height:260px;
+        overflow:auto;
+    }
+    .nexus-map-dashboard .nexus-chassis,
+    .nexus-map-full .nexus-chassis{
+        min-width:820px!important;
+    }
+}
+
+/* Phase 74 alarm notification topbar fix */
+body .topbar-user.command-topbar-user{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:flex-end!important;
+    gap:10px!important;
+    flex:0 0 auto!important;
+    min-width:max-content!important;
+    overflow:visible!important;
+    position:relative!important;
+    z-index:900!important;
+}
+body .topbar-user.command-topbar-user .command-user-dropdown,
+body .topbar-user.command-topbar-user .command-alarm-menu{
+    flex:0 0 auto!important;
+    overflow:visible!important;
+}
+body .topbar-user.command-topbar-user .command-alarm-menu>summary.notification-chip,
+body .topbar-user.command-topbar-user .command-alarm-menu .alarm-mini-summary{
+    width:42px!important;
+    height:42px!important;
+    min-width:42px!important;
+    min-height:42px!important;
+    max-width:42px!important;
+    max-height:42px!important;
+    padding:0!important;
+    margin:0!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    border-radius:999px!important;
+    background:#f59e0b!important;
+    color:#111827!important;
+    font-size:13px!important;
+    line-height:1!important;
+    font-weight:900!important;
+    text-align:center!important;
+    box-shadow:0 10px 24px rgba(245,158,11,.25)!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+}
+body .topbar-user.command-topbar-user .command-alarm-menu>summary.notification-chip.is-critical,
+body .topbar-user.command-topbar-user .command-alarm-menu .alarm-mini-summary.is-critical{
+    background:#ef4444!important;
+    color:#fff!important;
+    box-shadow:0 10px 24px rgba(239,68,68,.26)!important;
+}
+body .topbar-user.command-topbar-user .command-alarm-menu>summary.notification-chip::after,
+body .topbar-user.command-topbar-user .command-alarm-menu .alarm-mini-summary::after{
+    display:none!important;
+    content:""!important;
+}
+body .topbar-user.command-topbar-user .command-alarm-panel,
+body .topbar-user.command-topbar-user .alarm-mini-panel{
+    position:absolute!important;
+    top:calc(100% + 10px)!important;
+    right:auto!important;
+    left:0!important;
+    min-width:250px!important;
+    max-width:min(340px,90vw)!important;
+    padding:14px!important;
+    border-radius:18px!important;
+    background:#fff!important;
+    color:#0f172a!important;
+    border:1px solid #dbe7f5!important;
+    box-shadow:0 24px 55px rgba(15,23,42,.24)!important;
+    z-index:2200!important;
+    display:grid!important;
+    gap:10px!important;
+    text-align:right!important;
+}
+body .topbar-user.command-topbar-user .command-alarm-panel strong,
+body .topbar-user.command-topbar-user .alarm-mini-panel strong{
+    font-size:14px!important;
+    font-weight:850!important;
+    color:#0f172a!important;
+}
+body .topbar-user.command-topbar-user .command-alarm-panel a,
+body .topbar-user.command-topbar-user .alarm-mini-panel a{
+    min-height:36px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    border-radius:12px!important;
+    background:#eff6ff!important;
+    color:#1d4ed8!important;
+    font-size:13px!important;
+    font-weight:820!important;
+    text-decoration:none!important;
+}
+
+/* Phase 75 alarm notification compact topbar fix */
+body .app-topbar.command-topbar,
+body .modern-app-frame,
+body .command-topbar-user,
+body .topbar-user.command-topbar-user{
+    overflow:visible!important;
+}
+body .topbar-user.command-topbar-user{
+    display:flex!important;
+    flex-direction:row!important;
+    align-items:center!important;
+    justify-content:flex-end!important;
+    gap:12px!important;
+    min-width:max-content!important;
+    height:auto!important;
+    position:relative!important;
+    z-index:5000!important;
+}
+body .topbar-user.command-topbar-user .command-user-dropdown{
+    order:1!important;
+    flex:0 0 auto!important;
+    position:relative!important;
+    z-index:5002!important;
+}
+body .topbar-user.command-topbar-user .command-alarm-menu.alarm-mini-dropdown,
+body .topbar-user.command-topbar-user details.command-alarm-menu,
+body .topbar-user.command-topbar-user details.alarm-mini-dropdown.nav-link-notification{
+    order:2!important;
+    flex:0 0 46px!important;
+    width:46px!important;
+    min-width:46px!important;
+    max-width:46px!important;
+    height:46px!important;
+    min-height:46px!important;
+    max-height:46px!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    align-content:center!important;
+    position:relative!important;
+    overflow:visible!important;
+    z-index:5003!important;
+}
+body .topbar-user.command-topbar-user .command-alarm-menu>summary.notification-chip,
+body .topbar-user.command-topbar-user .command-alarm-menu>summary.alarm-mini-summary,
+body .topbar-user.command-topbar-user .command-alarm-menu .alarm-mini-summary{
+    width:46px!important;
+    height:46px!important;
+    min-width:46px!important;
+    min-height:46px!important;
+    max-width:46px!important;
+    max-height:46px!important;
+    margin:0!important;
+    padding:0!important;
+    border:0!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    place-items:center!important;
+    grid-template-columns:1fr!important;
+    gap:0!important;
+    border-radius:999px!important;
+    background:#f59e0b!important;
+    color:#111827!important;
+    font-size:13px!important;
+    line-height:46px!important;
+    font-weight:950!important;
+    text-align:center!important;
+    letter-spacing:0!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    cursor:pointer!important;
+    box-shadow:0 12px 26px rgba(245,158,11,.30)!important;
+    transform:none!important;
+}
+body .topbar-user.command-topbar-user .command-alarm-menu>summary.notification-chip.is-critical,
+body .topbar-user.command-topbar-user .command-alarm-menu>summary.alarm-mini-summary.is-critical,
+body .topbar-user.command-topbar-user .command-alarm-menu .alarm-mini-summary.is-critical{
+    background:#ef4444!important;
+    color:#fff!important;
+    box-shadow:0 12px 30px rgba(239,68,68,.32)!important;
+}
+body .topbar-user.command-topbar-user .command-alarm-menu>summary.notification-chip::before,
+body .topbar-user.command-topbar-user .command-alarm-menu>summary.notification-chip::after,
+body .topbar-user.command-topbar-user .command-alarm-menu>summary.alarm-mini-summary::before,
+body .topbar-user.command-topbar-user .command-alarm-menu>summary.alarm-mini-summary::after{
+    display:none!important;
+    content:""!important;
+}
+body .topbar-user.command-topbar-user .command-alarm-panel,
+body .topbar-user.command-topbar-user .alarm-mini-panel{
+    position:absolute!important;
+    top:calc(100% + 12px)!important;
+    right:0!important;
+    left:auto!important;
+    width:300px!important;
+    min-width:300px!important;
+    max-width:min(340px,calc(100vw - 24px))!important;
+    margin:0!important;
+    padding:14px!important;
+    border-radius:18px!important;
+    background:#fff!important;
+    color:#0f172a!important;
+    border:1px solid #dbe7f5!important;
+    box-shadow:0 24px 55px rgba(15,23,42,.28)!important;
+    z-index:6500!important;
+    display:grid!important;
+    gap:10px!important;
+    text-align:right!important;
+    visibility:visible!important;
+    opacity:1!important;
+}
+body .topbar-user.command-topbar-user .command-alarm-menu:not([open]) .command-alarm-panel,
+body .topbar-user.command-topbar-user .command-alarm-menu:not([open]) .alarm-mini-panel{
+    display:none!important;
+}
+body .topbar-user.command-topbar-user .command-alarm-panel strong,
+body .topbar-user.command-topbar-user .alarm-mini-panel strong{
+    display:block!important;
+    font-size:14px!important;
+    font-weight:900!important;
+    color:#0f172a!important;
+}
+body .topbar-user.command-topbar-user .command-alarm-panel a,
+body .topbar-user.command-topbar-user .alarm-mini-panel a{
+    min-height:38px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    border-radius:12px!important;
+    background:#eff6ff!important;
+    color:#1d4ed8!important;
+    font-size:13px!important;
+    font-weight:850!important;
+    text-decoration:none!important;
+}
+body .topbar-user.command-topbar-user .command-alarm-panel a:hover,
+body .topbar-user.command-topbar-user .alarm-mini-panel a:hover{
+    background:#dbeafe!important;
+}
+@media (max-width:760px){
+    body .topbar-user.command-topbar-user .command-alarm-panel,
+    body .topbar-user.command-topbar-user .alarm-mini-panel{
+        right:auto!important;
+        left:0!important;
+        width:min(300px,calc(100vw - 24px))!important;
+        min-width:0!important;
+    }
+}
+

@@ -1,0 +1,136 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SwitchMap | Dashboard Visual Preview</title>
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link rel="stylesheet" href="https://fonts.bunny.net/css?family=vazirmatn:400,500,600,700,800,900">
+    <link rel="stylesheet" href="{% static 'inventory/css/dashboard-visual-preview.css' %}?v=phase66-10-font-menu-quicksearch">
+</head>
+<body class="sm-preview-body phase66-8-dashboard-visual-prototype phase66-9-typography-responsive-polish phase66-10-font-menu-quicksearch">
+    <!-- Phase 66.8 Dashboard Visual Prototype Only -->
+    <!-- Phase 66.9 Typography and Responsive Refinement Only -->
+    <!-- Phase 66.10 Font, menu and quick search refinement only -->
+    <header class="sm-preview-topbar">
+        <a class="sm-preview-brand" href="{% url 'inventory:switch_list' %}">
+            <span class="sm-preview-logo">SM</span>
+            <span class="sm-preview-brand-text">
+                <strong>SwitchMap</strong>
+                <small>Production Monitoring</small>
+            </span>
+        </a>
+        <nav class="sm-preview-nav" aria-label="Preview navigation">
+            <a class="is-active" href="#" aria-current="page">داشبورد</a>
+            <a href="#">پایش</a>
+            <a href="#">تجهیزات</a>
+            <a href="#">عملیات</a>
+            <a href="#">مدیریت</a>
+        </nav>
+        <div class="sm-preview-user">
+            <span>a-mortazavi</span>
+            <b>0</b>
+        </div>
+    </header>
+
+    <main class="sm-preview-shell">
+        <section class="sm-preview-toolbar" aria-label="Dashboard toolbar">
+            <div class="sm-preview-titlebox">
+                <h1>داشبورد مانیتورینگ</h1>
+                <p>وضعیت عملیاتی شبکه؛ فقط موارد قابل اقدام نمایش داده می‌شود.</p>
+            </div>
+            <form class="sm-preview-quick-search" action="#" method="get" role="search" aria-label="Quick search preview">
+                <label for="sm-preview-search">Quick Search</label>
+                <div class="sm-preview-searchbox">
+                    <input id="sm-preview-search" name="q" type="search" placeholder="جستجوی سوییچ، IP، پورت، آلارم..." autocomplete="off"><span class="sm-preview-last-update">آخرین بروزرسانی: 12:00</span>
+            </div>
+        </section>
+
+        <section class="sm-preview-grid" aria-label="Command center cards">
+            <article class="sm-preview-card is-critical" data-preview-card="urgent-action">
+                <div class="sm-preview-card-head">
+                    <div class="sm-preview-card-title">
+                        <span class="sm-preview-card-dot"></span>
+                        <h2>اقدام فوری</h2>
+                    </div>
+                    <strong class="sm-preview-number">3</strong>
+                </div>
+                <div class="sm-preview-card-summary">
+                    <span>3 ناموفق</span>
+                    <span>0 قدیمی</span>
+                </div>
+                <div class="sm-preview-list">
+                    <button type="button"><b>RB2011-Iranmall</b><small>SNMP Failed</small></button>
+                    <button type="button"><b>AX3-Karaj</b><small>SNMP Failed</small></button>
+                </div>
+            </article>
+
+            <article class="sm-preview-card is-blue" data-preview-card="connectivity">
+                <div class="sm-preview-card-head">
+                    <div class="sm-preview-card-title">
+                        <span class="sm-preview-card-dot"></span>
+                        <h2>اتصال تجهیزات</h2>
+                    </div>
+                    <strong class="sm-preview-number">14/18</strong>
+                </div>
+                <div class="sm-preview-meter"><span style="width:78%"></span></div>
+                <div class="sm-preview-card-summary">
+                    <span>14 سالم</span>
+                    <span>2 ناموفق</span>
+                    <span>1 خارج از پایش</span>
+                </div>
+                <p class="sm-preview-note">جزئیات خطا فقط با کلیک نمایش داده می‌شود.</p>
+            </article>
+
+            <article class="sm-preview-card is-amber" data-preview-card="topology">
+                <div class="sm-preview-card-head">
+                    <div class="sm-preview-card-title">
+                        <span class="sm-preview-card-dot"></span>
+                        <h2>توپولوژی</h2>
+                    </div>
+                    <strong class="sm-preview-number">2</strong>
+                </div>
+                <div class="sm-preview-card-summary">
+                    <span>Link</span>
+                    <span>SFP</span>
+                    <span>Discovery</span>
+                </div>
+                <div class="sm-preview-list">
+                    <button type="button"><b>Edari-1 Gi1/0/18</b><small>Link Warning</small></button>
+                    <button type="button"><b>RB5009</b><small>Discovery Stale</small></button>
+                </div>
+            </article>
+
+            <article class="sm-preview-card is-neutral" data-preview-card="alarms">
+                <div class="sm-preview-card-head">
+                    <div class="sm-preview-card-title">
+                        <span class="sm-preview-card-dot"></span>
+                        <h2>آلارم‌ها</h2>
+                    </div>
+                    <strong class="sm-preview-number">1</strong>
+                </div>
+                <div class="sm-preview-card-summary">
+                    <span>1 بحرانی</span>
+                    <span>0 هشدار</span>
+                </div>
+                <div class="sm-preview-list">
+                    <button type="button"><b>SNMP Down</b><small>Alarm Active</small></button>
+                </div>
+            </article>
+        </section>
+
+        <section class="sm-preview-drawer">
+            <div>
+                <strong>جزئیات با کلیک باز می‌شود</strong>
+                <span>Drawer / Modal نهایی اینجا جایگزین می‌شود.</span>
+            </div>
+            <a href="{% url 'inventory:switch_list' %}">بازگشت به داشبورد فعلی</a>
+        </section>
+    </main>
+</body>
+</html>
+
+<!-- Phase 66.10.1 compatibility block: keep phase 66.9 smoke markers after phase 66.10 cache-buster change. -->
+<!-- phase66-9-typography-responsive-polish -->
+<!-- ?v=phase66-9-typography-responsive-polish -->

@@ -40,6 +40,46 @@ TRUNK_FORCE_ACTIONS = {
     "force_trunk",
 }
 
+PLATFORM_UNSUPPORTED_ACTIONS = {
+    "nexus": {"poe_auto", "poe_never", "set_voice_vlan", "remove_voice_vlan"},
+}
+
+
+def _switch_platform_text(switch):
+    if switch is None:
+        return ""
+    parts = []
+    for name in (
+        "name", "hostname", "model", "vendor", "device_family",
+        "platform", "os_type", "software_type", "description"
+    ):
+        try:
+            value = getattr(switch, name, "")
+        except Exception:
+            value = ""
+        if value is not None:
+            parts.append(str(value))
+    return " ".join(parts).lower()
+
+
+def _is_nexus_switch(switch):
+    text = _switch_platform_text(switch)
+    return any(token in text for token in ("nexus", "nx-os", "nxos", "n3k", "n5k", "n7k", "n9k"))
+
+
+def unsupported_action_reason(switch, action):
+    action = (action or "").strip()
+    if _is_nexus_switch(switch) and action in PLATFORM_UNSUPPORTED_ACTIONS["nexus"]:
+        return "این Action روی Cisco Nexus پشتیبانی نمی‌شود: %s" % action_label(action)
+    return ""
+
+
+def validate_platform_action(switch, action):
+    reason = unsupported_action_reason(switch, action)
+    if reason:
+        raise SshActionError(reason)
+
+
 VLAN_LIST_PATTERN = re.compile(r"^[0-9,\- ]+$")
 INVALID_OUTPUT_MARKERS = (
     "% invalid",
@@ -146,12 +186,14 @@ def _clean_description(value):
     return description
 
 
-def build_port_commands(port, action, value=None, force=False):
+def build_port_commands(port, action, value=None, force=False, switch=None):
     interface_name = _clean_interface(port.interface_name)
     action = (action or "").strip()
+    switch = switch or getattr(port, "switch", None)
 
     if action not in SUPPORTED_ACTIONS:
         raise SshActionError("Action نامعتبر است.")
+    validate_platform_action(switch, action)
 
     if action == "set_access_vlan":
         if port.port_mode == port.PortMode.TRUNK and not force:
@@ -387,6 +429,7 @@ def run_port_action(switch, port, username, password, action, value=None, enable
         action=action,
         value=value,
         force=force,
+        switch=switch,
     )
 
     paramiko = _require_paramiko()
@@ -453,6 +496,106 @@ def run_port_action(switch, port, username, password, action, value=None, enable
                 pass
 
 
+
+def run_port_multi_actions(switch, port, username, password, action_items, enable_password="", force=False):
+    """Execute multiple supported SSH actions for one port in one SSH session."""
+    if not switch.ssh_enabled:
+        raise SshActionError("SSH برای این سوییچ فعال نیست.")
+
+    username = (username or switch.ssh_username or "").strip()
+    password = password or ""
+    enable_password = enable_password or password
+
+    if not username:
+        raise SshActionError("Username خالی است.")
+    if not password:
+        raise SshActionError("Password خالی است.")
+
+    prepared = []
+    for item in action_items or []:
+        action = (item.get("action") or "").strip()
+        value = item.get("value") or ""
+        item_force = bool(item.get("force") or force)
+        commands = build_port_commands(port=port, action=action, value=value, force=item_force, switch=switch)
+        prepared.append({
+            "action": action,
+            "value": value,
+            "force": item_force,
+            "label": action_label(action),
+            "commands": commands,
+        })
+
+    if not prepared:
+        raise SshActionError("هیچ Action معتبری انتخاب نشده است.")
+
+    paramiko = _require_paramiko()
+    client = None
+    output = ""
+
+    try:
+        client = paramiko.SSHClient()
+        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        client.connect(
+            str(switch.management_ip),
+            port=int(switch.ssh_port or 22),
+            username=username,
+            password=password,
+            look_for_keys=False,
+            allow_agent=False,
+            timeout=12,
+            auth_timeout=12,
+            banner_timeout=12,
+        )
+
+        channel = client.invoke_shell(width=180, height=70)
+        output += _read_channel(channel, 1.0)
+        output += _send(channel, "terminal length 0", 0.8)
+
+        if enable_password:
+            enable_output = _send(channel, "enable", 0.8)
+            output += enable_output
+            if "password" in enable_output.lower():
+                output += _send(channel, enable_password, 0.9)
+
+        output += _send(channel, "configure terminal", 0.8)
+        all_commands = []
+        for item in prepared:
+            for command in item["commands"]:
+                output += _send(channel, command, 0.9)
+                all_commands.append(command)
+        output += _send(channel, "end", 0.8)
+
+        if any(marker in output.lower() for marker in INVALID_OUTPUT_MARKERS):
+            raise SshActionError("سوییچ خطا برگرداند.")
+
+        verify = _send(channel, f"show running-config interface {port.interface_name}", 1.0)
+        status_output = _send(channel, "show interfaces status", 1.0)
+        mac_output = _send(channel, f"show mac address-table interface {port.interface_name}", 1.0)
+
+        return {
+            "ok": True,
+            "items": prepared,
+            "commands": all_commands,
+            "output": output,
+            "verify": verify,
+            "status_output": status_output,
+            "mac_output": mac_output,
+        }
+    except paramiko.AuthenticationException as exc:
+        raise SshActionError("SSH Authentication failed.") from exc
+    except (TimeoutError, OSError) as exc:
+        raise SshActionError("SSH Timeout.") from exc
+    except SshActionError:
+        raise
+    except Exception as exc:
+        raise SshActionError(str(exc)) from exc
+    finally:
+        if client is not None:
+            try:
+                client.close()
+            except Exception:
+                pass
+
 def run_bulk_port_actions(switch, ports, username, password, action, value=None, enable_password="", force=False):
     if not switch.ssh_enabled:
         raise SshActionError("SSH برای این سوییچ فعال نیست.")
@@ -475,6 +618,7 @@ def run_bulk_port_actions(switch, ports, username, password, action, value=None,
                 action=action,
                 value=value,
                 force=force,
+                switch=switch,
             )
             prepared.append((port, commands))
         except SshActionError as exc:

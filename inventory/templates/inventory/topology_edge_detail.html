@@ -1,0 +1,50 @@
+{% extends "inventory/base.html" %}
+{% block title %}Topology Edge Detail | SwitchMap{% endblock %}
+{% block page_title %}Topology Edge Drill-down{% endblock %}
+{% block page_subtitle %}<p class="page-subtitle">جزئیات Confidence، Evidence و وضعیت لینک.</p>{% endblock %}
+{% block page_actions %}<a class="btn btn-secondary" href="{% url 'inventory:topology' %}">Back to Topology</a>{% endblock %}
+{% block content %}
+<section class="summary-bar-grid">
+    <div class="summary-tile"><span>Confidence</span><strong>{{ edge.confidence|default:"unknown" }}</strong></div>
+    <div class="summary-tile"><span>Health</span><strong>{{ edge.health_label|default:"-" }}</strong></div>
+    <div class="summary-tile"><span>Severity</span><strong>{{ edge.severity|default:"info" }}</strong></div>
+    <div class="summary-tile"><span>Evidence</span><strong>{{ edge.evidence_count|default:0 }}</strong></div>
+</section>
+
+<section class="surface-card table-panel">
+    <div class="section-title-row compact-title-row"><div><h3>Edge</h3><p>{{ edge.reason|default:"-" }}</p></div></div>
+    <div class="table-wrap">
+        <table class="data-table">
+            <tbody>
+                <tr><th>Source Device</th><td><a class="table-link" href="{% url 'inventory:switch_detail' edge.source_switch.id %}">{{ edge.source_switch.name }}</a></td></tr>
+                <tr><th>Source Port</th><td><a class="table-link ltr" href="{% url 'inventory:switch_detail' edge.source_switch.id %}?port={{ edge.source_port.id }}">{{ edge.source_port.interface_name }}</a></td></tr>
+                <tr><th>Remote Device</th><td>{% if edge.matched_switch %}<a class="table-link" href="{% url 'inventory:switch_detail' edge.matched_switch.id %}">{{ edge.matched_switch.name }}</a>{% else %}{{ edge.neighbor_device|default:"Unknown" }}{% endif %}</td></tr>
+                <tr><th>Remote Port</th><td class="ltr">{% if edge.matched_port %}<a class="table-link" href="{% url 'inventory:switch_detail' edge.matched_switch.id %}?port={{ edge.matched_port.id }}">{{ edge.matched_port.interface_name }}</a>{% else %}{{ edge.neighbor_port|default:"-" }}{% endif %}</td></tr>
+                <tr><th>Discovery Source</th><td>{{ edge.neighbor_source|default:"-" }}</td></tr>
+                <tr><th>Matched By</th><td>{{ edge.matched_by|default:"-" }}</td></tr>
+                <tr><th>Source State</th><td class="ltr">{{ edge.source_state|default:"-" }}</td></tr>
+                <tr><th>Target State</th><td class="ltr">{{ edge.target_state|default:"-" }}</td></tr>
+                <tr><th>First Seen</th><td class="ltr">{{ edge.first_seen|default:"-" }}</td></tr>
+                <tr><th>Last Seen</th><td class="ltr">{{ edge.last_seen|default:"-" }}</td></tr>
+                <tr><th>Parent Suppressed</th><td>{{ edge.parent_down|yesno:"Yes,No" }}</td></tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<section class="surface-card table-panel">
+    <div class="section-title-row compact-title-row"><div><h3>Evidence</h3></div></div>
+    <div class="table-wrap">
+        <table class="data-table">
+            <thead><tr><th>Source</th><th>Value</th></tr></thead>
+            <tbody>
+                {% for item in edge.evidence %}
+                    <tr><td>{{ item.source }}</td><td class="ltr">{{ item.value }}</td></tr>
+                {% empty %}
+                    <tr><td colspan="2">Evidence وجود ندارد؛ این Edge نباید Warning عملیاتی بسازد.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% endblock %}

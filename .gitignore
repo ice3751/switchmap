@@ -24,3 +24,14 @@ logs_acl_backup.txt
 *.crt
 *.pfx
 *.p12
+
+# Phase95 sensitive/generated artifacts
+secrets/
+*.dpapi
+project_snapshots/
+_phase91_backup/
+_phase91_quarantine/
+restore_candidates/
+dist/
+*.sqlite
+*.db

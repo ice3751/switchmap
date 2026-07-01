@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none">
+  
+  <g stroke-linecap="round" stroke-linejoin="round"><path d="M12 11h17l7 7v31H12V11Z" stroke="#f4f8ff" stroke-width="2.7"/><path d="M29 11v8h7M34 15h18v38H24" stroke="#f4f8ff" stroke-width="2.7"/><path d="M20 31h10M20 39h8M40 29h8M40 37h8" stroke="#27a8ff" stroke-width="2.7"/><rect x="26" y="43" width="24" height="11" rx="3" fill="#27a8ff"/><text x="38" y="51" fill="white" font-family="Arial, sans-serif" font-size="8" font-weight="700" text-anchor="middle">DIFF</text></g>
+</svg>

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import AlarmNotification, CiscoSyslogEntry, Port, PortActionLog, PortDocumentationHistory, SfpMonitorSnapshot, Switch, SystemAuditLog
+from .models import AlarmNotification, CiscoSyslogEntry, ConfigBackupSnapshot, EndpointObservation, NetworkEndpoint, Port, PortActionLog, PortDocumentationHistory, RouterHealthSnapshot, RouterTunnel, RoutingPolicy, SfpMonitorSnapshot, Site, SSHJobTemplate, Switch, SystemAuditLog, WanLink
 
 
 class PortInline(admin.TabularInline):
@@ -459,3 +459,177 @@ class SystemAuditLogAdmin(admin.ModelAdmin):
         "actor_role",
     )
     readonly_fields = tuple(field.name for field in SystemAuditLog._meta.fields)
+
+
+
+@admin.register(Site)
+class SiteAdmin(admin.ModelAdmin):
+    list_display = ("name", "code", "kind", "is_active", "updated_at")
+    search_fields = ("name", "code", "description")
+    list_filter = ("kind", "is_active")
+
+
+@admin.register(WanLink)
+class WanLinkAdmin(admin.ModelAdmin):
+    list_display = ("name", "switch", "site", "link_type", "provider", "interface_name", "is_primary", "is_active")
+    search_fields = ("name", "provider", "interface_name", "purpose", "notes", "switch__name", "site__name")
+    list_filter = ("link_type", "is_primary", "is_active", "site")
+
+
+@admin.register(RouterTunnel)
+class RouterTunnelAdmin(admin.ModelAdmin):
+    list_display = (
+        "name",
+        "tunnel_type",
+        "source_switch",
+        "destination_switch",
+        "local_tunnel_ip",
+        "remote_tunnel_ip",
+        "failover_priority",
+        "status",
+        "confidence",
+        "is_active",
+    )
+    search_fields = (
+        "name",
+        "routed_networks",
+        "notes",
+        "source_switch__name",
+        "destination_switch__name",
+        "source_site__name",
+        "destination_site__name",
+    )
+    list_filter = ("tunnel_type", "status", "confidence", "is_active", "source_site", "destination_site")
+
+
+@admin.register(RoutingPolicy)
+class RoutingPolicyAdmin(admin.ModelAdmin):
+    list_display = ("name", "switch", "site", "policy_type", "preferred_path", "backup_path", "confidence", "is_active")
+    search_fields = (
+        "name",
+        "source_zone",
+        "destination_zone",
+        "preferred_path",
+        "backup_path",
+        "routing_table",
+        "address_list",
+        "description",
+        "switch__name",
+        "site__name",
+    )
+    list_filter = ("policy_type", "confidence", "is_active", "site")
+
+
+@admin.register(RouterHealthSnapshot)
+class RouterHealthSnapshotAdmin(admin.ModelAdmin):
+    list_display = (
+        "collected_at",
+        "switch",
+        "status",
+        "source",
+        "cpu_load",
+        "memory_free_mb",
+        "routeros_version",
+        "tunnel_count",
+        "active_tunnel_count",
+    )
+    search_fields = ("switch__name", "routeros_version", "uptime", "raw_summary", "notes")
+    list_filter = ("status", "source", "switch")
+    readonly_fields = tuple(field.name for field in RouterHealthSnapshot._meta.fields)
+
+
+
+@admin.register(SSHJobTemplate)
+class SSHJobTemplateAdmin(admin.ModelAdmin):
+    list_display = ("name", "action", "risk_level", "requires_approval", "is_active", "updated_at")
+    list_filter = ("action", "risk_level", "requires_approval", "is_active")
+    search_fields = ("name", "action", "value_template", "description", "notes")
+    readonly_fields = ("created_at", "updated_at")
+
+
+@admin.register(ConfigBackupSnapshot)
+class ConfigBackupSnapshotAdmin(admin.ModelAdmin):
+    list_display = ("created_at", "switch", "config_type", "command_source", "actor_username", "content_hash")
+    list_filter = ("switch", "config_type", "command_source", "actor_username")
+    search_fields = ("switch__name", "command", "content_hash", "note", "content")
+    readonly_fields = ("created_at", "content_hash", "diff_text")
+    autocomplete_fields = ("switch",)
+
+
+# Phase112R8 Endpoint Live Tracking Foundation
+@admin.register(NetworkEndpoint)
+class NetworkEndpointAdmin(admin.ModelAdmin):
+    list_display = (
+        "last_seen",
+        "mac_address",
+        "ip_address",
+        "vlan",
+        "connection_type",
+        "confidence",
+        "last_seen_switch",
+        "last_seen_port",
+        "via_device_name",
+        "status",
+        "is_active",
+    )
+    search_fields = (
+        "identity_key",
+        "mac_address",
+        "ip_address",
+        "hostname",
+        "vendor",
+        "via_device_name",
+        "ssid",
+        "sources",
+        "evidence_summary",
+        "last_seen_switch__name",
+        "last_seen_switch__management_ip",
+        "last_seen_port__interface_name",
+    )
+    list_filter = (
+        "connection_type",
+        "status",
+        "is_active",
+        "vlan",
+        "last_seen_switch",
+    )
+    readonly_fields = tuple(field.name for field in NetworkEndpoint._meta.fields)
+    ordering = ("-last_seen", "mac_address")
+
+
+@admin.register(EndpointObservation)
+class EndpointObservationAdmin(admin.ModelAdmin):
+    list_display = (
+        "observed_at",
+        "source",
+        "mac_address",
+        "ip_address",
+        "vlan",
+        "connection_type",
+        "confidence",
+        "switch",
+        "port",
+        "is_selected",
+    )
+    search_fields = (
+        "mac_address",
+        "ip_address",
+        "source",
+        "connection_type",
+        "source_device_name",
+        "source_interface",
+        "source_detail",
+        "raw_data",
+        "switch__name",
+        "port__interface_name",
+    )
+    list_filter = (
+        "source",
+        "connection_type",
+        "vlan",
+        "switch",
+        "is_selected",
+    )
+    readonly_fields = tuple(field.name for field in EndpointObservation._meta.fields)
+    ordering = ("-observed_at", "mac_address")
+

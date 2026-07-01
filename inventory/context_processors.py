@@ -1,3 +1,7 @@
+from django.core.cache import cache
+from django.db.models import Count
+
+
 from .forms import SSHPortActionForm
 from .access_control import (
     allowed_ssh_actions,
@@ -15,7 +19,44 @@ from .access_control import (
 )
 
 
+SWITCHMAP_MENU_EXCLUDE_TOKENS = (
+    "smoke",
+    "test",
+    "phase41",
+    "phase42",
+    "phase43",
+    "phase48",
+    "phase50",
+    "phase55",
+    "phase56",
+    "switchmap-phase",
+    "switchmap_phase",
+)
+
+
+def _is_switchmap_test_device(switch):
+    if switch is None:
+        return False
+    blob = " ".join(
+        [
+            switch.name or "",
+            switch.model or "",
+            str(switch.management_ip or ""),
+            switch.site or "",
+            switch.location or "",
+            switch.notes or "",
+        ]
+    ).lower()
+    return any(token in blob for token in SWITCHMAP_MENU_EXCLUDE_TOKENS)
+
+
 def _alarm_counts():
+    # Phase93: performance-safe context cache refine.
+    # Keep behavior unchanged, but avoid three repeated COUNT queries on every uncached page render.
+    cache_key = "switchmap:phase93:alarm_counts:v2"
+    cached = cache.get(cache_key)
+    if cached is not None:
+        return cached
     try:
         from .models import AlarmNotification
 
@@ -30,19 +71,28 @@ def _alarm_counts():
             AlarmNotification.Severity.INFO: 2,
         }
         items.sort(key=lambda item: (severity_order.get(item.severity, 9), item.switch.name if item.switch else "", item.title))
-        return {
-            "active": active_qs.count(),
-            "critical": active_qs.filter(severity=AlarmNotification.Severity.CRITICAL).count(),
-            "warning": active_qs.filter(severity=AlarmNotification.Severity.WARNING).count(),
+        severity_totals = {
+            row["severity"]: row["total"]
+            for row in active_qs.values("severity").annotate(total=Count("id"))
+        }
+        result = {
+            "active": sum(severity_totals.values()),
+            "critical": severity_totals.get(AlarmNotification.Severity.CRITICAL, 0),
+            "warning": severity_totals.get(AlarmNotification.Severity.WARNING, 0),
             "items": items,
         }
+        cache.set(cache_key, result, 20)
+        return result
     except Exception:
         return {"active": 0, "critical": 0, "warning": 0, "items": []}
 
 
 
-
 def _switch_menu_groups():
+    cache_key = "switchmap:phase77:switch_menu_groups:v1"
+    cached = cache.get(cache_key)
+    if cached is not None:
+        return cached
     try:
         from django.urls import reverse
         from .models import Switch
@@ -57,9 +107,11 @@ def _switch_menu_groups():
         ]
         buckets = {key: {"key": key, "title": title, "items": []} for key, title in group_order}
         switches = Switch.objects.filter(is_active=True).only(
-            "id", "name", "management_ip", "device_family", "device_role", "model", "vendor", "topology_position"
+            "id", "name", "management_ip", "device_family", "device_role", "model", "vendor", "topology_position", "site", "location", "notes"
         ).order_by("topology_position", "name")
         for sw in switches:
+            if _is_switchmap_test_device(sw):
+                continue
             key = sw.device_family or "other"
             if key not in buckets:
                 key = "other"
@@ -80,6 +132,7 @@ def _switch_menu_groups():
             group = buckets[key]
             group["count"] = len(group["items"])
             groups.append(group)
+        cache.set(cache_key, groups, 60)
         return groups
     except Exception:
         return []
